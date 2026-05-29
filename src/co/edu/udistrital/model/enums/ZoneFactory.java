@@ -1,8 +1,8 @@
 package co.edu.udistrital.model.enums;
 
 /**
- * Clase encargada de recibir que tipo de enum de tipo zona usar en la logica
- * del sistema
+ * Clase encargada de retornar que tipo de enum de tipo zona usar en la logica
+ * del sistema con base en la seleccion de la vista
  *
  * @author Juan David Diaz Peres
  */
