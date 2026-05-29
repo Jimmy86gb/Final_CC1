@@ -28,26 +28,20 @@ nbproject/private/
 /dist/
 /build/
 
-# ==========================================
 # Archivos compilados de Java
-# ==========================================
 *.class
 /bin/
 /build/
 /out/
 
-# ==========================================
+
 # Archivos y carpetas de configuración de Eclipse
-# (Importante ignorarlos para que cada compañero 
-# configure su propio JavaFX y JDK en su PC)
-# ==========================================
+
 .classpath
 .project
 .settings/
 
-# ==========================================
 # Archivos del Sistema Operativo
-# ==========================================
 .DS_Store
 .DS_Store?
 ._*
@@ -56,9 +50,7 @@ nbproject/private/
 ehthumbs.db
 Thumbs.db
 
-# ==========================================
 # Logs y reportes de error de la Máquina Virtual
-# ==========================================
 *.log
 hs_err_pid*
 replay_pid*
