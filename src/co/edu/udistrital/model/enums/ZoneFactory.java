@@ -4,7 +4,7 @@ package co.edu.udistrital.model.enums;
  * Clase encargada de retornar que tipo de enum de tipo zona usar en la logica
  * del sistema con base en la seleccion de la vista
  *
- * @author Juan David Diaz Peres
+ * @author Juan David Diaz Perez
  */
 public class ZoneFactory {
 
@@ -37,7 +37,7 @@ public class ZoneFactory {
 		case "rafaeluribeuribe" -> OperationZone.RAFAEL_URIBE_URIBE;
 		case "ciudadbolivar" -> OperationZone.CIUDAD_BOLIVAR;
 		case "sumapaz" -> OperationZone.SUMAPAZ;
-		default -> throw new IllegalArgumentException("Tipo de apuesta no soportado: " + zone);
+		default -> throw new IllegalArgumentException("Tipo de zona no soportado: " + zone);
 		};
 	}
 }
