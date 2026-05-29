@@ -8,7 +8,7 @@ import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.ReportStatus;
 
 public class Report {
-	
+
 	private UUID ticketID;
 	private Client client;
 	private String problemDescription;
@@ -16,90 +16,90 @@ public class Report {
 	private OperationZone reportZone;
 	private LocalDateTime reportTime;
 	private ReportStatus status;
-	
+
 	private Technician assignedTechnician;
 	private Kit assignedKit;
-	
+
 	public Report(Client client, String problemDescription, CriticLevel priority, OperationZone zone) {
-		
-		this.ticketID=UUID.randomUUID();
-		this.reportTime=LocalDateTime.now();
-		this.status=ReportStatus.PENDING;
-		
-		this.client=client;
-		this.problemDescription=problemDescription;
-		this.priority=priority;
-		this.reportZone=zone;
-		
-		this.assignedTechnician=null;
-		this.assignedKit=null;
+
+		this.ticketID = UUID.randomUUID();
+		this.reportTime = LocalDateTime.now();
+		this.status = ReportStatus.PENDING;
+
+		this.client = client;
+		this.problemDescription = problemDescription;
+		this.priority = priority;
+		this.reportZone = zone;
+
+		this.assignedTechnician = null;
+		this.assignedKit = null;
 	}
-	
-	//setters
-	
+
+	// setters
+
 	public void setAssignedTechnician(Technician assignedTechnician) {
-		this.assignedTechnician=assignedTechnician;
+		this.assignedTechnician = assignedTechnician;
 	}
-	
+
 	public void setAssignedKit(Kit assignedKit) {
-		this.assignedKit=assignedKit;
+		this.assignedKit = assignedKit;
 	}
-	
+
 	public void setClient(Client client) {
-        this.client = client;
-    }
-	
+		this.client = client;
+	}
+
 	public void setProblemDescription(String problemDescription) {
-        this.problemDescription = problemDescription;
-    }
-	
+		this.problemDescription = problemDescription;
+	}
+
 	public void setPriority(CriticLevel priority) {
-        this.priority = priority;
-    }
-	
+		this.priority = priority;
+	}
+
 	public void setReportZone(OperationZone reportZone) {
-        this.reportZone = reportZone;
-    }
-	
+		this.reportZone = reportZone;
+	}
+
 	public void setStatus(ReportStatus status) {
-        this.status = status;
-    }
-	
-	//getters
-	
+		this.status = status;
+	}
+
+	// getters
+
 	public UUID getTicketID() {
-        return ticketID;
-    }
-	
+		return ticketID;
+	}
+
 	public Client getClient() {
-        return client;
-    }
-	
+		return client;
+	}
+
 	public String getProblemDescription() {
-        return problemDescription;
-    }
-	
+		return problemDescription;
+	}
+
 	public CriticLevel getPriority() {
-        return priority;
-    }
-	
+		return priority;
+	}
+
 	public OperationZone getReportZone() {
-        return reportZone;
-    }
-	
+		return reportZone;
+	}
+
 	public LocalDateTime getReportTime() {
-        return reportTime;
-    }
-	
+		return reportTime;
+	}
+
 	public ReportStatus getStatus() {
-        return status;
-    }
-	
+		return status;
+	}
+
 	public Technician getAssignedTechnician() {
-        return assignedTechnician;
-    }
-	
+		return assignedTechnician;
+	}
+
 	public Kit getAssignedKit() {
-        return assignedKit;
-    }
+		return assignedKit;
+	}
 }
