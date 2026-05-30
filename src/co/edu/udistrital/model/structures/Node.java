@@ -59,33 +59,12 @@ public class Node<T> {
 	}
 
 	/**
-	 * Un atajo para evitar doble llamado f1().f2() si queremos el dato del
-	 * siguiente
-	 *
-	 * @return la informacion del nodo que sigue
-	 */
-	public T getNextData() {
-		Node<T> next = getNext();
-		return next.getData();
-	}
-
-	/**
 	 * Pega un nodo nuevo despues de este
 	 *
 	 * @param next el nodo a conectar
 	 */
 	public void setNext(Node<T> next) {
 		this.next = next;
-	}
-
-	/**
-	 * Atajo para evitar llamado en cascada si queremos setear el dato siguiente
-	 *
-	 * @param data la informacion a asignar a siguiente
-	 */
-	public void setNextData(T data) {
-		Node<T> next = getNext();
-		next.setData(data);
 	}
 
 	/**
