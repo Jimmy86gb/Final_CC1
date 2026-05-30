@@ -1,5 +1,6 @@
 package co.edu.udistrital.model.entities;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import co.edu.udistrital.model.enums.OperationZone;
@@ -48,4 +49,16 @@ public class ServiceUnit {
 		return zone;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+
+		ServiceUnit serviceUnit = (ServiceUnit) obj;
+		return Objects.equals(serviceUnit.id, id);
+	}
 }
