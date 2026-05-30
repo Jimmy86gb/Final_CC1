@@ -91,4 +91,27 @@ public class TechnicianRepository {
 		}
 		return filteredList;
 	}
+
+	/**
+	 * Metodo que retorna una lista filtrada de los tecnicos por especialidad y
+	 * status actual
+	 * 
+	 * @param technicianSpecialty Especialidad a filtar
+	 * @param technicianStatus    Status a filtrar
+	 * @return La lista filtrada de los tecnicos
+	 */
+	public SimpleList<Technician> getTechnicianBySpecialityAndStatuSimpleList(TechnicianSpecialty technicianSpecialty,
+			TechnicianStatus technicianStatus) {
+
+		SimpleList<Technician> filteredList = new SimpleList<>();
+		Iterator<Technician> iterator = technicianList.iterador();
+
+		while (iterator.hasNext()) {
+			Technician technician = iterator.Next();
+			if (technician.getStatus() == technicianStatus && technician.getSpecialty() == technicianSpecialty) {
+				filteredList.add(technician);
+			}
+		}
+		return filteredList;
+	}
 }

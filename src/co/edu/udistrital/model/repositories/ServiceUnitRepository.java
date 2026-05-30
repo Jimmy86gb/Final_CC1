@@ -3,6 +3,7 @@ package co.edu.udistrital.model.repositories;
 import co.edu.udistrital.model.entities.ServiceUnit;
 import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.UnitStatus;
+import co.edu.udistrital.model.enums.UnitType;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 
@@ -83,6 +84,26 @@ public class ServiceUnitRepository {
 		while (iterator.hasNext()) {
 			ServiceUnit unit = iterator.Next();
 			if (unit.getStatus() == UnitStatus.AVAILABLE && unit.getZone() == targetZone) {
+				filteredList.add(unit);
+			}
+		}
+		return filteredList;
+	}
+
+	/**
+	 * Metodo que retorna las unidades de servicio por status y tipo de unidad
+	 * 
+	 * @param unitStatus Estatus de unidad a filtrar
+	 * @param unitType   Tipo de unidad a filtrar
+	 * @return La lista filtrada
+	 */
+	public SimpleList<ServiceUnit> getUnitsByStatusAndType(UnitStatus unitStatus, UnitType unitType) {
+		SimpleList<ServiceUnit> filteredList = new SimpleList<>();
+		Iterator<ServiceUnit> iterator = unitList.iterador();
+
+		while (iterator.hasNext()) {
+			ServiceUnit unit = iterator.Next();
+			if (unit.getStatus() == unitStatus && unit.getType() == unitType) {
 				filteredList.add(unit);
 			}
 		}
