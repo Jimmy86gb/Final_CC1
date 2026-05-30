@@ -1,5 +1,6 @@
 package co.edu.udistrital.model.entities;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import co.edu.udistrital.model.enums.OperationZone;
@@ -58,4 +59,16 @@ public class Technician {
 		return status;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Technician technician = (Technician) obj;
+		return Objects.equals(technician.id, id);
+	}
 }
