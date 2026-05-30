@@ -69,7 +69,7 @@ public class SimpleList<T> {
 
 		} else {
 
-			Node actual = head;
+			Node<T> actual = head;
 
 			while (actual.getNext() != null && !actual.getData().equals(actualData)) {
 				actual = actual.getNext();
@@ -105,4 +105,29 @@ public class SimpleList<T> {
 		return size;
 	}
 
+	// ---------------------- Iterador Básico ----------------------
+	public Iterator<T> iterador() {
+		return new Iterator<>(head);
+	}
+
+	public static class Iterator<T> {
+		private Node<T> actual;
+
+		public Iterator(Node<T> head) {
+			this.actual = head;
+		}
+
+		public boolean hasNext() {
+			return actual != null;
+		}
+
+		public T Next() {
+			if (!hasNext()) {
+				throw new IllegalStateException("No hay más elementos");
+			}
+			T dato = actual.getData();
+			actual = actual.getNext();
+			return dato;
+		}
+	}
 }
