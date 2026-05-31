@@ -20,7 +20,6 @@ public class ClientDTO {
 	 * @param contactInfo Informacion de contracto del cliente actual
 	 */
 	public ClientDTO(String id, String name, String type, String contactInfo) {
-		super();
 		this.id = id;
 		this.name = name;
 		this.type = type;
