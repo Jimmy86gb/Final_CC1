@@ -1,4 +1,4 @@
-package co.edu.udistrital.dtos;
+package co.edu.udistrital.model.dtos;
 
 /**
  * Clase de transferencia de datos que retorna el estado del caso de uso y un

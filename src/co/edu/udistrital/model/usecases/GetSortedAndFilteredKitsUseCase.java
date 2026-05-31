@@ -1,6 +1,6 @@
-package co.edu.udistrital.usecases;
+package co.edu.udistrital.model.usecases;
 
-import co.edu.udistrital.dtos.KitDTO;
+import co.edu.udistrital.model.dtos.KitDTO;
 import co.edu.udistrital.model.entities.Kit;
 import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.repositories.KitRepository;

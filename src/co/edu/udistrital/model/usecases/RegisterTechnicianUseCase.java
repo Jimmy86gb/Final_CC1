@@ -1,6 +1,6 @@
-package co.edu.udistrital.usecases;
+package co.edu.udistrital.model.usecases;
 
-import co.edu.udistrital.dtos.ResponseDTO;
+import co.edu.udistrital.model.dtos.ResponseDTO;
 import co.edu.udistrital.model.entities.Technician;
 import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.TechnicianFactory;

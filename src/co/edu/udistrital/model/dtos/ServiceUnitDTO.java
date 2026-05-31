@@ -1,4 +1,4 @@
-package co.edu.udistrital.dtos;
+package co.edu.udistrital.model.dtos;
 
 import java.util.UUID;
 

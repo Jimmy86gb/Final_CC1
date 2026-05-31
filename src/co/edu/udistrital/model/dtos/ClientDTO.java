@@ -1,4 +1,4 @@
-package co.edu.udistrital.dtos;
+package co.edu.udistrital.model.dtos;
 
 /**
  * Clase de transmision de datos de logica a vista de la entidad cliente
