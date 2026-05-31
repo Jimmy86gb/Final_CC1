@@ -1,5 +1,7 @@
 package co.edu.udistrital.model.entities;
 
+import java.util.Objects;
+
 import co.edu.udistrital.model.enums.ClientType;
 
 public class Client {
@@ -57,6 +59,6 @@ public class Client {
 		}
 
 		Client client = (Client) obj;
-		return client.id == id;
+		return Objects.equals(client.id, id);
 	}
 }

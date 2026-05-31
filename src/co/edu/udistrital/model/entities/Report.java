@@ -1,6 +1,7 @@
 package co.edu.udistrital.model.entities;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 import co.edu.udistrital.model.enums.CriticLevel;
@@ -101,5 +102,18 @@ public class Report {
 
 	public Kit getAssignedKit() {
 		return assignedKit;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Report report = (Report) obj;
+		return Objects.equals(report.ticketID, ticketID);
 	}
 }
