@@ -8,131 +8,126 @@ package co.edu.udistrital.model.structures;
  */
 public class SimpleList<T> {
 
-    private Node<T> head;
-    private Node<T> tail;
-    private int size;
+	private Node<T> head;
+	private int size;
 
-    /**
-     * Arranca la lista vacia sin nada adentro
-     */
-    public SimpleList() {
-        this.head = null;
-        this.tail = null;
-        this.size = 0;
-    }
+	public SimpleList() {
+		head = null;
+		size = 0;
+	}
 
-    /**
-     * Mete un dato nuevo al final de la cola
-     *
-     * @param data lo que vamos a guardar
-     */
-    public void add(T data) {
-        Node<T> newNode = new Node<>(data);
-        if (head == null) {
-            head = newNode;
-            tail = newNode;
-        } else {
-            tail.setNext(newNode);
-            tail = newNode;
-        }
-        size++;
-    }
+	// ---------------------- Operaciones Básicas ----------------------
+	public void add(T data) {
+		Node<T> newNode = new Node<>(data);
+		if (head == null) {
+			head = newNode;
+		} else {
+			Node<T> actual = head;
+			while (actual.getNext() != null) {
+				actual = actual.getNext();
+			}
+			actual.setNext(newNode);
+		}
+		size++;
+	}
 
-    /**
-     * Devuelve el primer nodo de todos / cabeza
-     *
-     * @return el nodo cabeza
-     */
-    public Node<T> getHead() {
-        return head;
-    }
+	public boolean delete(T data) {
+		if (head == null) {
+			return false;
+		}
 
-    /**
-     * Devuelve el nodo que se encuentre al lado de la cabeza
-     * 
-     * @return el nodo despues de cabeza
-     */
-    public Node<T> getNextNodeToHead() {
-        Node<T> head = getHead();
-        return head.getNext();
-    }
+		// Caso especial: delete la head
+		if (head.getData().equals(data)) {
+			head = head.getNext();
+			size--;
+			return true;
+		}
 
-    /**
-     * Cambia a la fuerza quien es el primero
-     *
-     * @param head el nuevo nodo inicial
-     */
-    public void setHead(Node<T> head) {
-        this.head = head;
-    }
+		// Buscar en el resto de la lista
+		Node<T> actual = head;
+		while (actual.getNext() != null && !actual.getNext().getData().equals(data)) {
+			actual = actual.getNext();
+		}
 
-    /**
-     * Devuelve el ultimo nodo de la fila
-     *
-     * @return el nodo cola
-     */
-    public Node<T> getTail() {
-        return tail;
-    }
+		if (actual.getNext() != null) {
+			actual.setNext(actual.getNext().getNext());
+			size--;
+			return true;
+		}
+		return false;
+	}
 
-    /**
-     * Cambia a la fuerza el nodo final
-     *
-     * @param tail el nuevo nodo final
-     */
-    public void setTail(Node<T> tail) {
-        this.tail = tail;
-    }
+	public boolean update(T actualData, T newData) {
+		if (head == null) {
+			return false;
+		}
 
-    /**
-     * Devuelve el tamaño de la lista
-     *
-     * @return el tamano de la lista
-     */
-    public int getSize() {
-        return size;
-    }
+		if (head.getData().equals(actualData)) {
 
-    /**
-     * Cambia el tamaño de la lista
-     *
-     * @param size el nuevo tamano
-     */
-    public void setSize(int size) {
-        this.size = size;
-    }
+			head.setData(newData);
+			return true;
 
-    /**
-     * Revisa si la lista esta vacia
-     *
-     * @return verdadero si esta vacia, falso si ya tiene algo
-     */
-    public boolean isEmpty() {
-        if (getSize() == 0) {
-            return true;
-        }
-        return false;
-    }
+		} else {
 
-    /**
-     * Busca y devuelve el nodo que esta en una posicion especifica
-     *
-     * @param index la posicion numerica (empezando desde 0)
-     * @return el nodo en esa posicion, o null si el indice no existe
-     */
-    public Node<T> getNodeAt(int index) {
-        // Validacion de seguridad para evitar errores
-        if (index < 0 || index >= size) {
-            return null;
-        }
+			Node<T> actual = head;
 
-        Node<T> current = head;
-        int count = 0;
-        while (current != null && count < index) {
-            current = current.getNext();
-            count++;
-        }
-        return current;
-    }
+			while (actual.getNext() != null && !actual.getData().equals(actualData)) {
+				actual = actual.getNext();
+			}
 
+			if (actual.getNext() == null && !actual.getData().equals(actualData)) {
+				return false;
+			} else {
+				actual.setData(newData);
+				return true;
+			}
+		}
+	}
+
+	// ---------------------- Búsqueda ----------------------
+	public boolean contains(T data) {
+		Node<T> actual = head;
+		while (actual != null) {
+			if (actual.getData().equals(data)) {
+				return true;
+			}
+			actual = actual.getNext();
+		}
+		return false;
+	}
+
+	// ---------------------- Utilidades ----------------------
+	public boolean isEmpty() {
+		return head == null;
+	}
+
+	public int getsize() {
+		return size;
+	}
+
+	// ---------------------- Iterador Básico ----------------------
+	public Iterator<T> iterador() {
+		return new Iterator<>(head);
+	}
+
+	public static class Iterator<T> {
+		private Node<T> actual;
+
+		public Iterator(Node<T> head) {
+			this.actual = head;
+		}
+
+		public boolean hasNext() {
+			return actual != null;
+		}
+
+		public T Next() {
+			if (!hasNext()) {
+				throw new IllegalStateException("No hay más elementos");
+			}
+			T dato = actual.getData();
+			actual = actual.getNext();
+			return dato;
+		}
+	}
 }

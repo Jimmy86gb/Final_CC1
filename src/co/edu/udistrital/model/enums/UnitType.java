@@ -1,5 +1,18 @@
 package co.edu.udistrital.model.enums;
 
 public enum UnitType {
-	CRANE, MOTORCYCLE, CAR, TRUCK
+	CRANE("Grua"), MOTORCYCLE("Moto"), CAR("Carro"), TRUCK("Camioneta");
+
+	private final String displayName;
+
+	private UnitType(String displayName) {
+		this.displayName = displayName;
+	}
+
+	/**
+	 * @return the displayName
+	 */
+	public String getDisplayName() {
+		return displayName;
+	}
 }

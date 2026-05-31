@@ -1,4 +1,7 @@
 package co.edu.udistrital.model.entities;
+
+import java.util.Objects;
+
 import co.edu.udistrital.model.enums.ClientType;
 
 public class Client {
@@ -6,44 +9,56 @@ public class Client {
 	private String name;
 	private ClientType type;
 	private String contactInfo;
-	
+
 	public Client(String id, String name, ClientType type, String contactInfo) {
-		this.id=id;
-		this.name=name;
-		this.type=type;
-		this.contactInfo=contactInfo;
+		this.id = id;
+		this.name = name;
+		this.type = type;
+		this.contactInfo = contactInfo;
 	}
-	
-    public String getId() {
-        return id;
-    }
 
-    public String getName() {
-        return name;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public ClientType getType() {
-        return type;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getContactInfo() {
-        return contactInfo;
-    }
+	public ClientType getType() {
+		return type;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public String getContactInfo() {
+		return contactInfo;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void setType(ClientType type) {
-        this.type = type;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setContactInfo(String contactInfo) {
-        this.contactInfo = contactInfo;
-    }
-	
+	public void setType(ClientType type) {
+		this.type = type;
+	}
+
+	public void setContactInfo(String contactInfo) {
+		this.contactInfo = contactInfo;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
+
+		Client client = (Client) obj;
+		return Objects.equals(client.id, id);
+	}
 }
