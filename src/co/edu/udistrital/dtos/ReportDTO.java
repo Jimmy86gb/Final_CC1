@@ -22,6 +22,7 @@ public class ReportDTO {
 	private final String technicianName;
 	private final String technicianSpeciality;
 	private final UUID kitID;
+	private final boolean isEditable;
 
 	/**
 	 * Metodo constructor del DTO de reportes
@@ -39,10 +40,12 @@ public class ReportDTO {
 	 * @param technicianName       Nombre del tecnico relacionado al reporte
 	 * @param technicianSpeciality Especialidad del tecnico relacionado al reporte
 	 * @param kitID                ID del kit utilizado en el reporte
+	 * @param isEditable           Si se muestran los botones de elimiar y editar en
+	 *                             la vista
 	 */
 	public ReportDTO(UUID ticketID, String clientID, String clientName, String clientContact, String problemDescription,
 			String priority, String reportZone, String reportTime, String reportStatus, UUID technicianID,
-			String technicianName, String technicianSpeciality, UUID kitID) {
+			String technicianName, String technicianSpeciality, UUID kitID, boolean isEditable) {
 		super();
 		this.ticketID = ticketID;
 		this.clientID = clientID;
@@ -57,6 +60,7 @@ public class ReportDTO {
 		this.technicianName = technicianName;
 		this.technicianSpeciality = technicianSpeciality;
 		this.kitID = kitID;
+		this.isEditable = isEditable;
 	}
 
 	/**
@@ -148,5 +152,12 @@ public class ReportDTO {
 	 */
 	public UUID getKitID() {
 		return kitID;
+	}
+
+	/**
+	 * @return Si se muestran los botones de elimiar y editar en la vista
+	 */
+	public boolean isEditable() {
+		return isEditable;
 	}
 }

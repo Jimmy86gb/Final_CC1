@@ -12,18 +12,21 @@ public class KitDTO {
 	private final UUID id;
 	private final String type;
 	private final String status;
+	private final boolean isEditable;
 
 	/**
 	 * Constructor del DTO de kit con lo necesario para la vista
 	 * 
-	 * @param id     ID del kit actual
-	 * @param type   Tipo del kit actual
-	 * @param status Estatus del kit actual
+	 * @param id         ID del kit actual
+	 * @param type       Tipo del kit actual
+	 * @param status     Estatus del kit actual
+	 * @param isEditable Si se muestran los botones de elimiar y editar en la vista
 	 */
-	public KitDTO(UUID id, String type, String status) {
+	public KitDTO(UUID id, String type, String status, boolean isEditable) {
 		this.id = id;
 		this.type = type;
 		this.status = status;
+		this.isEditable = isEditable;
 	}
 
 	/**
@@ -45,5 +48,12 @@ public class KitDTO {
 	 */
 	public String getStatus() {
 		return status;
+	}
+
+	/**
+	 * @return Si se muestran los botones de elimiar y editar en la vista
+	 */
+	public boolean isEditable() {
+		return isEditable;
 	}
 }

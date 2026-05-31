@@ -14,6 +14,7 @@ public class TechnicianDTO {
 	private final String specialty;
 	private final String zone;
 	private final String status;
+	private final boolean isEditable;
 
 	/**
 	 * Metodo constructor de el DTO de tecnico
@@ -24,13 +25,14 @@ public class TechnicianDTO {
 	 * @param zone      La zona del tecnico actual
 	 * @param status    El status del tecnico actual
 	 */
-	public TechnicianDTO(UUID id, String name, String specialty, String zone, String status) {
+	public TechnicianDTO(UUID id, String name, String specialty, String zone, String status, boolean isEditable) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.specialty = specialty;
 		this.zone = zone;
 		this.status = status;
+		this.isEditable = isEditable;
 	}
 
 	/**
@@ -66,5 +68,12 @@ public class TechnicianDTO {
 	 */
 	public String getStatus() {
 		return status;
+	}
+
+	/**
+	 * @return Si se muestran los botones de elimiar y editar en la vista
+	 */
+	public boolean isEditable() {
+		return isEditable;
 	}
 }
