@@ -42,6 +42,11 @@ public class ReportRepository {
 	private final Stack<Report> onGoingReportStack = new Stack<Report>();
 
 	/**
+	 * Pila de reportes para confirmar si se cerro un caso
+	 */
+	private final Stack<Report> toConfirmStack = new Stack<Report>();
+
+	/**
 	 * Lista de todos los reportes sin importar su estado
 	 */
 	private final SimpleList<Report> allHistoricalReports = new SimpleList<Report>();
@@ -163,6 +168,49 @@ public class ReportRepository {
 
 		while (!tempStack.isEmpty()) {
 			onGoingReportStack.push(tempStack.pop());
+		}
+
+		return copyList;
+	}
+
+	/**
+	 * Metodo que añade un nuevo reporte a los que se van a confirmar para cerrar
+	 * 
+	 * @param report Reporte a poner en progreso
+	 */
+	public void pushToConfirm(Report report) {
+		toConfirmStack.push(report);
+	}
+
+	/**
+	 * Metodo que saca el ultimo reporte de la pila de confirmaciones de acciones
+	 * 
+	 * @return Reporte fuera de la pila
+	 */
+	public Report popOnConfirm() {
+		return toConfirmStack.pop();
+	}
+
+	/**
+	 * Metodo que muestra todos los reportes a confirmar su cierre
+	 * 
+	 * @return La lista de todos los reportes tratados en el momento
+	 */
+	public SimpleList<Report> getToConfirmReports() {
+
+		SimpleList<Report> copyList = new SimpleList<>();
+		Stack<Report> tempStack = new Stack<>();
+
+		while (!toConfirmStack.isEmpty()) {
+			Report currenReport = toConfirmStack.pop();
+
+			copyList.add(currenReport);
+
+			tempStack.push(currenReport);
+		}
+
+		while (!tempStack.isEmpty()) {
+			toConfirmStack.push(tempStack.pop());
 		}
 
 		return copyList;
