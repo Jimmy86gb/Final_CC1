@@ -6,6 +6,7 @@ import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.enums.UnitType;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
+import co.edu.udistrital.model.structures.Stack;
 
 /**
  * Clase que representa la memoria y administracion referente a las unidades de
@@ -19,6 +20,11 @@ public class ServiceUnitRepository {
 	 * Lista estatica de unidades de servicio que almacenara a todos en memoria
 	 */
 	private final SimpleList<ServiceUnit> unitList = new SimpleList<>();
+
+	/**
+	 * Pila estatica para confirmar cambios de estado de la unidad de servicio
+	 */
+	private final Stack<ServiceUnit> toConfirmStack = new Stack<ServiceUnit>();
 
 	/**
 	 * Metodo que guarda una nueva unidad de servicios en la lista de unidades
@@ -108,5 +114,50 @@ public class ServiceUnitRepository {
 			}
 		}
 		return filteredList;
+	}
+
+	/**
+	 * Metodo que añade una nueva unidad de servicio a confirmar su cambio de estado
+	 * 
+	 * @param serviceUnit Unidad de servicio a cambiar el estado
+	 */
+	public void pushToConfirm(ServiceUnit serviceUnit) {
+		toConfirmStack.push(serviceUnit);
+	}
+
+	/**
+	 * Metodo que saca la unidad de servicio que encontraba pendiente la
+	 * confirmacion de sus cambios
+	 * 
+	 * @return Unidad de servicio fuera de la fila
+	 */
+	public ServiceUnit popOnConfirm() {
+		return toConfirmStack.pop();
+	}
+
+	/**
+	 * Metodo que muestra todas las unidades de servicio a confirmar su cambio de
+	 * estado
+	 * 
+	 * @return La lista de todos los reportes tratados en el momento
+	 */
+	public SimpleList<ServiceUnit> getToConfirmUnits() {
+
+		SimpleList<ServiceUnit> copyList = new SimpleList<>();
+		Stack<ServiceUnit> tempStack = new Stack<>();
+
+		while (!toConfirmStack.isEmpty()) {
+			ServiceUnit currentServiceUnit = toConfirmStack.pop();
+
+			copyList.add(currentServiceUnit);
+
+			tempStack.push(currentServiceUnit);
+		}
+
+		while (!tempStack.isEmpty()) {
+			toConfirmStack.push(tempStack.pop());
+		}
+
+		return copyList;
 	}
 }
