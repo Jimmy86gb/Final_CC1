@@ -30,32 +30,25 @@ public class GetSortedAndFilteredClientsUseCase {
 	}
 
 	/**
-	 * Metodo de apoyo que genera la lista ordenada final con base en el criterio
-	 * del repositorio
+	 * Metodo de apoyo optimizado que genera la lista ordenada final con base en el
+	 * criterio del repositorio para Clientes.
 	 * 
 	 * @return Lista ordenada
 	 */
 	private SimpleList<Client> buildOrderedList() {
+
 		SimpleList<Client> orderedList = new SimpleList<Client>();
 
-		SimpleList<Client> privateList = clientRepository.getClientsByType(ClientType.PRIVATE);
-		SimpleList<Client> insuranceList = clientRepository.getClientsByType(ClientType.INSURANCE);
-		SimpleList<Client> companyList = clientRepository.getClientsByType(ClientType.TRANSPORT_COMPANY);
+		ClientType[] typeOrder = { ClientType.INSURANCE, ClientType.TRANSPORT_COMPANY, ClientType.PRIVATE };
 
-		Iterator<Client> privateIterator = privateList.iterador();
-		Iterator<Client> insuranceIterator = insuranceList.iterador();
-		Iterator<Client> companyIterator = companyList.iterador();
+		for (int i = 0; i < typeOrder.length; i++) {
 
-		while (insuranceIterator.hasNext()) {
-			orderedList.add(insuranceIterator.Next());
-		}
+			SimpleList<Client> subList = clientRepository.getClientsByType(typeOrder[i]);
+			Iterator<Client> iterator = subList.iterador();
 
-		while (companyIterator.hasNext()) {
-			orderedList.add(companyIterator.Next());
-		}
-
-		while (privateIterator.hasNext()) {
-			orderedList.add(privateIterator.Next());
+			while (iterator.hasNext()) {
+				orderedList.add(iterator.Next());
+			}
 		}
 
 		return orderedList;

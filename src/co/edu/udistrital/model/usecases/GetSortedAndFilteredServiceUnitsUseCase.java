@@ -32,97 +32,30 @@ public class GetSortedAndFilteredServiceUnitsUseCase {
 	}
 
 	/**
-	 * Metodo de apoyo que genera la lista ordenada final con base en el criterio
-	 * del repositorio
+	 * Metodo de apoyo optimizado que genera la lista ordenada final con base en el
+	 * criterio del repositorio cruzando Tipo de Unidad y Estado.
 	 * 
 	 * @return Lista ordenada
 	 */
 	private SimpleList<ServiceUnit> buildOrderedList() {
 		SimpleList<ServiceUnit> orderedList = new SimpleList<ServiceUnit>();
 
-		SimpleList<ServiceUnit> motorcicleAvailableList = serviceUnitRepository
-				.getUnitsByStatusAndType(UnitStatus.AVAILABLE, UnitType.MOTORCYCLE);
-		SimpleList<ServiceUnit> motorcicleMaintenanceList = serviceUnitRepository
-				.getUnitsByStatusAndType(UnitStatus.MAINTENANCE, UnitType.MOTORCYCLE);
-		SimpleList<ServiceUnit> motorcicleAssignedList = serviceUnitRepository
-				.getUnitsByStatusAndType(UnitStatus.ASSIGNED, UnitType.MOTORCYCLE);
-		SimpleList<ServiceUnit> carAvailableList = serviceUnitRepository.getUnitsByStatusAndType(UnitStatus.AVAILABLE,
-				UnitType.CAR);
-		SimpleList<ServiceUnit> carMaintenanceList = serviceUnitRepository
-				.getUnitsByStatusAndType(UnitStatus.MAINTENANCE, UnitType.CAR);
-		SimpleList<ServiceUnit> carAssignedList = serviceUnitRepository.getUnitsByStatusAndType(UnitStatus.ASSIGNED,
-				UnitType.CAR);
-		SimpleList<ServiceUnit> truckAvailableList = serviceUnitRepository.getUnitsByStatusAndType(UnitStatus.AVAILABLE,
-				UnitType.TRUCK);
-		SimpleList<ServiceUnit> truckMaintenanceList = serviceUnitRepository
-				.getUnitsByStatusAndType(UnitStatus.MAINTENANCE, UnitType.TRUCK);
-		SimpleList<ServiceUnit> truckAssignedList = serviceUnitRepository.getUnitsByStatusAndType(UnitStatus.ASSIGNED,
-				UnitType.TRUCK);
-		SimpleList<ServiceUnit> craneAvailableList = serviceUnitRepository.getUnitsByStatusAndType(UnitStatus.AVAILABLE,
-				UnitType.CRANE);
-		SimpleList<ServiceUnit> craneMaintenanceList = serviceUnitRepository
-				.getUnitsByStatusAndType(UnitStatus.MAINTENANCE, UnitType.CRANE);
-		SimpleList<ServiceUnit> craneAssignedList = serviceUnitRepository.getUnitsByStatusAndType(UnitStatus.ASSIGNED,
-				UnitType.CRANE);
+		UnitType[] typeOrder = { UnitType.MOTORCYCLE, UnitType.CAR, UnitType.TRUCK, UnitType.CRANE };
 
-		Iterator<ServiceUnit> motorcicleAvalilableIterator = motorcicleAvailableList.iterador();
-		Iterator<ServiceUnit> motorcicleMaintenanceIterator = motorcicleMaintenanceList.iterador();
-		Iterator<ServiceUnit> motorcicleAssignedIterator = motorcicleAssignedList.iterador();
-		Iterator<ServiceUnit> carAvalilableIterator = carAvailableList.iterador();
-		Iterator<ServiceUnit> carMaintenanceIterator = carMaintenanceList.iterador();
-		Iterator<ServiceUnit> carAssignedIterator = carAssignedList.iterador();
-		Iterator<ServiceUnit> truckAvalilableIterator = truckAvailableList.iterador();
-		Iterator<ServiceUnit> truckMaintenanceIterator = truckMaintenanceList.iterador();
-		Iterator<ServiceUnit> truckAssignedIterator = truckAssignedList.iterador();
-		Iterator<ServiceUnit> craneAvalilableIterator = craneAvailableList.iterador();
-		Iterator<ServiceUnit> craneMaintenanceIterator = craneMaintenanceList.iterador();
-		Iterator<ServiceUnit> craneAssignedIterator = craneAssignedList.iterador();
+		UnitStatus[] statusOrder = { UnitStatus.AVAILABLE, UnitStatus.MAINTENANCE, UnitStatus.ASSIGNED };
 
-		while (motorcicleAvalilableIterator.hasNext()) {
-			orderedList.add(motorcicleAvalilableIterator.Next());
-		}
+		for (int i = 0; i < typeOrder.length; i++) {
+			for (int j = 0; j < statusOrder.length; j++) {
 
-		while (motorcicleMaintenanceIterator.hasNext()) {
-			orderedList.add(motorcicleMaintenanceIterator.Next());
-		}
+				SimpleList<ServiceUnit> subList = serviceUnitRepository.getUnitsByStatusAndType(statusOrder[j],
+						typeOrder[i]);
 
-		while (motorcicleAssignedIterator.hasNext()) {
-			orderedList.add(motorcicleAssignedIterator.Next());
-		}
+				Iterator<ServiceUnit> iterator = subList.iterador();
 
-		while (carAvalilableIterator.hasNext()) {
-			orderedList.add(carAvalilableIterator.Next());
-		}
-
-		while (carMaintenanceIterator.hasNext()) {
-			orderedList.add(carMaintenanceIterator.Next());
-		}
-
-		while (carAssignedIterator.hasNext()) {
-			orderedList.add(carAssignedIterator.Next());
-		}
-
-		while (truckAvalilableIterator.hasNext()) {
-			orderedList.add(truckAvalilableIterator.Next());
-		}
-
-		while (truckMaintenanceIterator.hasNext()) {
-			orderedList.add(truckMaintenanceIterator.Next());
-		}
-
-		while (truckAssignedIterator.hasNext()) {
-			orderedList.add(truckAssignedIterator.Next());
-		}
-		while (craneAvalilableIterator.hasNext()) {
-			orderedList.add(craneAvalilableIterator.Next());
-		}
-
-		while (craneMaintenanceIterator.hasNext()) {
-			orderedList.add(craneMaintenanceIterator.Next());
-		}
-
-		while (craneAssignedIterator.hasNext()) {
-			orderedList.add(craneAssignedIterator.Next());
+				while (iterator.hasNext()) {
+					orderedList.add(iterator.Next());
+				}
+			}
 		}
 
 		return orderedList;

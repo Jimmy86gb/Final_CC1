@@ -31,32 +31,24 @@ public class GetSortedAndFilteredKitsUseCase {
 	}
 
 	/**
-	 * Metodo de apoyo que genera la lista ordenada final con base en el criterio
-	 * del repositorio
+	 * Metodo de apoyo optimizado que genera la lista ordenada final con base en el
+	 * criterio del repositorio para Kits.
 	 * 
 	 * @return Lista ordenada
 	 */
 	private SimpleList<Kit> buildOrderedList() {
 		SimpleList<Kit> orderedList = new SimpleList<Kit>();
 
-		SimpleList<Kit> availableList = kitRepository.getKitsByStatus(UnitStatus.AVAILABLE);
-		SimpleList<Kit> assignedList = kitRepository.getKitsByStatus(UnitStatus.ASSIGNED);
-		SimpleList<Kit> maintenanceList = kitRepository.getKitsByStatus(UnitStatus.MAINTENANCE);
+		UnitStatus[] statusOrder = { UnitStatus.AVAILABLE, UnitStatus.ASSIGNED, UnitStatus.MAINTENANCE };
 
-		Iterator<Kit> availableIterator = availableList.iterador();
-		Iterator<Kit> assignedIterator = assignedList.iterador();
-		Iterator<Kit> maintenanceIterator = maintenanceList.iterador();
+		for (int i = 0; i < statusOrder.length; i++) {
 
-		while (availableIterator.hasNext()) {
-			orderedList.add(availableIterator.Next());
-		}
+			SimpleList<Kit> subList = kitRepository.getKitsByStatus(statusOrder[i]);
+			Iterator<Kit> iterator = subList.iterador();
 
-		while (assignedIterator.hasNext()) {
-			orderedList.add(assignedIterator.Next());
-		}
-
-		while (maintenanceIterator.hasNext()) {
-			orderedList.add(maintenanceIterator.Next());
+			while (iterator.hasNext()) {
+				orderedList.add(iterator.Next());
+			}
 		}
 
 		return orderedList;
