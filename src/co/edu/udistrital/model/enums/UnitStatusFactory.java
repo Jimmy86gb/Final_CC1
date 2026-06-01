@@ -21,6 +21,7 @@ public class UnitStatusFactory {
 		case "disponible" -> UnitStatus.AVAILABLE;
 		case "asignada" -> UnitStatus.ASSIGNED;
 		case "enmantenimiento" -> UnitStatus.MAINTENANCE;
+		case "inactivo" -> UnitStatus.INACTIVE;
 		default -> throw new IllegalArgumentException("Tipo de status no soportado: " + unitStatus);
 		};
 	}
