@@ -77,7 +77,8 @@ public class UpdateServiceUnitUseCase {
 			boolean requiresConfirmation = (actualServiceUnit.getStatus() == UnitStatus.AVAILABLE
 					&& requestedStatus == UnitStatus.MAINTENANCE)
 					|| (actualServiceUnit.getStatus() == UnitStatus.MAINTENANCE
-							&& requestedStatus == UnitStatus.AVAILABLE);
+							&& requestedStatus == UnitStatus.AVAILABLE)
+					|| (requestedStatus == UnitStatus.INACTIVE);
 
 			UnitStatus statusForMainList = requiresConfirmation ? actualServiceUnit.getStatus() : requestedStatus;
 
