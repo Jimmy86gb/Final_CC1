@@ -16,12 +16,26 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+/**
+ * Clase que define la vista principal de la aplicacion.
+ * Gestiona el contenedor raiz, la estructura de navegacion superior y el area 
+ * central donde se visualizan los diferentes modulos del sistema.
+ * 
+ * @author Jimmy86gb
+ */
 public class MainView {
     private BorderPane rootPane;
     private StackPane contentArea;
     private AppController appController;
     private ProfileType role;
 
+    /**
+     * Constructor de la clase.
+     * Inicializa el contenedor raiz de tipo BorderPane y configura el area de 
+     * contenido principal.
+     * 
+     * @param role Perfil del usuario autenticado para la configuracion de permisos.
+     */
     public MainView(ProfileType role) {
         this.role = role;
 
@@ -36,11 +50,21 @@ public class MainView {
         rootPane.setCenter(contentArea);
     }
 
+    /**
+     * Se asigna el controlador de navegacion encargado de gestionar el flujo entre vistas.
+     * 
+     * @param controller Instancia del controlador principal de la aplicacion.
+     */
     public void setNavigationController(AppController controller) {
         this.appController = controller;
         this.appController.navigateToDashboard();
     }
 
+    /**
+     * Se configura la barra de navegacion superior.
+     * Se instancian los botones de menu, los espaciadores y los controles de cierre de sesion
+     * integrados en la parte superior del layout.
+     */
     private void setupTopNavigation() {
         HBox topNav = new HBox(15);
         topNav.setPadding(new Insets(15, 30, 15, 30));
@@ -57,7 +81,7 @@ public class MainView {
         Button btnDashboard = createMenuButton("Dashboard");
         Button btnRequests = createMenuButton("Solicitudes");
         Button btnUnits = createMenuButton("Unidades");
-        Button btnTechnicians = createMenuButton("Técnicos");
+        Button btnTechnicians = createMenuButton("Tecnicos");
         Button btnKits = createMenuButton("Kits");
         Button btnClients = createMenuButton("Clientes");
 
@@ -85,7 +109,7 @@ public class MainView {
         );
 
         lblRole.setStyle("-fx-text-fill:white;");
-        Button btnLogout = new Button("Cerrar Sesión");
+        Button btnLogout = new Button("Cerrar Sesion");
         btnLogout.setFont(Font.font("Segoe UI", FontWeight.BOLD, 12));
         btnLogout.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 4; -fx-padding: 6 12;");
         btnLogout.setOnAction(e -> appController.logout());
@@ -95,6 +119,12 @@ public class MainView {
         rootPane.setTop(topNav);
     }
 
+    /**
+     * Se crea un boton de navegacion con estilos definidos para la interaccion.
+     * 
+     * @param text Texto a visualizar en el boton.
+     * @return Objeto Button configurado.
+     */
     private Button createMenuButton(String text) {
         Button button = new Button(text);
         button.setFont(Font.font("Segoe UI", FontWeight.SEMI_BOLD, 14));
@@ -107,14 +137,30 @@ public class MainView {
         return button;
     }
 
+    /**
+     * Se reemplaza el contenido actual en el area central de la vista por un nuevo componente.
+     * 
+     * @param viewNode Componente de interfaz a visualizar.
+     */
     public void setContent(VBox viewNode) {
         contentArea.getChildren().clear();
         contentArea.getChildren().add(viewNode);
     }
 
+    /**
+     * Se retorna la escena configurada con el contenedor raiz.
+     * 
+     * @return Objeto Scene con las dimensiones y diseño definidos.
+     */
     public Scene getScene() {
         return new Scene(rootPane, 1150, 700);
     }
+
+    /**
+     * Se obtiene el perfil del usuario autenticado.
+     * 
+     * @return Tipo de perfil del usuario.
+     */
     public ProfileType getRole() {
         return role;
     }
