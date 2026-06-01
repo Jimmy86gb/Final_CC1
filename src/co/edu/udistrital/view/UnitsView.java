@@ -203,5 +203,7 @@ public class UnitsView {
      * 
      * @return Objeto VBox con el diseño de la vista.
      */
-    public VBox getView() { return rootContainer; }
+    public VBox getView() { 
+    	return rootContainer; 
+    }
 }

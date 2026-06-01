@@ -136,6 +136,7 @@ public class AppController {
 
         // Llena las tablas con los datos que hayan guardados
         refreshClientsView();
+        refreshKitsView();
         refreshUnitsView();
         refreshTechniciansView();
 
@@ -175,6 +176,20 @@ public class AppController {
     }
 
     /**
+     * Añade un nuevo lote de kits al inventario para que los tecnicos los usen.
+     * 
+     * @param type El tipo de kit (ej. Cerrajeria)
+     * @param quantity La cantidad de kits que llegaron
+     */
+    public void registerKit(String type, int quantity) {
+        ResponseDTO response = registerKitUseCase.execute(type.replace(" ", ""), quantity);
+        showNotification(response.isSuccess(), response.getMessage());
+        if (response.isSuccess()) {
+        	refreshKitsView();
+        }
+    }
+
+    /**
      * Registra a un nuevo tecnico en el sistema.
      * 
      * @param name El nombre del tecnico
@@ -199,6 +214,18 @@ public class AppController {
         SimpleList.Iterator<ClientDTO> iterator = list.iterador();
         while (iterator.hasNext()) {
             clientsView.addClient(iterator.Next());
+        }
+    }
+
+    /**
+     * Limpia y actualiza la tabla de los kits.
+     */
+    private void refreshKitsView() {
+        kitsView.clearTable();
+        SimpleList<KitDTO> list = getSortedKitsUseCase.execute();
+        SimpleList.Iterator<KitDTO> iterator = list.iterador();
+        while (iterator.hasNext()) {
+            kitsView.addKit(iterator.Next());
         }
     }
 
