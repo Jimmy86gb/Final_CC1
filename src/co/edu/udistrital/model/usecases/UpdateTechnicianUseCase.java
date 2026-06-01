@@ -65,7 +65,7 @@ public class UpdateTechnicianUseCase {
 			OperationZone operationZone = zoneFactory.generateOperationZone(zone);
 			TechnicianStatus technicianStatus = technicianStatusFactory.generaTechnicianStatus(status);
 
-			Technician actualTechnician = technicianRepository.getClientByID(id);
+			Technician actualTechnician = technicianRepository.getTechnicianByID(id);
 
 			if (actualTechnician == null) {
 				return new ResponseDTO(false,
