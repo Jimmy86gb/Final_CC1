@@ -52,57 +52,37 @@ public class UpdateServiceUnitUseCase {
 
 	/**
 	 * Metodo que ejecuta el caso de uso de actualizacion de datos de la unidad de
-	 * servicio y almacena en stack de confirmacion si es un cambio de estados
-	 * manual
+	 * servicio
 	 * 
-	 * @param idServiceUnit ID de ambas unidades de servicio
-	 * @param type          Tipo de ambas unidades de servicio
-	 * @param status        Nuevo status de la unidad de servicio
-	 * @param zone          Nueva zona de la unidad de servicio
+	 * @param id     ID de ambas unidades de servicio
+	 * @param type   Tipo de ambas unidades de servicio
+	 * @param status Nuevo status de la unidad de servicio
+	 * @param zone   Nueva zona de la unidad de servicio
 	 * @return DTO con respuesta para implementar en la vista
 	 */
-	public ResponseDTO execute(String idServiceUnit, String type, String status, String zone) {
+	public ResponseDTO execute(UUID id, String type, String status, String zone) {
 		try {
-
-			UUID id = UUID.fromString(idServiceUnit);
 
 			UnitType unitType = unitFactory.generateUnitType(type);
 			OperationZone operationZone = zoneFactory.generateOperationZone(zone);
-			UnitStatus requestedStatus = unitStatusFactory.generateUnitStatus(status);
+			UnitStatus unitStatus = unitStatusFactory.generateUnitStatus(status);
 
 			ServiceUnit actualServiceUnit = serviceUnitRepository.getServiceUnitByID(id);
 
 			if (actualServiceUnit == null) {
 				return new ResponseDTO(false,
-						"La unidad de servicio no se encontró en el sistema. Es posible que haya sido eliminada.");
+						"La unidad de servicio no se encontró en el sistema. Es posible que haya sido eliminado.");
 			}
 
-			boolean requiresConfirmation = (actualServiceUnit.getStatus() == UnitStatus.AVAILABLE
-					&& requestedStatus == UnitStatus.MAINTENANCE)
-					|| (actualServiceUnit.getStatus() == UnitStatus.MAINTENANCE
-							&& requestedStatus == UnitStatus.AVAILABLE)
-					|| (requestedStatus == UnitStatus.INACTIVE);
+			ServiceUnit newServiceUnit = new ServiceUnit(unitType, unitStatus, operationZone);
 
-			UnitStatus statusForMainList = requiresConfirmation ? actualServiceUnit.getStatus() : requestedStatus;
+			newServiceUnit.setId(id);
 
-			ServiceUnit updatedUnitForMainList = new ServiceUnit(unitType, statusForMainList, operationZone);
-			updatedUnitForMainList.setId(id);
-
-			boolean isUpdated = serviceUnitRepository.update(actualServiceUnit, updatedUnitForMainList);
+			boolean isUpdated = serviceUnitRepository.update(actualServiceUnit, newServiceUnit);
 
 			if (isUpdated) {
-
-				if (requiresConfirmation) {
-
-					ServiceUnit unitForConfirmation = new ServiceUnit(unitType, requestedStatus, operationZone);
-					unitForConfirmation.setId(id);
-					serviceUnitRepository.pushToConfirm(unitForConfirmation);
-
-					return new ResponseDTO(true, "Datos generales actualizados. El cambio de estado a "
-							+ requestedStatus.name() + " fue enviado a la pila de confirmación.");
-				}
-
-				return new ResponseDTO(true, "La información de la unidad de servicio fue actualizada exitosamente.");
+				return new ResponseDTO(true, "La información de la unidad de servicio " + newServiceUnit.getId()
+						+ " fue actualizada exitosamente.");
 			} else {
 				return new ResponseDTO(false, "No se pudo actualizar la información de la unidad de servicio.");
 			}
