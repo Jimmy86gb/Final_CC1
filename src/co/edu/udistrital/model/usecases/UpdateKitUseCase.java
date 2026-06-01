@@ -45,13 +45,16 @@ public class UpdateKitUseCase {
 	/**
 	 * Metodo del caso de uso que actualiza la informacion de los kits
 	 * 
-	 * @param id     ID de ambos kits
+	 * @param idDkit ID de ambos kits
 	 * @param type   Tipo de ambos kits
 	 * @param status Status a actualizar
 	 * @return DTO de respuesta frente a la accion
 	 */
-	public ResponseDTO execute(UUID id, String type, String status) {
+	public ResponseDTO execute(String idDkit, String type, String status) {
 		try {
+
+			UUID id = UUID.fromString(idDkit);
+
 			KitType kitType = kitFactory.generateKitType(type);
 			UnitStatus requestedStatus = unitStatusFactory.generateUnitStatus(status);
 

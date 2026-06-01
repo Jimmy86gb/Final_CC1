@@ -55,14 +55,17 @@ public class UpdateServiceUnitUseCase {
 	 * servicio y almacena en stack de confirmacion si es un cambio de estados
 	 * manual
 	 * 
-	 * @param id     ID de ambas unidades de servicio
-	 * @param type   Tipo de ambas unidades de servicio
-	 * @param status Nuevo status de la unidad de servicio
-	 * @param zone   Nueva zona de la unidad de servicio
+	 * @param idServiceUnit ID de ambas unidades de servicio
+	 * @param type          Tipo de ambas unidades de servicio
+	 * @param status        Nuevo status de la unidad de servicio
+	 * @param zone          Nueva zona de la unidad de servicio
 	 * @return DTO con respuesta para implementar en la vista
 	 */
-	public ResponseDTO execute(UUID id, String type, String status, String zone) {
+	public ResponseDTO execute(String idServiceUnit, String type, String status, String zone) {
 		try {
+
+			UUID id = UUID.fromString(idServiceUnit);
+
 			UnitType unitType = unitFactory.generateUnitType(type);
 			OperationZone operationZone = zoneFactory.generateOperationZone(zone);
 			UnitStatus requestedStatus = unitStatusFactory.generateUnitStatus(status);
