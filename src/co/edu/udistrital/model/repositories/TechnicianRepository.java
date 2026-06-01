@@ -52,15 +52,15 @@ public class TechnicianRepository {
 	 * busqueda por ID
 	 * 
 	 * @param id Id para buscar la lista
-	 * @return Elemento tecnico con la id dada
+	 * @return Elemento cliente con la id dada
 	 */
-	public Technician getTechnicianByID(UUID id) {
+	public Technician getClientByID(UUID id) {
 		Iterator<Technician> iterator = this.technicianList.iterador();
 
 		while (iterator.hasNext()) {
 			Technician currentTechnician = iterator.Next();
 
-			if (currentTechnician.getId().equals(id)) {
+			if (currentTechnician.getId() == id) {
 				return currentTechnician;
 			}
 		}
