@@ -1,5 +1,7 @@
 package co.edu.udistrital.model.repositories;
 
+import java.util.UUID;
+
 import co.edu.udistrital.model.entities.Kit;
 import co.edu.udistrital.model.enums.KitType;
 import co.edu.udistrital.model.enums.UnitStatus;
@@ -59,6 +61,27 @@ public class KitRepository {
 	 */
 	public boolean updatekit(Kit currentKit, Kit newKit) {
 		return kitList.update(currentKit, newKit);
+	}
+
+	/**
+	 * Metodo que retorna si exite un elemento kit de la lista segun una busqueda
+	 * por ID
+	 * 
+	 * @param id Id para buscar la lista
+	 * @return kit con la id dada
+	 */
+	public Kit getKitByID(UUID id) {
+		Iterator<Kit> iterator = this.kitList.iterador();
+
+		while (iterator.hasNext()) {
+			Kit currentKit = iterator.Next();
+
+			if (currentKit.getId() == id) {
+				return currentKit;
+			}
+		}
+
+		return null;
 	}
 
 	/**
