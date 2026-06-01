@@ -20,7 +20,7 @@ public class GetCriticLevelLabelsUseCase {
 
 		SimpleList<String> criticLevelLabels = new SimpleList<>();
 
-		CriticLevel[] criticLevels = CriticLevel.values();
+		CriticLevel[] criticLevels = { CriticLevel.LOW, CriticLevel.HIGH };
 
 		for (int i = 0; i < criticLevels.length; i++) {
 			criticLevelLabels.add(criticLevels[i].getDisplayName());
