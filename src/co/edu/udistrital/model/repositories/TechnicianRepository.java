@@ -70,7 +70,7 @@ public class TechnicianRepository {
 		while (iterator.hasNext()) {
 			Technician currentTechnician = iterator.Next();
 
-			if (currentTechnician.getId() == id) {
+			if (currentTechnician.getId().equals(id)) {
 				return currentTechnician;
 			}
 		}

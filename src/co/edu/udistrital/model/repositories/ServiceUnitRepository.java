@@ -77,7 +77,7 @@ public class ServiceUnitRepository {
 		while (iterator.hasNext()) {
 			ServiceUnit currentServiceUnit = iterator.Next();
 
-			if (currentServiceUnit.getId() == id) {
+			if (currentServiceUnit.getId().equals(id)) {
 				return currentServiceUnit;
 			}
 		}
