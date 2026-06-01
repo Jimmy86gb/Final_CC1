@@ -66,7 +66,7 @@ public class KitRepository {
 		while (iterator.hasNext()) {
 			Kit currentKit = iterator.Next();
 
-			if (currentKit.getId().equals(id)) {
+			if (currentKit.getId() == id) {
 				return currentKit;
 			}
 		}
