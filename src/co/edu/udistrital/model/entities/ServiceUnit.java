@@ -33,6 +33,13 @@ public class ServiceUnit {
 		this.zone = zone;
 	}
 
+	/**
+	 * @param id the id to set
+	 */
+	public void setId(UUID id) {
+		this.id = id;
+	}
+
 	public UUID getId() {
 		return id;
 	}
