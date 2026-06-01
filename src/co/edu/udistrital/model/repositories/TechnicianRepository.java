@@ -58,6 +58,27 @@ public class TechnicianRepository {
 	}
 
 	/**
+	 * Metodo que retorna si exite un elemento tecnico de la lista segun una
+	 * busqueda por ID
+	 * 
+	 * @param id Id para buscar la lista
+	 * @return Elemento tecnico con la id dada
+	 */
+	public Technician getTechnicianByID(UUID id) {
+		Iterator<Technician> iterator = this.technicianList.iterador();
+
+		while (iterator.hasNext()) {
+			Technician currentTechnician = iterator.Next();
+
+			if (currentTechnician.getId() == id) {
+				return currentTechnician;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Metodo que retorna a todos los tecnicos del sistema
 	 * 
 	 * @return la lista de todos los tecnicos
