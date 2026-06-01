@@ -5,7 +5,7 @@ package co.edu.udistrital.model.dtos;
  *
  * @author Juan David Diaz Perez
  */
-public class SesionDTO {
+public class SessionDTO {
 
 	private final boolean success;
 	private final String message;
@@ -18,7 +18,7 @@ public class SesionDTO {
 	 * @param message El mensaje segun el exito de la operacion
 	 * @param role    El rol que representa el perfil en el sistema
 	 */
-	public SesionDTO(boolean success, String message, String role) {
+	public SessionDTO(boolean success, String message, String role) {
 		super();
 		this.success = success;
 		this.message = message;
