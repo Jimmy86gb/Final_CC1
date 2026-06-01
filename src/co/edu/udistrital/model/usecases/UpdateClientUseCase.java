@@ -34,9 +34,9 @@ public class UpdateClientUseCase {
 	}
 
 	/**
-	 * Ejecuta el caso de uso para actualizar el cliente actual * @param id ID del
-	 * cliente a actualizar
+	 * Ejecuta el caso de uso para actualizar el cliente actual
 	 * 
+	 * @param id         ID del cliente a actualizar
 	 * @param name       Nombre del cliente a actualizar
 	 * @param typeClient Tipo de cliente a actualizar
 	 * @param contact    Contacto del cliente a actualizar
