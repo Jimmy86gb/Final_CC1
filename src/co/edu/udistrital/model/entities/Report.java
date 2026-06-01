@@ -7,21 +7,25 @@ import java.util.UUID;
 import co.edu.udistrital.model.enums.CriticLevel;
 import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.ReportStatus;
+import co.edu.udistrital.model.enums.TechnicianSpecialty;
 
 public class Report {
 
 	private UUID ticketID;
 	private Client client;
 	private String problemDescription;
+	private TechnicianSpecialty problemType;
 	private CriticLevel priority;
 	private OperationZone reportZone;
 	private LocalDateTime reportTime;
 	private ReportStatus status;
 
 	private Technician assignedTechnician;
+	private ServiceUnit assignedUnit;
 	private Kit assignedKit;
 
-	public Report(Client client, String problemDescription, CriticLevel priority, OperationZone zone) {
+	public Report(Client client, String problemDescription, TechnicianSpecialty problemType, CriticLevel priority,
+			OperationZone zone) {
 
 		this.ticketID = UUID.randomUUID();
 		this.reportTime = LocalDateTime.now();
@@ -29,17 +33,21 @@ public class Report {
 
 		this.client = client;
 		this.problemDescription = problemDescription;
+		this.problemType = problemType;
 		this.priority = priority;
 		this.reportZone = zone;
 
 		this.assignedTechnician = null;
+		this.assignedUnit = null;
 		this.assignedKit = null;
 	}
 
-	// setters
-
 	public void setAssignedTechnician(Technician assignedTechnician) {
 		this.assignedTechnician = assignedTechnician;
+	}
+
+	public void setAssignedUnit(ServiceUnit assignedUnit) {
+		this.assignedUnit = assignedUnit;
 	}
 
 	public void setAssignedKit(Kit assignedKit) {
@@ -54,6 +62,10 @@ public class Report {
 		this.problemDescription = problemDescription;
 	}
 
+	public void setProblemType(TechnicianSpecialty problemType) {
+		this.problemType = problemType;
+	}
+
 	public void setPriority(CriticLevel priority) {
 		this.priority = priority;
 	}
@@ -66,8 +78,6 @@ public class Report {
 		this.status = status;
 	}
 
-	// getters
-
 	public UUID getTicketID() {
 		return ticketID;
 	}
@@ -78,6 +88,10 @@ public class Report {
 
 	public String getProblemDescription() {
 		return problemDescription;
+	}
+
+	public TechnicianSpecialty getProblemType() {
+		return problemType;
 	}
 
 	public CriticLevel getPriority() {
@@ -98,6 +112,10 @@ public class Report {
 
 	public Technician getAssignedTechnician() {
 		return assignedTechnician;
+	}
+
+	public ServiceUnit getAssignedUnit() {
+		return assignedUnit;
 	}
 
 	public Kit getAssignedKit() {
