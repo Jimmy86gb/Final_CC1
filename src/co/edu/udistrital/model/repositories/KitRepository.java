@@ -43,16 +43,6 @@ public class KitRepository {
 	}
 
 	/**
-	 * Metodo que elimina un kit de la lista de kits del sistema
-	 * 
-	 * @param kit Objeto kit
-	 * @return Si la operacion fue exitosa o no
-	 */
-	public boolean deleteKit(Kit kit) {
-		return kitList.delete(kit);
-	}
-
-	/**
 	 * Metodo que actualiza la informacion del kit seleccionado
 	 * 
 	 * @param currentKit Objeto del kit con la informacion actual

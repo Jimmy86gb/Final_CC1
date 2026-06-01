@@ -74,16 +74,6 @@ public class ReportRepository {
 	}
 
 	/**
-	 * Metodo para eliminar un reporte terminado o cancelado
-	 * 
-	 * @param report Objeto de reporte a eliminar
-	 * @return Si la operacion fue exitosa
-	 */
-	public boolean deleteReport(Report report) {
-		return allHistoricalReports.delete(report);
-	}
-
-	/**
 	 * Metodo para actualizar un reporte a lo largo del proceso
 	 * 
 	 * @param actualReport Objeto con la informacion actual de reporte

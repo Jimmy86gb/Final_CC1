@@ -37,16 +37,6 @@ public class TechnicianRepository {
 	}
 
 	/**
-	 * Metodo que elimina un tecnico de la lista de tecnicos
-	 * 
-	 * @param technician Objeto de tecnico a eliminar
-	 * @return Si la operacion fue un exito o no
-	 */
-	public boolean deleteTechnician(Technician technician) {
-		return technicianList.delete(technician);
-	}
-
-	/**
 	 * Metodo que actualiza la informacion de un tecnico seleccionado
 	 * 
 	 * @param actualTechnician Objeto de tecnico con la informacion actual

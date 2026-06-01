@@ -35,16 +35,6 @@ public class ClientRepository {
 	}
 
 	/**
-	 * Metodo que elimina un cliente en la memoria de clientes
-	 * 
-	 * @param client Objeto de cliente a eliminar
-	 * @return Si la operacion fue un exito o no
-	 */
-	public boolean deleteClient(Client client) {
-		return clientList.delete(client);
-	}
-
-	/**
 	 * Metodo que actualiza la informacion de un cliente selecionado
 	 * 
 	 * @param actualClient Objeto cliente con la informacion actual

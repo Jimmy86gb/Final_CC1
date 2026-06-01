@@ -43,17 +43,6 @@ public class ServiceUnitRepository {
 	}
 
 	/**
-	 * Metodo que elimina una unidad de servicio en la memoria de unidades de
-	 * servicio
-	 * 
-	 * @param unit Objeto de unidad de servicio a eliminar
-	 * @return Si la operacion fue un exito o no
-	 */
-	public boolean deleteUnit(ServiceUnit unit) {
-		return unitList.delete(unit);
-	}
-
-	/**
 	 * Metodo que actualiza la informacion de una unidad de servicio selecionada
 	 * 
 	 * @param actualUnit Objeto unidad con la informacion actual
