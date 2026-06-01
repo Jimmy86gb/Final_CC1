@@ -145,6 +145,28 @@ public class AppController {
     }
 
     /**
+     * Procesa cuando se quiere crear una nueva solicitud de emergencia.
+     * Revisa si la cedula existe. Si no, manda al usuario a crear el cliente primero.
+     * 
+     * @param clientId La cedula o ID que escribio el operador
+     */
+    public void processNewRequest(String clientId) {
+    	String cleanId = clientId.trim();
+        Client client = clientRepository.getClientByID(cleanId);
+        
+        if (client == null) {
+            Alert alert = new Alert(AlertType.WARNING);
+            alert.setHeaderText("Cliente No Encontrado");
+            alert.setContentText("Sera redirigido para registrar este nuevo cliente en el sistema.");
+            alert.showAndWait();
+            navigateToClients();
+            clientsView.showAddClientDialog(clientId);
+        } else {
+            requestsView.showCreateReportDialog(client);
+        }
+    }
+
+    /**
      * Guarda un cliente nuevo en el sistema y refresca la tabla.
      * 
      * @param id La cedula del cliente
