@@ -137,6 +137,7 @@ public class AppController {
         // Llena las tablas con los datos que hayan guardados
         refreshClientsView();
         refreshUnitsView();
+        refreshTechniciansView();
 
         primaryStage.setScene(mainView.getScene());
         mainView.getScene().getWindow().centerOnScreen();
@@ -174,6 +175,21 @@ public class AppController {
     }
 
     /**
+     * Registra a un nuevo tecnico en el sistema.
+     * 
+     * @param name El nombre del tecnico
+     * @param specialty En que es experto (mecanica, grua, etc)
+     * @param zone La zona que le toca cubrir
+     */
+    public void registerTechnician(String name, String specialty, String zone) {
+        ResponseDTO response = registerTechnicianUseCase.execute(name, specialty.replace(" ", ""), zone.replace(" ", ""));
+        showNotification(response.isSuccess(), response.getMessage());
+        if (response.isSuccess()) {
+        	refreshTechniciansView();
+        }
+    }
+
+    /**
      * Limpia la tabla de clientes y la vuelve a dibujar con lo que hay en memoria.
      * Aca usamos el iterador propio para cumplir con las reglas del proyecto.
      */
@@ -199,6 +215,22 @@ public class AppController {
             boolean canEdit = unit.getStatus().getDisplayName().equals("Disponible");
             unitsView.addUnit(unit.getId().toString(), unit.getType().getDisplayName(),
                     unit.getStatus().getDisplayName(), unit.getZone().getDisplayName(), canEdit);
+        }
+    }
+
+    /**
+     * Refresca la tabla de los tecnicos viendo si estan ocupados o libres.
+     */
+    private void refreshTechniciansView() {
+        techniciansView.clearTable();
+        SimpleList<Technician> list = technicianRepository.getAllTechnicians();
+        SimpleList.Iterator<Technician> iterator = list.iterador();
+        while (iterator.hasNext()) {
+            Technician tech = iterator.Next();
+            boolean canEdit = tech.getStatus().getDisplayName().equals("Disponible");
+            techniciansView.addTechnician(tech.getId().toString(), tech.getName(),
+                    tech.getSpecialty().getDisplayName(), tech.getStatus().getDisplayName(),
+                    tech.getZone().getDisplayName(), canEdit);
         }
     }
 
