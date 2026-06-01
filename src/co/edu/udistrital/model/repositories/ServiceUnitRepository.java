@@ -1,5 +1,7 @@
 package co.edu.udistrital.model.repositories;
 
+import java.util.UUID;
+
 import co.edu.udistrital.model.entities.ServiceUnit;
 import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.UnitStatus;
@@ -60,6 +62,27 @@ public class ServiceUnitRepository {
 	 */
 	public boolean update(ServiceUnit actualUnit, ServiceUnit newUnit) {
 		return unitList.update(actualUnit, newUnit);
+	}
+
+	/**
+	 * Metodo que retorna si exite un elemento unidad de servicio de la lista segun
+	 * una busqueda por ID
+	 * 
+	 * @param id Id para buscar la lista
+	 * @return Elemento unidad de servicio con la id dada
+	 */
+	public ServiceUnit getServiceUnitByID(UUID id) {
+		Iterator<ServiceUnit> iterator = this.unitList.iterador();
+
+		while (iterator.hasNext()) {
+			ServiceUnit currentServiceUnit = iterator.Next();
+
+			if (currentServiceUnit.getId() == id) {
+				return currentServiceUnit;
+			}
+		}
+
+		return null;
 	}
 
 	/**
