@@ -10,6 +10,13 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import java.util.Optional;
 
+/**
+ * Clase que define la vista para la gestion de unidades de servicio.
+ * Se encarga de la visualizacion del parque automotor y gestiona los componentes 
+ * necesarios para el registro de nuevos recursos en el sistema.
+ * 
+ * @author Jimmy86gb
+ */
 public class UnitsView {
     private VBox rootContainer;
     private GridPane dataGrid;
@@ -17,6 +24,13 @@ public class UnitsView {
     private AppController appController;
     private ProfileType role;
 
+    /**
+     * Constructor de la clase.
+     * Inicializa los componentes graficos, define el diseño de la tabla y configura 
+     * los permisos de visualizacion segun el rol del usuario autenticado.
+     * 
+     * @param role Perfil del usuario que accede a la vista.
+     */
     public UnitsView(ProfileType role) {
         this.role = role;
         rootContainer = new VBox(25);
@@ -61,8 +75,21 @@ public class UnitsView {
         rootContainer.getChildren().addAll(headerBox, tableContainer);
     }
 
-    public void setController(AppController controller) { this.appController = controller; }
+    /**
+     * Asigna el controlador que gestionara los eventos de la vista.
+     * 
+     * @param controller Instancia del controlador de la aplicacion.
+     */
+    public void setController(AppController controller) { 
+        this.appController = controller; 
+    }
 
+    /**
+     * Genera y configura un encabezado de tabla con estilos predefinidos.
+     * 
+     * @param text Texto del encabezado.
+     * @param col Indice de la columna.
+     */
     private void addHeaderCell(String text, int col) {
         Label lbl = new Label(text);
         lbl.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
@@ -71,11 +98,24 @@ public class UnitsView {
         dataGrid.add(lbl, col, 0);
     }
 
+    /**
+     * Elimina los registros visuales de la tabla conservando la estructura del encabezado.
+     */
     public void clearTable() {
         dataGrid.getChildren().removeIf(node -> GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) > 0);
         currentRow = 1;
     }
 
+    /**
+     * Inserta una nueva fila con la informacion de una unidad de servicio.
+     * Aplica estilos segun el estado y gestiona la habilitacion de controles.
+     * 
+     * @param id Identificador unico de la unidad.
+     * @param type Clasificacion del vehiculo.
+     * @param status Estado operativo actual.
+     * @param zone Zona de operacion asignada.
+     * @param isEditable Booleano que define si los controles de accion deben estar habilitados.
+     */
     public void addUnit(String id, String type, String status, String zone, boolean isEditable) {
         Label lblId = createDataCell(id.substring(0, 8));
         Label lblType = createDataCell(type);
@@ -105,6 +145,12 @@ public class UnitsView {
         currentRow++;
     }
 
+    /**
+     * Crea un componente de tipo Label configurado para la presentacion de datos.
+     * 
+     * @param text Contenido del texto.
+     * @return Label configurado con estilos predefinidos.
+     */
     private Label createDataCell(String text) {
         Label lbl = new Label(text);
         lbl.setFont(Font.font("Segoe UI", 14));
@@ -112,6 +158,10 @@ public class UnitsView {
         return lbl;
     }
 
+    /**
+     * Despliega un cuadro de dialogo para el ingreso de datos de una unidad nueva.
+     * Los valores capturados son remitidos al controlador para su procesamiento.
+     */
     private void showAddUnitDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Registrar Unidad");
@@ -144,10 +194,14 @@ public class UnitsView {
                 int qty = Integer.parseInt(qtyField.getText());
                 appController.registerUnit(typeBox.getValue(), zoneBox.getValue(), qty);
             } catch(NumberFormatException ex) {
-                // Validación ignorada por brevedad
             }
         }
     }
 
+    /**
+     * Retorna el contenedor principal de la vista.
+     * 
+     * @return Objeto VBox con el diseño de la vista.
+     */
     public VBox getView() { return rootContainer; }
 }
