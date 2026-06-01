@@ -1,5 +1,7 @@
 package co.edu.udistrital.model.repositories;
 
+import java.util.UUID;
+
 import co.edu.udistrital.model.entities.Report;
 import co.edu.udistrital.model.enums.CriticLevel;
 import co.edu.udistrital.model.enums.ReportStatus;
@@ -264,5 +266,61 @@ public class ReportRepository {
 		while (!tempStack.isEmpty()) {
 			onGoingReportStack.push(tempStack.pop());
 		}
+	}
+
+	/**
+	 * Metodo que saca de la cola especificada un reporte segun si coincide su ID
+	 * 
+	 * @param originalQueue La cola original evaluada
+	 * @param targetID      El id del reporte a buscar
+	 * @return El elemento fuera de sus colas de prioridad
+	 */
+	private Report extractFromQueue(Queue<Report> originalQueue, UUID targetID) {
+		Queue<Report> tempQueue = new Queue<>();
+		Report foundReport = null;
+
+		// 1. Vaciamos la cola original buscando el objetivo
+		while (!originalQueue.isEmpty()) {
+			Report current = originalQueue.dequeue();
+
+			if (current.getTicketID().equals(targetID)) {
+				foundReport = current; // ¡Lo encontramos! No lo metemos en la temporal
+			} else {
+				tempQueue.enqueue(current); // Los demás se guardan para no perderlos
+			}
+		}
+
+		// 2. Devolvemos los elementos a la cola original manteniendo el orden
+		while (!tempQueue.isEmpty()) {
+			originalQueue.enqueue(tempQueue.dequeue());
+		}
+
+		return foundReport;
+	}
+
+	/**
+	 * Busca un reporte específico en las colas de prioridad y lo extrae.
+	 * 
+	 * @param ticketID ID del reporte buscado.
+	 * @return El reporte si fue encontrado, o null si no estaba en ninguna cola.
+	 */
+	public Report extractPendingReport(UUID ticketID) {
+		Report target = extractFromQueue(undoQueue, ticketID);
+		if (target != null) {
+			return target;
+		}
+
+		target = extractFromQueue(highPriorityQueue, ticketID);
+		if (target != null) {
+			return target;
+		}
+
+		target = extractFromQueue(mediumPriorityQueue, ticketID);
+		if (target != null) {
+			return target;
+		}
+
+		target = extractFromQueue(lowPriorityQueue, ticketID);
+		return target;
 	}
 }
