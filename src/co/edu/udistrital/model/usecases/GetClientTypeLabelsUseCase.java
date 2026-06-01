@@ -11,6 +11,11 @@ import co.edu.udistrital.model.structures.SimpleList;
  */
 public class GetClientTypeLabelsUseCase {
 
+	/**
+	 * Metodo que retorna la lista en strings para mostrar en la vista
+	 * 
+	 * @return La lista en strings para mostrar en la vista
+	 */
 	public SimpleList<String> execute() {
 
 		SimpleList<String> typeClientLabelsList = new SimpleList<>();
