@@ -52,15 +52,18 @@ public class UpdateTechnicianUseCase {
 	/**
 	 * Metodo que ejecuta el caso de uso de actualizacion de datos de tenico
 	 * 
-	 * @param id        El ID de ambos tecnicos
-	 * @param name      El nombre de ambos tecnicos
-	 * @param specialty La especialidad de ambos tecnicos
-	 * @param zone      La nueva zona del tecnico
-	 * @param status    El nuevo status del tecnico
+	 * @param idTechnician El ID de ambos tecnicos
+	 * @param name         El nombre de ambos tecnicos
+	 * @param specialty    La especialidad de ambos tecnicos
+	 * @param zone         La nueva zona del tecnico
+	 * @param status       El nuevo status del tecnico
 	 * @return DTO de respuesta frente a la accion realizada
 	 */
-	public ResponseDTO execute(UUID id, String name, String specialty, String zone, String status) {
+	public ResponseDTO execute(String idTechnician, String name, String specialty, String zone, String status) {
 		try {
+
+			UUID id = UUID.fromString(idTechnician);
+
 			TechnicianSpecialty technicianSpecialty = technicianFactory.generaTechnicianSpecialty(specialty);
 			OperationZone operationZone = zoneFactory.generateOperationZone(zone);
 			TechnicianStatus technicianStatus = technicianStatusFactory.generaTechnicianStatus(status);
