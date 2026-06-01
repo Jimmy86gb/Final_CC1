@@ -219,6 +219,30 @@ public class ReportRepository {
 
 	/**
 	 * Metodo que retorna el siguiente reporte a procesar segun el orden de
+	 * prioridades, sin sacarlo de la cola.
+	 * 
+	 * @return El siguiente reporte o null si no hay ninguno.
+	 */
+	public Report peekNextPendingReport() {
+
+		if (!undoQueue.isEmpty()) {
+			return undoQueue.peek();
+		}
+		if (!highPriorityQueue.isEmpty()) {
+			return highPriorityQueue.peek();
+		}
+		if (!mediumPriorityQueue.isEmpty()) {
+			return mediumPriorityQueue.peek();
+		}
+		if (!lowPriorityQueue.isEmpty()) {
+			return lowPriorityQueue.peek();
+		}
+
+		return null;
+	}
+
+	/**
+	 * Metodo que retorna el siguiente reporte a procesar segun el orden de
 	 * prioridades
 	 * 
 	 * @return El siguiente reporte
