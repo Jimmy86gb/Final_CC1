@@ -33,12 +33,14 @@ public class RequestReportCancellationUseCase {
 	/**
 	 * Ejecuta la solicitud de cancelación.
 	 * 
-	 * @param ticketIdStr El ID del reporte a cancelar (enviado desde la UI como
-	 *                    String).
+	 * @param ticketId El ID del reporte a cancelar (enviado desde la UI como
+	 *                 String).
 	 * @return DTO con el resultado de la operación.
 	 */
-	public ResponseDTO execute(UUID ticketID) {
+	public ResponseDTO execute(String ticketId) {
 		try {
+
+			UUID ticketID = UUID.fromString(ticketId);
 
 			Report reportToCancel = reportRepository.extractPendingReport(ticketID);
 
