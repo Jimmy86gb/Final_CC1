@@ -68,7 +68,7 @@ public class ClientRepository {
 		while (iterator.hasNext()) {
 			Client currentClient = iterator.Next();
 
-			if (currentClient.getId() == id) {
+			if (currentClient.getId().equals(id)) {
 				return currentClient;
 			}
 		}
