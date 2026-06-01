@@ -13,7 +13,7 @@ import co.edu.udistrital.model.structures.SimpleList.Iterator;
  *
  * @author Juan David Diaz Perez
  */
-public class GetConfirmActionsServiceUnitsUseCase {
+public class GetToConfirmServiceUnitsUseCase {
 
 	/**
 	 * Instancia privada del reporitorio de unidades de servicio
@@ -25,7 +25,7 @@ public class GetConfirmActionsServiceUnitsUseCase {
 	 * 
 	 * @param serviceUnitRepository repositorio de unidades de servicio
 	 */
-	public GetConfirmActionsServiceUnitsUseCase(ServiceUnitRepository serviceUnitRepository) {
+	public GetToConfirmServiceUnitsUseCase(ServiceUnitRepository serviceUnitRepository) {
 		this.serviceUnitRepository = serviceUnitRepository;
 	}
 
