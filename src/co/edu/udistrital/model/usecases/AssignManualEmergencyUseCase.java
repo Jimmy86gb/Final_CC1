@@ -70,14 +70,14 @@ public class AssignManualEmergencyUseCase {
 	 * @param kitIdStr    ID del kit seleccionado.
 	 * @return DTO con el resultado de la operación.
 	 */
-	public ResponseDTO execute(String techIdStr, String unitIdStr, String kitIdStr) {
+	public ResponseDTO execute(String reportIdStr, String techIdStr, String unitIdStr, String kitIdStr) {
 		try {
-
+			UUID ticketID = UUID.fromString(reportIdStr);
 			UUID techID = UUID.fromString(techIdStr);
 			UUID unitID = UUID.fromString(unitIdStr);
 			UUID kitID = UUID.fromString(kitIdStr);
 
-			Report targetReport = reportRepository.getNextPendingReport();
+			Report targetReport = reportRepository.extractPendingReport(ticketID);
 
 			if (targetReport == null || targetReport.getStatus() != ReportStatus.PENDING) {
 				return new ResponseDTO(false, "El siniestro ya no está disponible en las colas de espera.");
