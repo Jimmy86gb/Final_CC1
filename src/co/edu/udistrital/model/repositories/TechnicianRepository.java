@@ -52,9 +52,9 @@ public class TechnicianRepository {
 	 * busqueda por ID
 	 * 
 	 * @param id Id para buscar la lista
-	 * @return Elemento cliente con la id dada
+	 * @return Elemento tecnico con la id dada
 	 */
-	public Technician getClientByID(UUID id) {
+	public Technician getTechnicianByID(UUID id) {
 		Iterator<Technician> iterator = this.technicianList.iterador();
 
 		while (iterator.hasNext()) {
