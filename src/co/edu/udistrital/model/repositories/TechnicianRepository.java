@@ -1,5 +1,7 @@
 package co.edu.udistrital.model.repositories;
 
+import java.util.UUID;
+
 import co.edu.udistrital.model.entities.Technician;
 import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.TechnicianSpecialty;
@@ -53,6 +55,27 @@ public class TechnicianRepository {
 	 */
 	public boolean update(Technician actualTechnician, Technician newTechnician) {
 		return technicianList.update(actualTechnician, newTechnician);
+	}
+
+	/**
+	 * Metodo que retorna si exite un elemento tecnico de la lista segun una
+	 * busqueda por ID
+	 * 
+	 * @param id Id para buscar la lista
+	 * @return Elemento cliente con la id dada
+	 */
+	public Technician getClientByID(UUID id) {
+		Iterator<Technician> iterator = this.technicianList.iterador();
+
+		while (iterator.hasNext()) {
+			Technician currentTechnician = iterator.Next();
+
+			if (currentTechnician.getId() == id) {
+				return currentTechnician;
+			}
+		}
+
+		return null;
 	}
 
 	/**
