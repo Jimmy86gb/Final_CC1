@@ -3,7 +3,10 @@ package co.edu.udistrital.model.dtos;
 import java.util.UUID;
 
 /**
- * Clase de transmision de datos de logica a vista del reporte
+ * Clase de transmisión de datos (Data Transfer Object) de la lógica a la vista
+ * para la entidad Reporte. Esta versión incluye banderas lógicas para el
+ * renderizado dinámico de botones en las tablas de JavaFX según la máquina de
+ * estados.
  *
  * @author Juan David Diaz Perez
  */
@@ -14,150 +17,226 @@ public class ReportDTO {
 	private final String clientName;
 	private final String clientContact;
 	private final String problemDescription;
+	private final String problemType;
 	private final String priority;
 	private final String reportZone;
 	private final String reportTime;
 	private final String reportStatus;
+
 	private final UUID technicianID;
 	private final String technicianName;
 	private final String technicianSpeciality;
+	private final UUID unitID;
 	private final UUID kitID;
-	private final boolean isEditable;
+
+	private final boolean canCancel;
+	private final boolean canUndo;
+	private final boolean canFinish;
+	private final boolean canConfirm;
 
 	/**
-	 * Metodo constructor del DTO de reportes
+	 * Método constructor del DTO de reportes con todos los campos necesarios para
+	 * las diferentes vistas del ciclo de vida del siniestro.
 	 * 
-	 * @param ticketID             ID del tiquete actual
-	 * @param clientID             ID del cliente relacionado al tiquete
-	 * @param clientName           Nombre del cliente relacionado al tiquete
-	 * @param clientContact        Contacto del cliente relacionado al tiquete
-	 * @param problemDescription   Descripcion del problema del reporte
-	 * @param priority             Prioridad del reporte actual
-	 * @param reportZone           Zona del reporte actual
-	 * @param reportTime           Tiempo del reporte actual
-	 * @param reportStatus         Status del reporte actual
-	 * @param technicianID         ID del tecnico relacionado al reporte
-	 * @param technicianName       Nombre del tecnico relacionado al reporte
-	 * @param technicianSpeciality Especialidad del tecnico relacionado al reporte
-	 * @param kitID                ID del kit utilizado en el reporte
-	 * @param isEditable           Si se muestran los botones de elimiar y editar en
-	 *                             la vista
+	 * @param ticketID             ID único del tiquete/reporte actual.
+	 * 
+	 * @param clientID             ID del cliente relacionado al siniestro.
+	 * @param clientName           Nombre del cliente para visualización rápida.
+	 * @param clientContact        Número o medio de contacto del cliente.
+	 * @param problemDescription   Descripción detallada dada por el cliente.
+	 * @param problemType          Especialidad o categoría requerida para el
+	 *                             rescate.
+	 * @param priority             Nivel de criticidad (Alta, Media, Baja).
+	 * @param reportZone           Zona donde ocurrió el siniestro (Ej: Norte, Sur).
+	 * @param reportTime           Fecha y hora de registro en formato String.
+	 * @param reportStatus         Estado actual del reporte (PENDING, ON_GOING,
+	 *                             etc.).
+	 * @param technicianID         ID del técnico asignado (null si está PENDING).
+	 * @param technicianName       Nombre del técnico asignado (null si está
+	 *                             PENDING).
+	 * @param technicianSpeciality Especialidad del técnico despachado.
+	 * @param unitID               ID de la unidad (moto/grúa) asignada.
+	 * @param kitID                ID del kit de herramientas/botiquín asignado.
+	 * @param canCancel            Habilita el botón "Cancelar" en la vista general.
+	 * @param canUndo              Habilita el botón "Deshacer" (retorno a cola).
+	 * @param canFinish            Habilita el botón "Finalizar Tareas" en campo.
+	 * @param canConfirm           Habilita el botón "Aprobar Cierre" al gerente.
 	 */
 	public ReportDTO(UUID ticketID, String clientID, String clientName, String clientContact, String problemDescription,
-			String priority, String reportZone, String reportTime, String reportStatus, UUID technicianID,
-			String technicianName, String technicianSpeciality, UUID kitID, boolean isEditable) {
-		super();
+			String problemType, String priority, String reportZone, String reportTime, String reportStatus,
+			UUID technicianID, String technicianName, String technicianSpeciality, UUID unitID, UUID kitID,
+			boolean canCancel, boolean canUndo, boolean canFinish, boolean canConfirm) {
+
 		this.ticketID = ticketID;
 		this.clientID = clientID;
 		this.clientName = clientName;
 		this.clientContact = clientContact;
 		this.problemDescription = problemDescription;
+		this.problemType = problemType;
 		this.priority = priority;
 		this.reportZone = reportZone;
 		this.reportTime = reportTime;
 		this.reportStatus = reportStatus;
+
 		this.technicianID = technicianID;
 		this.technicianName = technicianName;
 		this.technicianSpeciality = technicianSpeciality;
+		this.unitID = unitID;
 		this.kitID = kitID;
-		this.isEditable = isEditable;
+
+		this.canCancel = canCancel;
+		this.canUndo = canUndo;
+		this.canFinish = canFinish;
+		this.canConfirm = canConfirm;
 	}
 
 	/**
-	 * @return ID del tiquete actual
+	 * @return ID del tiquete actual. Usado como identificador principal en tablas.
 	 */
 	public UUID getTicketID() {
 		return ticketID;
 	}
 
 	/**
-	 * @return ID del cliente relacionado al tiquete
+	 * @return ID del cliente relacionado.
 	 */
 	public String getClientID() {
 		return clientID;
 	}
 
 	/**
-	 * @return Nombre del cliente relacionado al tiquete
+	 * @return Nombre del cliente. Usado para mostrar a quién se va a asistir.
 	 */
 	public String getClientName() {
 		return clientName;
 	}
 
 	/**
-	 * @return Contacto del cliente relacionado al tiquete
+	 * @return Contacto del cliente para que el técnico pueda llamarlo.
 	 */
 	public String getClientContact() {
 		return clientContact;
 	}
 
 	/**
-	 * @return Descripcion del problema del reporte
+	 * @return Descripción del problema relatado en la llamada.
 	 */
 	public String getProblemDescription() {
 		return problemDescription;
 	}
 
 	/**
-	 * @return Prioridad del reporte actual
+	 * @return Tipo de problema que define qué especialidad técnica se necesita.
+	 */
+	public String getProblemType() {
+		return problemType;
+	}
+
+	/**
+	 * @return Prioridad del reporte (Determina en qué cola está formado).
 	 */
 	public String getPriority() {
 		return priority;
 	}
 
 	/**
-	 * @return Zona del reporte actual
+	 * @return Zona operativa del incidente para asignar recursos cercanos.
 	 */
 	public String getReportZone() {
 		return reportZone;
 	}
 
 	/**
-	 * @return Tiempo del reporte actual
+	 * @return Fecha y hora de creación del reporte formateada para la UI.
 	 */
 	public String getReportTime() {
 		return reportTime;
 	}
 
 	/**
-	 * @return Status del reporte actual
+	 * @return Estado actual en la máquina de estados (PENDING, ON_GOING, DONE,
+	 *         CANCELED).
 	 */
 	public String getReportStatus() {
 		return reportStatus;
 	}
 
 	/**
-	 * @return ID del tecnico relacionado al reporte
+	 * @return ID del técnico despachado. Retorna null si el caso aún no se asigna.
 	 */
 	public UUID getTechnicianID() {
 		return technicianID;
 	}
 
 	/**
-	 * @return Nombre del tecnico relacionado al reporte
+	 * @return Nombre del técnico despachado para mostrar en la tabla de activos.
 	 */
 	public String getTechnicianName() {
 		return technicianName;
 	}
 
 	/**
-	 * @return Especialidad del tecnico relacionado al reporte
+	 * @return Especialidad del técnico para verificar correspondencia con el
+	 *         problema.
 	 */
 	public String getTechnicianSpeciality() {
 		return technicianSpeciality;
 	}
 
 	/**
-	 * @return ID del kit utilizado en el reporte
+	 * @return ID de la unidad (Grúa/Moto) despachada.
+	 */
+	public UUID getUnitID() {
+		return unitID;
+	}
+
+	/**
+	 * @return ID del kit provisto para el servicio.
 	 */
 	public UUID getKitID() {
 		return kitID;
 	}
 
 	/**
-	 * @return Si se muestran los botones de elimiar y editar en la vista
+	 * Indica a la vista si el botón de "Cancelar Siniestro" debe estar activo.
+	 * 
+	 * @return true si el reporte está PENDING y puede ser cancelado; false de lo
+	 *         contrario.
 	 */
-	public boolean isEditable() {
-		return isEditable;
+	public boolean canCancel() {
+		return canCancel;
+	}
+
+	/**
+	 * Indica a la vista si el botón de "Deshacer Asignación (Ctrl+Z)" debe estar
+	 * activo.
+	 * 
+	 * @return true si el reporte está en el tope de la pila On-Going; false de lo
+	 *         contrario.
+	 */
+	public boolean canUndo() {
+		return canUndo;
+	}
+
+	/**
+	 * Indica a la vista si el botón de "Reportar Tareas Finalizadas" debe estar
+	 * activo.
+	 * 
+	 * @return true si el reporte está en proceso (ON_GOING) y el técnico terminó en
+	 *         campo.
+	 */
+	public boolean canFinish() {
+		return canFinish;
+	}
+
+	/**
+	 * Indica a la vista si el botón administrativo de "Aprobar Cierre / Rechazar"
+	 * debe estar activo.
+	 * 
+	 * @return true si el reporte está en el tope de la pila de confirmación; false
+	 *         de lo contrario.
+	 */
+	public boolean canConfirm() {
+		return canConfirm;
 	}
 }
