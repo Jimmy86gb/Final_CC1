@@ -15,7 +15,7 @@ public class TechnicianStatusFactory {
 	 * @param technicianStatus Especialidad en string del tenico
 	 * @return Especialidad en enum del tecnico
 	 */
-	public TechnicianStatus generaTechnicianStatus(String technicianStatus) {
+	public TechnicianStatus generaTechnicianSpecialty(String technicianStatus) {
 		return switch (technicianStatus.toLowerCase()) {
 		case "disponible" -> TechnicianStatus.AVAILABLE;
 		case "ocupado" -> TechnicianStatus.BUSY;
