@@ -42,6 +42,10 @@ public class Queue<T> {
 		return this.head;
 	}
 
+	public T peek() {
+		return this.head.getData();
+	}
+
 	public int getSize() {
 		return this.size;
 	}
