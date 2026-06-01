@@ -56,6 +56,27 @@ public class ClientRepository {
 	}
 
 	/**
+	 * Metodo que retorna si exite un elemento cliente de la lista segun una
+	 * busqueda por ID
+	 * 
+	 * @param id Id para buscar la lista
+	 * @return Elemento cliente con la id dada
+	 */
+	public Client getClientByID(String id) {
+		Iterator<Client> iterator = this.clientList.iterador();
+
+		while (iterator.hasNext()) {
+			Client currentClient = iterator.Next();
+
+			if (currentClient.getId() == id) {
+				return currentClient;
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Metodo que retorna toda la lista de clientes
 	 * 
 	 * @return La lista de clientes
