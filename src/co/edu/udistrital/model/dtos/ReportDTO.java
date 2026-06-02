@@ -27,6 +27,7 @@ public class ReportDTO {
 	private final String technicianName;
 	private final String technicianSpeciality;
 	private final UUID unitID;
+	private final String unitType;
 	private final UUID kitID;
 
 	private final boolean canCancel;
@@ -55,7 +56,8 @@ public class ReportDTO {
 	 * @param technicianName       Nombre del técnico asignado (null si está
 	 *                             PENDING).
 	 * @param technicianSpeciality Especialidad del técnico despachado.
-	 * @param unitID               ID de la unidad (moto/grúa) asignada.
+	 * @param unitID               ID de la unidad (moto/grúa) asignada
+	 * @param unitType             Typo de la unidad (moto/grúa) asignada.
 	 * @param kitID                ID del kit de herramientas/botiquín asignado.
 	 * @param canCancel            Habilita el botón "Cancelar" en la vista general.
 	 * @param canUndo              Habilita el botón "Deshacer" (retorno a cola).
@@ -65,7 +67,7 @@ public class ReportDTO {
 	public ReportDTO(UUID ticketID, String clientID, String clientName, String clientContact, String problemDescription,
 			String problemType, String priority, String reportZone, String reportTime, String reportStatus,
 			UUID technicianID, String technicianName, String technicianSpeciality, UUID unitID, UUID kitID,
-			boolean canCancel, boolean canUndo, boolean canFinish, boolean canConfirm) {
+			String unitType, boolean canCancel, boolean canUndo, boolean canFinish, boolean canConfirm) {
 
 		this.ticketID = ticketID;
 		this.clientID = clientID;
@@ -82,6 +84,7 @@ public class ReportDTO {
 		this.technicianName = technicianName;
 		this.technicianSpeciality = technicianSpeciality;
 		this.unitID = unitID;
+		this.unitType = unitType;
 		this.kitID = kitID;
 
 		this.canCancel = canCancel;
@@ -188,6 +191,41 @@ public class ReportDTO {
 	 */
 	public UUID getUnitID() {
 		return unitID;
+	}
+
+	/**
+	 * @return the unitType
+	 */
+	public String getUnitType() {
+		return unitType;
+	}
+
+	/**
+	 * @return the canCancel
+	 */
+	public boolean isCanCancel() {
+		return canCancel;
+	}
+
+	/**
+	 * @return the canUndo
+	 */
+	public boolean isCanUndo() {
+		return canUndo;
+	}
+
+	/**
+	 * @return the canFinish
+	 */
+	public boolean isCanFinish() {
+		return canFinish;
+	}
+
+	/**
+	 * @return the canConfirm
+	 */
+	public boolean isCanConfirm() {
+		return canConfirm;
 	}
 
 	/**
