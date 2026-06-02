@@ -1,7 +1,5 @@
 package co.edu.udistrital.model.dtos;
 
-import java.util.UUID;
-
 /**
  * Clase de transmision de datos de logica a vista de la entidad unidad de
  * servicio
@@ -10,7 +8,7 @@ import java.util.UUID;
  */
 public class ServiceUnitDTO {
 
-	private final UUID id;
+	private final String id;
 	private final String type;
 	private final String status;
 	private final String zone;
@@ -25,7 +23,7 @@ public class ServiceUnitDTO {
 	 * @param zone       Zona de la unidad de sercivio actual
 	 * @param isEditable Si se muestran los botones de elimiar y editar en la vista
 	 */
-	public ServiceUnitDTO(UUID id, String type, String status, String zone, boolean isEditable) {
+	public ServiceUnitDTO(String id, String type, String status, String zone, boolean isEditable) {
 		super();
 		this.id = id;
 		this.type = type;
@@ -37,7 +35,7 @@ public class ServiceUnitDTO {
 	/**
 	 * @return Id de la unidad de servicio actual
 	 */
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 

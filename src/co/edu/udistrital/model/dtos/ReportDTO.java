@@ -12,7 +12,7 @@ import java.util.UUID;
  */
 public class ReportDTO {
 
-	private final UUID ticketID;
+	private final String ticketID;
 	private final String clientID;
 	private final String clientName;
 	private final String clientContact;
@@ -64,10 +64,10 @@ public class ReportDTO {
 	 * @param canFinish            Habilita el botón "Finalizar Tareas" en campo.
 	 * @param canConfirm           Habilita el botón "Aprobar Cierre" al gerente.
 	 */
-	public ReportDTO(UUID ticketID, String clientID, String clientName, String clientContact, String problemDescription,
-			String problemType, String priority, String reportZone, String reportTime, String reportStatus,
-			UUID technicianID, String technicianName, String technicianSpeciality, UUID unitID, String unitType,
-			UUID kitID, boolean canCancel, boolean canUndo, boolean canFinish, boolean canConfirm) {
+	public ReportDTO(String ticketID, String clientID, String clientName, String clientContact,
+			String problemDescription, String problemType, String priority, String reportZone, String reportTime,
+			String reportStatus, UUID technicianID, String technicianName, String technicianSpeciality, UUID unitID,
+			String unitType, UUID kitID, boolean canCancel, boolean canUndo, boolean canFinish, boolean canConfirm) {
 
 		this.ticketID = ticketID;
 		this.clientID = clientID;
@@ -96,7 +96,7 @@ public class ReportDTO {
 	/**
 	 * @return ID del tiquete actual. Usado como identificador principal en tablas.
 	 */
-	public UUID getTicketID() {
+	public String getTicketID() {
 		return ticketID;
 	}
 
