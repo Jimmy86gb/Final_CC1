@@ -44,7 +44,7 @@ public class GetNextPendingReportUseCase {
 
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-		UUID ticketID = nextReport.getTicketID();
+		String ticketID = nextReport.getTicketID().toString();
 		String clientID = nextReport.getClient().getId();
 		String clientName = nextReport.getClient().getName();
 		String clientContact = nextReport.getClient().getContactInfo();

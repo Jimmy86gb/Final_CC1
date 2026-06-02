@@ -69,7 +69,7 @@ public class GetAvailableKitsByTypeUseCase {
 
 			String status = kit.getStatus().getDisplayName();
 
-			KitDTO dto = new KitDTO(kit.getId(), type, status, false);
+			KitDTO dto = new KitDTO(kit.getId().toString(), type, status, false);
 
 			resultList.add(dto);
 		}
