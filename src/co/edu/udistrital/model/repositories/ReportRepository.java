@@ -272,24 +272,27 @@ public class ReportRepository {
 	 * 
 	 * @param finishedReport El reporte que ya se completó
 	 */
-	public void removeFinishedReportFromStack(Report finishedReport) {
+	public Report removeFinishedReportFromStack(UUID id) {
+
 		Stack<Report> tempStack = new Stack<>();
+		Report currentReport = null;
 		boolean removed = false;
 
 		while (!onGoingReportStack.isEmpty()) {
-			Report currentReport = onGoingReportStack.pop();
+			currentReport = onGoingReportStack.pop();
 
-			if (currentReport.equals(finishedReport) && !removed) {
+			if (currentReport.getTicketID().equals(id) && !removed) {
 				removed = true;
 			} else {
 				tempStack.push(currentReport);
 			}
 		}
 
-		// 2. Restaurar la pila original
 		while (!tempStack.isEmpty()) {
 			onGoingReportStack.push(tempStack.pop());
 		}
+
+		return currentReport;
 	}
 
 	/**
