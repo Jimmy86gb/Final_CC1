@@ -1,12 +1,15 @@
 package co.edu.udistrital.model.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 import co.edu.udistrital.model.enums.KitType;
 import co.edu.udistrital.model.enums.UnitStatus;
 
-public class Kit {
+public class Kit implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private UUID id;
 	private KitType type;

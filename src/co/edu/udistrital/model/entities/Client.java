@@ -1,10 +1,13 @@
 package co.edu.udistrital.model.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import co.edu.udistrital.model.enums.ClientType;
 
-public class Client {
+public class Client implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private String id;
 	private String name;
 	private ClientType type;

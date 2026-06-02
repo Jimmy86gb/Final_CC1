@@ -1,5 +1,6 @@
 package co.edu.udistrital.model.entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
@@ -9,7 +10,9 @@ import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.ReportStatus;
 import co.edu.udistrital.model.enums.TechnicianSpecialty;
 
-public class Report {
+public class Report implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private UUID ticketID;
 	private Client client;
