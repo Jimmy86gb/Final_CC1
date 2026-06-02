@@ -54,7 +54,6 @@ public class RequestsView {
         btnAssignManual.setStyle("-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-cursor: hand;");
         btnAssignManual.setOnAction(e -> {
             ReportDTO next = appController.getNextPendingReport();
-            // ESCUDO CONTRA FANTASMAS: Verificamos que realmente tenga datos
             if (next != null && next.getTicketID() != null && !next.getTicketID().toString().trim().isEmpty()) {
                 showAssignManualDialog(next);
             } else {
@@ -62,7 +61,7 @@ public class RequestsView {
             }
         });
 
-        if ((role.equals("ADMIN"))) {
+        if (role.equals("ADMIN")) {
             btnNewRequest.setDisable(true);
             btnAssignManual.setDisable(true);
         }
@@ -103,10 +102,11 @@ public class RequestsView {
 
         ScrollPane scroll = new ScrollPane(internalContainer);
         scroll.setFitToWidth(true);
+        scroll.setFitToHeight(true); 
         scroll.setStyle("-fx-background: " + bgColor + "; -fx-background-color: transparent; -fx-control-inner-background: transparent;");
         scroll.setBorder(Border.EMPTY);
 
-        VBox.setVgrow(scroll, Priority.ALWAYS);
+        VBox.setVgrow(scroll, Priority.ALWAYS); // Altura dinámica garantizada
         col.getChildren().addAll(lbl, scroll);
 
         return col;
@@ -240,7 +240,7 @@ public class RequestsView {
             if (res == ButtonType.OK && techBox.getValue() != null && unitBox.getValue() != null && kitBox.getValue() != null) {
                 appController.assignReportResources(techBox.getValue().getId(), unitBox.getValue().getId(), kitBox.getValue().getId());
             } else if (res == ButtonType.OK) {
-                new Alert(Alert.AlertType.ERROR, "Faltan recursos disponibles para la asignación.").showAndWait();
+                new Alert(Alert.AlertType.ERROR, "Faltan recursos disponibles (Técnico, Unidad o Kit) para la asignación en esta zona.").showAndWait();
             }
         });
     }
@@ -261,7 +261,6 @@ public class RequestsView {
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
 
-        // ZONAS Y ESPECIALIDADES CARGADAS DESDE EL BACKEND
         ComboBox<String> typeBox = new ComboBox<>();
         SimpleList.Iterator<String> sIt = appController.getSpecialityLabels().iterador();
         while(sIt.hasNext()) typeBox.getItems().add(sIt.Next());
@@ -272,7 +271,7 @@ public class RequestsView {
         while(zIt.hasNext()) zoneBox.getItems().add(zIt.Next());
         zoneBox.getSelectionModel().selectFirst();
 
-        // PRIORIDADES: Solo Alta y Baja según requerimiento
+        // Solo Alta y Baja para el operador (Requisito)
         ComboBox<String> priorityBox = new ComboBox<>();
         priorityBox.getItems().addAll("Alta", "Baja");
         priorityBox.getSelectionModel().selectFirst();
@@ -293,10 +292,10 @@ public class RequestsView {
                 String finalPriority = priorityBox.getValue();
                 String clientType = client.getType().toString();
                 
-                // LÓGICA DE PRIORIDAD INTELIGENTE
+                // Conversión inteligente a Media
                 if (finalPriority.equals("Baja") && (clientType.equalsIgnoreCase("Seguros") || clientType.equalsIgnoreCase("Empresarial"))) {
                     finalPriority = "Media";
-                    new Alert(Alert.AlertType.INFORMATION, "La prioridad se ajustó a 'Media' por políticas del tipo de cliente.").showAndWait();
+                    new Alert(Alert.AlertType.INFORMATION, "La prioridad se ajustó automáticamente a 'Media' por políticas del tipo de cliente.").showAndWait();
                 }
                 
                 appController.submitReportCreation(client.getId(), descArea.getText(), typeBox.getValue(), finalPriority, zoneBox.getValue());

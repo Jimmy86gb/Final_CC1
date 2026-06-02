@@ -9,28 +9,16 @@ import javafx.stage.Stage;
  * 
  * @author Jimmy86gb
  */
-public class Main extends Application {
+public class Main{
 
-    private AppController controller;
-
-    @Override
-    public void init() throws Exception {
-        controller = new AppController();
-
-        controller.loadData();
-    }
-
-    @Override
-    public void start(Stage stage) {
-        controller.startApplication(stage);
-    }
-
-    @Override
-    public void stop() throws Exception {
-        controller.saveData();
-    }
-
+    
     public static void main(String[] args) {
-        launch(args);
-    }
+    	AppController controller = new AppController();
+    	controller.run();
+	}
+    	
+    	
+    
+
+   
 }

@@ -14,7 +14,7 @@ import javafx.scene.input.ClipboardContent;
 public class KitsView {
     private VBox rootContainer;
     private VBox availableContainer;
-    private VBox maintenanceContainer;
+    private VBox unavailableContainer;
     private AppController appController;
     private String role;
 
@@ -30,18 +30,18 @@ public class KitsView {
         
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        headerBox.getChildren().addAll(lblTitle, spacer); // Eliminado botón de registrar
+        headerBox.getChildren().addAll(lblTitle, spacer); 
 
         HBox columnsContainer = new HBox(20);
         availableContainer = new VBox(12);
-        maintenanceContainer = new VBox(12);
+        unavailableContainer = new VBox(12);
         
         VBox colAvailable = createColumn("✅ Kits Disponibles", "#D1FAE5", availableContainer);
-        VBox colMaintenance = createColumn("🛠 Kits en Mantenimiento", "#FEE2E2", maintenanceContainer);
+        VBox colUnavailable = createColumn("⚠️ En Mantenimiento / Inactivos", "#FEE2E2", unavailableContainer);
         
-        columnsContainer.getChildren().addAll(colAvailable, colMaintenance);
+        columnsContainer.getChildren().addAll(colAvailable, colUnavailable);
         HBox.setHgrow(colAvailable, Priority.ALWAYS);
-        HBox.setHgrow(colMaintenance, Priority.ALWAYS);
+        HBox.setHgrow(colUnavailable, Priority.ALWAYS);
 
         rootContainer.getChildren().addAll(headerBox, columnsContainer);
     }
@@ -59,7 +59,7 @@ public class KitsView {
         
         ScrollPane scroll = new ScrollPane(internalContainer);
         scroll.setFitToWidth(true);
-        scroll.setPrefHeight(600);
+        scroll.setFitToHeight(true);
         scroll.setStyle("-fx-background: " + bgColor + "; -fx-background-color: transparent; -fx-control-inner-background: transparent;");
         scroll.setBorder(Border.EMPTY);
         
@@ -72,7 +72,7 @@ public class KitsView {
 
     public void clearTable() {
         availableContainer.getChildren().clear();
-        maintenanceContainer.getChildren().clear();
+        unavailableContainer.getChildren().clear();
     }
 
     public void addKit(KitDTO kit) {
@@ -85,6 +85,9 @@ public class KitsView {
         
         Label lblType = new Label(kit.getType());
         lblType.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
+        
+        Label lblStatus = new Label("Estado: " + kit.getStatus());
+        lblStatus.setFont(Font.font("Segoe UI", 12));
 
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER_RIGHT);
@@ -93,25 +96,36 @@ public class KitsView {
         btnCopy.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(kit.getId().toString()); }}));
         actions.getChildren().add(btnCopy);
 
-        // Operador y Admin pueden gestionar disponibilidad
-        Button btnAction = new Button();
         if (kit.getStatus().equalsIgnoreCase("Mantenimiento")) {
-            btnAction.setText("Retornar a Servicio");
-            btnAction.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-cursor: hand;");
-            btnAction.setOnAction(e -> appController.retireKitFromMaintenance());
+        	if (role.equals("ADMIN")) {
+                Button btnReturn = new Button("Retornar (Pila)");
+                btnReturn.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-cursor: hand;");
+                btnReturn.setOnAction(e -> appController.returnKitToService());
+
+                Button btnRetire = new Button("Baja (Pila)");
+                btnRetire.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-cursor: hand;");
+                btnRetire.setOnAction(e -> appController.retireKitFromMaintenance());
+                
+                actions.getChildren().addAll(btnReturn, btnRetire);
+            }
         } else {
-            btnAction.setText("Enviar a Mantenimiento");
-            btnAction.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand;");
-            btnAction.setOnAction(e -> appController.updateKitToMaintenance(kit.getId().toString(), kit.getType()));
+            // AQUÍ EL TOGGLE DISPONIBLE / INACTIVO
+            ComboBox<String> stateBox = new ComboBox<>();
+            stateBox.getItems().addAll("Disponible", "Inactivo");
+            stateBox.setValue(kit.getStatus());
+            
+            Button btnApply = new Button("Aplicar");
+            btnApply.setOnAction(e -> appController.updateKitStatus(kit.getId().toString(), kit.getType(), stateBox.getValue()));
+            
+            actions.getChildren().addAll(stateBox, btnApply);
         }
-        actions.getChildren().add(btnAction);
 
-        card.getChildren().addAll(lblId, lblType, actions);
+        card.getChildren().addAll(lblId, lblType, lblStatus, actions);
 
-        if (kit.getStatus().equalsIgnoreCase("Mantenimiento")) {
-            maintenanceContainer.getChildren().add(card);
-        } else {
+        if (kit.getStatus().equalsIgnoreCase("Disponible")) {
             availableContainer.getChildren().add(card);
+        } else {
+            unavailableContainer.getChildren().add(card);
         }
     }
 

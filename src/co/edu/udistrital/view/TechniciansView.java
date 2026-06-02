@@ -1,8 +1,6 @@
 package co.edu.udistrital.view;
 
 import co.edu.udistrital.controller.AppController;
-import co.edu.udistrital.model.enums.ProfileType;
-import co.edu.udistrital.model.structures.SimpleList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -11,6 +9,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import co.edu.udistrital.model.structures.SimpleList;
 
 public class TechniciansView {
     private VBox rootContainer;
@@ -22,17 +21,19 @@ public class TechniciansView {
     public TechniciansView(String role) {
         this.role = role;
         rootContainer = new VBox(25);
+        rootContainer.setPadding(new Insets(20));
         
         HBox headerBox = new HBox();
         headerBox.setAlignment(Pos.CENTER_LEFT);
         
-        Label lblTitle = new Label("Gestion de Tecnicos");
+        Label lblTitle = new Label("Gestión de Técnicos");
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
         
-        Button btnNewTechnician = new Button("+ Registrar Tecnico");
+        Button btnNewTechnician = new Button("+ Registrar Técnico");
         btnNewTechnician.setStyle("-fx-background-color: #8B5CF6; -fx-text-fill: white; -fx-padding: 8 16; -fx-cursor: hand;");
         btnNewTechnician.setOnAction(e -> showAddTechnicianDialog());
-        if ((role.equals("ADMIN"))) btnNewTechnician.setDisable(true);
+        
+        if (role.equals("ADMIN")) btnNewTechnician.setDisable(true);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -46,7 +47,7 @@ public class TechniciansView {
         dataGrid.setHgap(30);
         dataGrid.setVgap(15);
 
-        addHeaderCell("ID", 0);
+        addHeaderCell("ID (UUID)", 0);
         addHeaderCell("Nombre", 1);
         addHeaderCell("Especialidad", 2);
         addHeaderCell("Estado", 3);
@@ -78,17 +79,71 @@ public class TechniciansView {
         dataGrid.add(new Label(status), 3, currentRow);
         dataGrid.add(new Label(zone), 4, currentRow);
 
-        Button btnAction = new Button("Copiar ID");
-        btnAction.setStyle("-fx-background-color: white; -fx-border-color: #D1D5DB; -fx-cursor: hand;");
-        btnAction.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(id); }}));
-
-        dataGrid.add(btnAction, 5, currentRow);
+        HBox actionsBox = new HBox(5);
+        
+        Button btnCopy = new Button("Copiar ID");
+        btnCopy.setStyle("-fx-background-color: white; -fx-border-color: #D1D5DB; -fx-cursor: hand;");
+        btnCopy.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(id); }}));
+        
+        // Cambio de estado directo (Toggle)
+        if (role.equals("OPERATOR") || role.equals("ADMIN")) {
+            Button btnToggle = new Button("Editar");
+            btnToggle.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white;");
+            
+            btnToggle.setOnAction(e -> {
+            	showEditTechnicianDialog(id, name, specialty, zone, status);
+            });
+            actionsBox.getChildren().add(btnToggle);
+        }
+        
+        actionsBox.getChildren().add(btnCopy);
+        dataGrid.add(actionsBox, 5, currentRow);
         currentRow++;
+    }
+    
+    private void showEditTechnicianDialog(String id, String name, String spec, String zone, String status) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Editar Técnico");
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
+
+        // Labels sin edición
+        grid.add(new Label("ID: " + id.substring(0,8)), 0, 0);
+        grid.add(new Label("Nombre: " + name), 0, 1);
+        grid.add(new Label("Especialidad: " + spec), 0, 2);
+
+        // ComboBoxes para editar
+        ComboBox<String> statusBox = new ComboBox<>();
+	     // ITERACIÓN MANUAL: Así recorres tu SimpleList de forma segura
+	     SimpleList<String> statusList = appController.getTechnicianStatusLabels();
+	     SimpleList.Iterator<String> sIt = statusList.iterador();
+	     while (sIt.hasNext()) {
+	         statusBox.getItems().add(sIt.Next());
+	     }
+	     statusBox.setValue(status);
+	
+	     ComboBox<String> zoneBox = new ComboBox<>();
+	     SimpleList<String> zoneList = appController.getZoneLabels();
+	     SimpleList.Iterator<String> zIt = zoneList.iterador();
+	     while (zIt.hasNext()) {
+	         zoneBox.getItems().add(zIt.Next());
+	     }
+	     zoneBox.setValue(zone);
+
+        grid.add(new Label("Estado:"), 0, 3); grid.add(statusBox, 1, 3);
+        grid.add(new Label("Zona:"), 0, 4);   grid.add(zoneBox, 1, 4);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(res -> {
+            if(res == ButtonType.OK) appController.updateTechnician(id, name, spec, zoneBox.getValue(), statusBox.getValue());
+        });
     }
 
     private void showAddTechnicianDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Registrar Tecnico");
+        dialog.setTitle("Registrar Técnico");
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
         grid.setPadding(new Insets(20));
@@ -113,7 +168,9 @@ public class TechniciansView {
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.showAndWait().ifPresent(res -> {
-            if (res == ButtonType.OK) appController.registerTechnician(nameField.getText(), specialtyBox.getValue(), zoneBox.getValue());
+            if (res == ButtonType.OK && !nameField.getText().trim().isEmpty()) {
+                appController.registerTechnician(nameField.getText(), specialtyBox.getValue(), zoneBox.getValue());
+            }
         });
     }
 

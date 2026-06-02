@@ -26,7 +26,6 @@ public class UnitsView {
         
         HBox headerBox = new HBox();
         headerBox.setAlignment(Pos.CENTER_LEFT);
-        
         Label lblTitle = new Label("Control de Unidades de Servicio");
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
         
@@ -39,7 +38,7 @@ public class UnitsView {
         pendingContainer = new VBox(12);
         
         VBox colActive = createColumn("✅ Unidades Activas", "#DBEAFE", activeContainer);
-        VBox colPending = createColumn("⏳ Cambios Pendientes (Aprobación)", "#FEF3C7", pendingContainer);
+        VBox colPending = createColumn("⏳ Cambios Pendientes (Aprobación Admin)", "#FEF3C7", pendingContainer);
         
         columnsContainer.getChildren().addAll(colActive, colPending);
         HBox.setHgrow(colActive, Priority.ALWAYS);
@@ -63,7 +62,7 @@ public class UnitsView {
         
         ScrollPane scroll = new ScrollPane(internalContainer);
         scroll.setFitToWidth(true);
-        scroll.setPrefHeight(600);
+        scroll.setFitToHeight(true);
         scroll.setStyle("-fx-background: " + bgColor + "; -fx-background-color: transparent; -fx-control-inner-background: transparent;");
         scroll.setBorder(Border.EMPTY);
         
@@ -98,6 +97,7 @@ public class UnitsView {
         btnCopy.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(unit.getId().toString()); }}));
         actions.getChildren().add(btnCopy);
 
+        // Operador Solicita Cambio
         if (!isPending && role.equals("OPERATOR")) {
             Button btnEdit = new Button("✏️ Solicitar Cambio");
             btnEdit.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand;");
@@ -105,6 +105,7 @@ public class UnitsView {
             actions.getChildren().add(btnEdit);
         }
 
+        // Administrador Aprueba/Rechaza Cambio
         if (isPending && role.equals("ADMIN")) {
             Button btnApprove = new Button("Aprobar");
             btnApprove.setStyle("-fx-background-color: #10B981; -fx-text-fill: white;");
