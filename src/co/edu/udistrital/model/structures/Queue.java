@@ -1,6 +1,10 @@
 package co.edu.udistrital.model.structures;
 
-public class Queue<T> {
+import java.io.Serializable;
+
+public class Queue<T> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private Node<T> head;
 	private Node<T> tail;

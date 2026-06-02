@@ -1,5 +1,7 @@
 package co.edu.udistrital.model.entities;
 
+import java.io.Serializable;
+
 import co.edu.udistrital.model.enums.ProfileType;
 
 /**
@@ -7,7 +9,9 @@ import co.edu.udistrital.model.enums.ProfileType;
  *
  * @author Juan David Diaz Perez
  */
-public class Profile {
+public class Profile implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private final String username;
 	private final String password;

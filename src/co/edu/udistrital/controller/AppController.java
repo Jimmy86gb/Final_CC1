@@ -46,8 +46,8 @@ public class AppController {
     private LoginUseCase loginUseCase;
 
     private RegisterReportUseCase registerReportUseCase;
-    private AssignManualEmergencyUseCase assignManualEmergencyUseCase;
-    private UndoReportAssignmentUseCase undoReportAssignmentUseCase;
+    private AssignResourcesReportUseCase assignResourcesReportUseCase;
+    private UndoReportResourcesUseCase undoReportResourcesUseCase;
     private FinishReportInFieldUseCase finishReportInFieldUseCase;
     private ApproveReportActionUseCase approveReportActionUseCase;
     private RejectReportActionUseCase rejectReportActionUseCase;
@@ -55,7 +55,7 @@ public class AppController {
     private GetSortedAndFilteredReportsUseCase getSortedAndFilteredReportsUseCase;
     private GetOnGoingReportsUseCase getOnGoingReportsUseCase;
     private GetToConfirmReportsUseCase getToConfirmReportsUseCase;
-    private ExportDailyReportCSVUseCase exportDailyReportCSVUseCase;
+    private GenerateDailyCSVUseCase generateDailyCSVUseCase;
  // Agrégalo junto a los otros UseCases
     private GetNextPendingReportUseCase getNextPendingReportUseCase;
     
@@ -87,8 +87,6 @@ public class AppController {
         this.loginUseCase = new LoginUseCase(this.profileRepository);
     
         this.registerReportUseCase = new RegisterReportUseCase(this.clientRepository, this.reportRepository);
-        this.assignManualEmergencyUseCase = new AssignManualEmergencyUseCase(this.reportRepository, this.technicianRepository, this.serviceUnitRepository, this.kitRepository);
-        this.undoReportAssignmentUseCase = new UndoReportAssignmentUseCase(this.reportRepository);
         this.finishReportInFieldUseCase = new FinishReportInFieldUseCase(this.reportRepository);
         this.approveReportActionUseCase = new ApproveReportActionUseCase(this.reportRepository, this.kitRepository);
         this.rejectReportActionUseCase = new RejectReportActionUseCase(this.reportRepository);
@@ -96,7 +94,6 @@ public class AppController {
         this.getSortedAndFilteredReportsUseCase = new GetSortedAndFilteredReportsUseCase(this.reportRepository);
         this.getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(this.reportRepository);
         this.getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(this.reportRepository);
-        this.exportDailyReportCSVUseCase = new ExportDailyReportCSVUseCase(this.reportRepository);
     
         this.getNextPendingReportUseCase = new GetNextPendingReportUseCase(this.reportRepository);
     }
@@ -210,7 +207,7 @@ public class AppController {
     }
 
     public void assignReportResources(String techId, String unitId, String kitId) {
-        ResponseDTO response = assignManualEmergencyUseCase.execute(techId, unitId, kitId);
+        ResponseDTO response = assignResourcesReportUseCase.execute(techId, unitId, kitId);
         showNotification(response.isSuccess(), response.getMessage());
         refreshRequestsView();
         refreshTechniciansView();
@@ -225,7 +222,7 @@ public class AppController {
     }
 
     public void undoReport() {
-        ResponseDTO response = undoReportAssignmentUseCase.execute();
+        ResponseDTO response = undoReportResourcesUseCase.execute();
         showNotification(response.isSuccess(), response.getMessage());
         refreshRequestsView();
         refreshTechniciansView();
@@ -255,7 +252,7 @@ public class AppController {
     }
 
     public void exportDailyReport() {
-        ResponseDTO response = exportDailyReportCSVUseCase.execute();
+        ResponseDTO response = generateDailyCSVUseCase.execute("hola");
         showNotification(response.isSuccess(), response.getMessage());
     }
     
@@ -601,9 +598,9 @@ public class AppController {
         // CORRECCIÓN: Mandamos los textos con espacios exactamente igual a como los genera el ComboBox de la interfaz.
      // 5. Crear Solicitudes
         // CORRECCIÓN: Quitamos los espacios para que el Factory los reconozca
-        System.out.println("Siniestro 1: " + registerReportUseCase.execute("101010", "Camión varado por motor", "MecanicoGeneral", "Alta", "Suba").getMessage());
-        System.out.println("Siniestro 2: " + registerReportUseCase.execute("202020", "Estrellada en la principal", "OperadordeGrua", "Alta", "Kennedy").getMessage());
-        System.out.println("Siniestro 3: " + registerReportUseCase.execute("101010", "Llanta pinchada sin repuesto", "OperarioMontallantas", "Media", "Suba").getMessage());
+        System.out.println("Siniestro 1: " + registerReportUseCase.execute("101010", "Camión varado por motor", "Mecanico General", "Alta", "Suba").getMessage());
+        System.out.println("Siniestro 2: " + registerReportUseCase.execute("202020", "Estrellada en la principal", "Operador de Grua", "Alta", "Kennedy").getMessage());
+        System.out.println("Siniestro 3: " + registerReportUseCase.execute("101010", "Llanta pinchada sin repuesto", "Operario Montallantas", "Media", "Suba").getMessage());
         
         System.out.println("--- FIN CARGA DE DATOS ---");
     }

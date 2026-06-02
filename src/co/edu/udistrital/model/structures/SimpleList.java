@@ -1,12 +1,16 @@
 package co.edu.udistrital.model.structures;
 
+import java.io.Serializable;
+
 /**
  * Lista simplemente enlazada
  *
  * @author Jimmy86gb
  * @param <T> el tipo de dato que queremos guardar en la lista
  */
-public class SimpleList<T> {
+public class SimpleList<T> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private Node<T> head;
 	private int size;

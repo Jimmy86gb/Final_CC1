@@ -20,7 +20,7 @@ public class TechnicianRepository {
 	/**
 	 * Lista estatica de tecnicos que almacenara a todos en memoria
 	 */
-	private final SimpleList<Technician> technicianList = new SimpleList<>();
+	private SimpleList<Technician> technicianList = new SimpleList<>();
 
 	/**
 	 * Metodo que guarda un nuevo tecnico en la lista de tecnicos
@@ -127,4 +127,19 @@ public class TechnicianRepository {
 		}
 		return filteredList;
 	}
+
+	/**
+	 * @return the technicianList
+	 */
+	public SimpleList<Technician> getTechnicianList() {
+		return technicianList;
+	}
+
+	/**
+	 * @param technicianList the technicianList to set
+	 */
+	public void setTechnicianList(SimpleList<Technician> technicianList) {
+		this.technicianList = technicianList;
+	}
+
 }

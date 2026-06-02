@@ -18,14 +18,22 @@ import co.edu.udistrital.model.structures.Stack;
 public class KitRepository {
 
 	/**
-	 * Lista estatica de kits que almacenara a todos en memoria
+	 * Lista de kits que almacenara a todos en memoria
 	 */
-	private final SimpleList<Kit> kitList = new SimpleList<Kit>();
+	private SimpleList<Kit> kitList;
 
 	/**
 	 * Pila que representa los kits que estan en mantenimiento
 	 */
-	private final Stack<Kit> maintenanceKitStack = new Stack<Kit>();
+	private Stack<Kit> maintenanceKitStack;
+
+	/**
+	 * Constructor que inicializa la lista de kits y la pila de mantenimiento
+	 */
+	public KitRepository() {
+		this.kitList = new SimpleList<Kit>();
+		this.maintenanceKitStack = new Stack<Kit>();
+	}
 
 	/**
 	 * Metodo que guarda un kit dentro de la lista de kits del sistema
@@ -171,5 +179,34 @@ public class KitRepository {
 		}
 
 		return copyList;
+	}
+
+	/**
+	 * @return La lista de todos los kits en el sistema
+	 */
+	public SimpleList<Kit> getKitList() {
+		return kitList;
+	}
+
+	/**
+	 * @param kitList La lista de los kits guardados en la base de datos
+	 */
+	public void setKitList(SimpleList<Kit> kitList) {
+		this.kitList = kitList;
+	}
+
+	/**
+	 * @return La pila de mantenimiento del sistema
+	 */
+	public Stack<Kit> getMaintenanceKitStack() {
+		return maintenanceKitStack;
+	}
+
+	/**
+	 * @param maintenanceKitStack La pila de mantenimiento guardada en la base de
+	 *                            datos
+	 */
+	public void setMaintenanceKitStack(Stack<Kit> maintenanceKitStack) {
+		this.maintenanceKitStack = maintenanceKitStack;
 	}
 }

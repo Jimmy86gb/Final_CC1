@@ -21,12 +21,12 @@ public class ServiceUnitRepository {
 	/**
 	 * Lista estatica de unidades de servicio que almacenara a todos en memoria
 	 */
-	private final SimpleList<ServiceUnit> unitList = new SimpleList<>();
+	private SimpleList<ServiceUnit> unitList = new SimpleList<>();
 
 	/**
 	 * Pila estatica para confirmar cambios de estado de la unidad de servicio
 	 */
-	private final Stack<ServiceUnit> toConfirmStack = new Stack<ServiceUnit>();
+	private Stack<ServiceUnit> toConfirmStack = new Stack<ServiceUnit>();
 
 	/**
 	 * Metodo que guarda una nueva unidad de servicios en la lista de unidades
@@ -171,5 +171,33 @@ public class ServiceUnitRepository {
 		}
 
 		return copyList;
+	}
+
+	/**
+	 * @return La lista de unidades de servicio de la ejecucion actual
+	 */
+	public SimpleList<ServiceUnit> getUnitList() {
+		return unitList;
+	}
+
+	/**
+	 * @param unitList La lista de unidades de servicio de la base de datos
+	 */
+	public void setUnitList(SimpleList<ServiceUnit> unitList) {
+		this.unitList = unitList;
+	}
+
+	/**
+	 * @return the toConfirmStack
+	 */
+	public Stack<ServiceUnit> getToConfirmStack() {
+		return toConfirmStack;
+	}
+
+	/**
+	 * @param toConfirmStack the toConfirmStack to set
+	 */
+	public void setToConfirmStack(Stack<ServiceUnit> toConfirmStack) {
+		this.toConfirmStack = toConfirmStack;
 	}
 }

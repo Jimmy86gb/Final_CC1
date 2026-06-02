@@ -1,5 +1,6 @@
 package co.edu.udistrital.model.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -7,7 +8,9 @@ import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.TechnicianSpecialty;
 import co.edu.udistrital.model.enums.TechnicianStatus;
 
-public class Technician {
+public class Technician implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private UUID id;
 	private String name;
