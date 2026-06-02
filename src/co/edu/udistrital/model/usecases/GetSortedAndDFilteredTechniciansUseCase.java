@@ -91,7 +91,8 @@ public class GetSortedAndDFilteredTechniciansUseCase {
 			String status = technician.getStatus().getDisplayName();
 			String zone = technician.getZone().getDisplayName();
 
-			TechnicianDTO dto = new TechnicianDTO(technician.getId(), zone, speciality, zone, status, canEdit);
+			TechnicianDTO dto = new TechnicianDTO(technician.getId(), technician.getName(), speciality, zone, status,
+					canEdit);
 
 			resultList.add(dto);
 		}
