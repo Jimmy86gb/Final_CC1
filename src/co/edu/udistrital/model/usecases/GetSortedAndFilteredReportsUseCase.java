@@ -80,7 +80,7 @@ public class GetSortedAndFilteredReportsUseCase {
 		while (iterator.hasNext()) {
 			Report report = iterator.Next();
 
-			UUID ticketID = report.getTicketID();
+			String ticketID = report.getTicketID().toString();
 			String clientID = report.getClient().getId();
 			String clientName = report.getClient().getName();
 			String clientContact = report.getClient().getContactInfo();

@@ -1,7 +1,5 @@
 package co.edu.udistrital.model.dtos;
 
-import java.util.UUID;
-
 /**
  * Clase de transmision de datos de logica a vista de la entidad Kit
  *
@@ -9,7 +7,7 @@ import java.util.UUID;
  */
 public class KitDTO {
 
-	private final UUID id;
+	private final String id;
 	private final String type;
 	private final String status;
 	private final boolean isEditable;
@@ -22,7 +20,7 @@ public class KitDTO {
 	 * @param status     Estatus del kit actual
 	 * @param isEditable Si se muestran los botones de elimiar y editar en la vista
 	 */
-	public KitDTO(UUID id, String type, String status, boolean isEditable) {
+	public KitDTO(String id, String type, String status, boolean isEditable) {
 		this.id = id;
 		this.type = type;
 		this.status = status;
@@ -32,7 +30,7 @@ public class KitDTO {
 	/**
 	 * @return La id del kit actual
 	 */
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 

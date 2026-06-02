@@ -84,7 +84,7 @@ public class GetSortedAndFilteredServiceUnitsUseCase {
 			String status = serviceUnit.getStatus().getDisplayName();
 			String zone = serviceUnit.getZone().getDisplayName();
 
-			ServiceUnitDTO dto = new ServiceUnitDTO(serviceUnit.getId(), type, status, zone, canEdit);
+			ServiceUnitDTO dto = new ServiceUnitDTO(serviceUnit.getId().toString(), type, status, zone, canEdit);
 
 			resultList.add(dto);
 		}

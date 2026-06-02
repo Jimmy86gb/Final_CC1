@@ -52,7 +52,7 @@ public class GetToConfirmServiceUnitsUseCase {
 			String zone = serviceUnit.getZone().getDisplayName();
 
 			// El primer DTO recibe 'true', los siguientes recibirán 'false'
-			ServiceUnitDTO dto = new ServiceUnitDTO(serviceUnit.getId(), type, status, zone, isTopElement);
+			ServiceUnitDTO dto = new ServiceUnitDTO(serviceUnit.getId().toString(), type, status, zone, isTopElement);
 			resultList.add(dto);
 
 			// Apagamos la bandera para el resto de los elementos

@@ -49,7 +49,7 @@ public class GetMaintenanceKitsUseCase {
 			String status = kit.getStatus().getDisplayName();
 
 			// El primer DTO recibe 'true', los siguientes recibirán 'false'
-			KitDTO dto = new KitDTO(kit.getId(), type, status, isTopElement);
+			KitDTO dto = new KitDTO(kit.getId().toString(), type, status, isTopElement);
 			resultList.add(dto);
 
 			// Apagamos la bandera para el resto de los elementos

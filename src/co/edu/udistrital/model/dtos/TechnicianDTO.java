@@ -1,7 +1,5 @@
 package co.edu.udistrital.model.dtos;
 
-import java.util.UUID;
-
 /**
  * Clase de transmision de datos de logica a vista del tecnico
  *
@@ -9,7 +7,7 @@ import java.util.UUID;
  */
 public class TechnicianDTO {
 
-	private final UUID id;
+	private final String id;
 	private final String name;
 	private final String specialty;
 	private final String zone;
@@ -25,7 +23,7 @@ public class TechnicianDTO {
 	 * @param zone      La zona del tecnico actual
 	 * @param status    El status del tecnico actual
 	 */
-	public TechnicianDTO(UUID id, String name, String specialty, String zone, String status, boolean isEditable) {
+	public TechnicianDTO(String id, String name, String specialty, String zone, String status, boolean isEditable) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -38,7 +36,7 @@ public class TechnicianDTO {
 	/**
 	 * @return La ID del tecnico actual
 	 */
-	public UUID getId() {
+	public String getId() {
 		return id;
 	}
 

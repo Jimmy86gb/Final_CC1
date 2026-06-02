@@ -55,7 +55,7 @@ public class GetAvailableUnitsByZoneUseCase {
 			String type = serviceUnit.getType().getDisplayName();
 			String status = serviceUnit.getStatus().getDisplayName();
 
-			ServiceUnitDTO dto = new ServiceUnitDTO(serviceUnit.getId(), type, status, zone, false);
+			ServiceUnitDTO dto = new ServiceUnitDTO(serviceUnit.getId().toString(), type, status, zone, false);
 
 			resultList.add(dto);
 		}

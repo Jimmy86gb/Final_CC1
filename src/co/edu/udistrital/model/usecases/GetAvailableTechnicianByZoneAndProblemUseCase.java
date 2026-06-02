@@ -64,8 +64,8 @@ public class GetAvailableTechnicianByZoneAndProblemUseCase {
 
 			String status = technician.getStatus().getDisplayName();
 
-			TechnicianDTO dto = new TechnicianDTO(technician.getId(), technician.getName(), speciality, zone, status,
-					false);
+			TechnicianDTO dto = new TechnicianDTO(technician.getId().toString(), technician.getName(), speciality, zone,
+					status, false);
 
 			resultList.add(dto);
 		}

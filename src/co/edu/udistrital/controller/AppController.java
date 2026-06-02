@@ -4,30 +4,61 @@ import co.edu.udistrital.model.dtos.*;
 import co.edu.udistrital.model.entities.Client;
 import co.edu.udistrital.model.repositories.*;
 import co.edu.udistrital.model.structures.SimpleList;
-import co.edu.udistrital.model.usecases.*;
-import co.edu.udistrital.view.*;
-import co.edu.udistrital.model.enums.ProfileType;
+import co.edu.udistrital.model.usecases.ApproveReportActionUseCase;
+import co.edu.udistrital.model.usecases.AssignResourcesReportUseCase;
+import co.edu.udistrital.model.usecases.FinishReportInFieldUseCase;
+import co.edu.udistrital.model.usecases.GenerateDailyCSVUseCase;
+import co.edu.udistrital.model.usecases.GetAvailableKitsByTypeUseCase;
+import co.edu.udistrital.model.usecases.GetAvailableTechnicianByZoneAndProblemUseCase;
+import co.edu.udistrital.model.usecases.GetAvailableUnitsByZoneUseCase;
+import co.edu.udistrital.model.usecases.GetKitTypeLabelsUseCase;
+import co.edu.udistrital.model.usecases.GetNextPendingReportUseCase;
+import co.edu.udistrital.model.usecases.GetOnGoingReportsUseCase;
+import co.edu.udistrital.model.usecases.GetSortedAndFilteredClientsUseCase;
+import co.edu.udistrital.model.usecases.GetSortedAndFilteredKitsUseCase;
+import co.edu.udistrital.model.usecases.GetSortedAndFilteredReportsUseCase;
+import co.edu.udistrital.model.usecases.GetToConfirmReportsUseCase;
+import co.edu.udistrital.model.usecases.LoginUseCase;
+import co.edu.udistrital.model.usecases.RegisterClientUseCase;
+import co.edu.udistrital.model.usecases.RegisterKitUseCase;
+import co.edu.udistrital.model.usecases.RegisterReportUseCase;
+import co.edu.udistrital.model.usecases.RegisterServiceUnitUseCase;
+import co.edu.udistrital.model.usecases.RegisterTechnicianUseCase;
+import co.edu.udistrital.model.usecases.RejectReportActionUseCase;
+import co.edu.udistrital.model.usecases.RequestReportCancellationUseCase;
+import co.edu.udistrital.model.usecases.RetireKitFromMaintenanceUseCase;
+import co.edu.udistrital.model.usecases.ReturnKitToServiceUseCase;
+import co.edu.udistrital.model.usecases.UndoReportResourcesUseCase;
+import co.edu.udistrital.model.usecases.UpdateKitUseCase;
+import co.edu.udistrital.view.ClientsView;
+import co.edu.udistrital.view.DashboardView;
+import co.edu.udistrital.view.KitsView;
+import co.edu.udistrital.view.LoginView;
+import co.edu.udistrital.view.MainView;
+import co.edu.udistrital.view.RequestsView;
+import co.edu.udistrital.view.TechniciansView;
+import co.edu.udistrital.view.UnitsView;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class AppController {
 
-    private MainView mainView;
-    private DashboardView dashboardView;
-    private RequestsView requestsView;
-    private UnitsView unitsView;
-    private TechniciansView techniciansView;
-    private KitsView kitsView;
-    private ClientsView clientsView;
-    private LoginView loginView;
+	private MainView mainView;
+	private DashboardView dashboardView;
+	private RequestsView requestsView;
+	private UnitsView unitsView;
+	private TechniciansView techniciansView;
+	private KitsView kitsView;
+	private ClientsView clientsView;
+	private LoginView loginView;
 
-    private ClientRepository clientRepository;
-    private KitRepository kitRepository;
-    private ReportRepository reportRepository;
-    private ServiceUnitRepository serviceUnitRepository;
-    private TechnicianRepository technicianRepository;
-    private ProfileRepository profileRepository;
+	private ClientRepository clientRepository;
+	private KitRepository kitRepository;
+	private ReportRepository reportRepository;
+	private ServiceUnitRepository serviceUnitRepository;
+	private TechnicianRepository technicianRepository;
+	private ProfileRepository profileRepository;
 
     // --- CASOS DE USO INTEGRADOS ---
     private RegisterClientUseCase registerClientUseCase;
@@ -81,17 +112,17 @@ public class AppController {
     private SaveSystemDataUseCase saveSystemDataUseCase;
     private LoadSystemDataUseCase loadSystemDataUseCase;
 
-    private ProfileType currentRole;
-    private Stage primaryStage;
+	private ProfileType currentRole;
+	private Stage primaryStage;
     private StringBuilder consoleHistory = new StringBuilder("Sistema AutoRescate Iniciado...\n");
 
-    public AppController() {
-        this.clientRepository = new ClientRepository();
-        this.kitRepository = new KitRepository();
-        this.reportRepository = new ReportRepository();
-        this.serviceUnitRepository = new ServiceUnitRepository();
-        this.technicianRepository = new TechnicianRepository();
-        this.profileRepository = new ProfileRepository();
+	public AppController() {
+		this.clientRepository = new ClientRepository();
+		this.kitRepository = new KitRepository();
+		this.reportRepository = new ReportRepository();
+		this.serviceUnitRepository = new ServiceUnitRepository();
+		this.technicianRepository = new TechnicianRepository();
+		this.profileRepository = new ProfileRepository();
 
         this.registerClientUseCase = new RegisterClientUseCase(clientRepository);
         this.updateClientUseCase = new UpdateClientUseCase(clientRepository);
@@ -125,25 +156,32 @@ public class AppController {
         this.getAvailableKitsByTypeUseCase = new GetAvailableKitsByTypeUseCase(kitRepository);
         this.getMaintenanceKitsUseCase = new GetMaintenanceKitsUseCase(kitRepository);
 
-        this.registerReportUseCase = new RegisterReportUseCase(clientRepository, reportRepository);
-        this.assignResourcesReportUseCase = new AssignResourcesReportUseCase(reportRepository, technicianRepository, serviceUnitRepository, kitRepository);
-        this.undoReportResourcesUseCase = new UndoReportResourcesUseCase(reportRepository);
-        this.finishReportInFieldUseCase = new FinishReportInFieldUseCase(reportRepository);
-        this.approveReportActionUseCase = new ApproveReportActionUseCase(reportRepository, kitRepository);
-        this.rejectReportActionUseCase = new RejectReportActionUseCase(reportRepository);
-        this.requestReportCancellationUseCase = new RequestReportCancellationUseCase(reportRepository);
-        this.getSortedAndFilteredReportsUseCase = new GetSortedAndFilteredReportsUseCase(reportRepository);
-        this.getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(reportRepository);
-        this.getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(reportRepository);
-        this.getNextPendingReportUseCase = new GetNextPendingReportUseCase(reportRepository);
-        this.generateDailyCSVUseCase = new GenerateDailyCSVUseCase(reportRepository);
+		this.registerReportUseCase = new RegisterReportUseCase(clientRepository, reportRepository);
+		this.assignResourcesReportUseCase = new AssignResourcesReportUseCase(reportRepository, technicianRepository,
+				serviceUnitRepository, kitRepository);
+		this.undoReportResourcesUseCase = new UndoReportResourcesUseCase(reportRepository);
+		this.finishReportInFieldUseCase = new FinishReportInFieldUseCase(reportRepository);
+		this.approveReportActionUseCase = new ApproveReportActionUseCase(reportRepository, kitRepository);
+		this.rejectReportActionUseCase = new RejectReportActionUseCase(reportRepository);
+		this.requestReportCancellationUseCase = new RequestReportCancellationUseCase(reportRepository);
+		this.getSortedAndFilteredReportsUseCase = new GetSortedAndFilteredReportsUseCase(reportRepository);
+		this.getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(reportRepository);
+		this.getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(reportRepository);
+		this.getNextPendingReportUseCase = new GetNextPendingReportUseCase(reportRepository);
+		this.generateDailyCSVUseCase = new GenerateDailyCSVUseCase(reportRepository);
         this.getCriticLevelLabelsUseCase = new GetCriticLevelLabelsUseCase();
         this.getZoneLabelsUseCase = new GetZoneLabelsUseCase();
 
         this.loginUseCase = new LoginUseCase(profileRepository);
         this.saveSystemDataUseCase = new SaveSystemDataUseCase(profileRepository,  clientRepository, technicianRepository, serviceUnitRepository, kitRepository, reportRepository);
         this.loadSystemDataUseCase = new LoadSystemDataUseCase(profileRepository,  clientRepository, technicianRepository, serviceUnitRepository, kitRepository, reportRepository);
-    }
+
+		this.getAvailableKitsByTypeUseCase = new GetAvailableKitsByTypeUseCase(kitRepository);
+		this.getAvailableTechnicianByZoneAndProblemUseCase = new GetAvailableTechnicianByZoneAndProblemUseCase(
+				technicianRepository);
+		this.getAvailableUnitsByZoneUseCase = new GetAvailableUnitsByZoneUseCase(serviceUnitRepository);
+
+	}
 
     public void startApplication(Stage primaryStage) {
         this.primaryStage = primaryStage;
@@ -185,10 +223,10 @@ public class AppController {
         techniciansView.setController(this);
         requestsView.setController(this);
 
-        refreshAllViews();
-        primaryStage.setScene(mainView.getScene());
-        primaryStage.centerOnScreen();
-    }
+		refreshAllViews();
+		primaryStage.setScene(mainView.getScene());
+		primaryStage.centerOnScreen();
+	}
 
     // --- CONSOLA Y LIFO GLOBAL ---
     
@@ -370,14 +408,15 @@ public class AppController {
         while(confIt.hasNext()) requestsView.addReportCard(confIt.Next(), "CONFIRM");
     }
 
-    private void refreshUnitsView() {
-        unitsView.clearTable();
-        SimpleList.Iterator<ServiceUnitDTO> uIt = getSortedAndFilteredServiceUnitsUseCase.execute().iterador();
-        while(uIt.hasNext()) {
-            ServiceUnitDTO u = uIt.Next();
-            unitsView.addUnit(u.getId().toString(), u.getType(), u.getStatus(), u.getZone(), u.getStatus().equals("Disponible"));
-        }
-    }
+	private void refreshUnitsView() {
+		unitsView.clearTable();
+		SimpleList.Iterator<ServiceUnitDTO> uIt = getSortedAndFilteredServiceUnitsUseCase.execute().iterador();
+		while (uIt.hasNext()) {
+			ServiceUnitDTO u = uIt.Next();
+			unitsView.addUnit(u.getId().toString(), u.getType(), u.getStatus(),
+					u.getZone(), u.getStatus().equals("Disponible"));
+		}
+	}
 
     private void refreshTechniciansView() {
         techniciansView.clearTable();
@@ -400,10 +439,12 @@ public class AppController {
         while(cIt.hasNext()) clientsView.addClient(cIt.Next());
     }
 
-    private void handleResponse(ResponseDTO response, Runnable onSuccess) {
-        showNotification(response.isSuccess(), response.getMessage());
-        if (response.isSuccess() && onSuccess != null) onSuccess.run();
-    }
+	private void handleResponse(ResponseDTO response, Runnable onSuccess) {
+		showNotification(response.isSuccess(), response.getMessage());
+		if (response.isSuccess() && onSuccess != null) {
+			onSuccess.run();
+		}
+	}
 
     private void showNotification(boolean success, String message) {
         Alert alert = new Alert(success ? AlertType.INFORMATION : AlertType.ERROR);

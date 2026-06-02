@@ -74,7 +74,7 @@ public class GetSortedAndFilteredKitsUseCase {
 			String type = kit.getType().getDisplayName();
 			String status = kit.getStatus().getDisplayName();
 
-			KitDTO dto = new KitDTO(kit.getId(), type, status, canEdit);
+			KitDTO dto = new KitDTO(kit.getId().toString(), type, status, canEdit);
 
 			resultList.add(dto);
 		}
