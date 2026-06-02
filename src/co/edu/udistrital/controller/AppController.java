@@ -7,6 +7,7 @@ import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.usecases.*;
 import co.edu.udistrital.view.*;
 import co.edu.udistrital.model.enums.ProfileType;
+import co.edu.udistrital.model.enums.UnitStatus;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
@@ -44,6 +45,18 @@ public class AppController {
     private RegisterTechnicianUseCase registerTechnicianUseCase;
     private LoginUseCase loginUseCase;
 
+    private RegisterReportUseCase registerReportUseCase;
+    private AssignManualEmergencyUseCase assignManualEmergencyUseCase;
+    private UndoReportAssignmentUseCase undoReportAssignmentUseCase;
+    private FinishReportInFieldUseCase finishReportInFieldUseCase;
+    private ApproveReportActionUseCase approveReportActionUseCase;
+    private RejectReportActionUseCase rejectReportActionUseCase;
+    private RequestReportCancellationUseCase requestReportCancellationUseCase;
+    private GetSortedAndFilteredReportsUseCase getSortedAndFilteredReportsUseCase;
+    private GetOnGoingReportsUseCase getOnGoingReportsUseCase;
+    private GetToConfirmReportsUseCase getToConfirmReportsUseCase;
+    private ExportDailyReportCSVUseCase exportDailyReportCSVUseCase;
+    
     private ProfileType currentRole;
     private Stage primaryStage;
 
@@ -70,6 +83,18 @@ public class AppController {
         this.registerServiceUnitUseCase = new RegisterServiceUnitUseCase(this.serviceUnitRepository);
         this.registerTechnicianUseCase = new RegisterTechnicianUseCase(this.technicianRepository);
         this.loginUseCase = new LoginUseCase(this.profileRepository);
+    
+        this.registerReportUseCase = new RegisterReportUseCase(this.clientRepository, this.reportRepository);
+        this.assignManualEmergencyUseCase = new AssignManualEmergencyUseCase(this.reportRepository, this.technicianRepository, this.serviceUnitRepository, this.kitRepository);
+        this.undoReportAssignmentUseCase = new UndoReportAssignmentUseCase(this.reportRepository);
+        this.finishReportInFieldUseCase = new FinishReportInFieldUseCase(this.reportRepository);
+        this.approveReportActionUseCase = new ApproveReportActionUseCase(this.reportRepository, this.kitRepository);
+        this.rejectReportActionUseCase = new RejectReportActionUseCase(this.reportRepository);
+        this.requestReportCancellationUseCase = new RequestReportCancellationUseCase(this.reportRepository);
+        this.getSortedAndFilteredReportsUseCase = new GetSortedAndFilteredReportsUseCase(this.reportRepository);
+        this.getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(this.reportRepository);
+        this.getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(this.reportRepository);
+        this.exportDailyReportCSVUseCase = new ExportDailyReportCSVUseCase(this.reportRepository);
     }
 
     /**
@@ -126,6 +151,10 @@ public class AppController {
         kitsView = new KitsView(role);
         clientsView = new ClientsView(role);
 
+        // Si la memoria de clientes está vacía, inyectamos todos los datos base
+        if (clientRepository.getAllClients().getSize() == 0) {
+            seedData();
+        }
         // Conecta como el controlador de todas esas vistas
         mainView.setNavigationController(this);
         clientsView.setController(this);
@@ -135,10 +164,7 @@ public class AppController {
         requestsView.setController(this);
 
         // Llena las tablas con los datos que hayan guardados
-        refreshClientsView();
-        refreshKitsView();
-        refreshUnitsView();
-        refreshTechniciansView();
+        refreshAllViews();
 
         primaryStage.setScene(mainView.getScene());
         mainView.getScene().getWindow().centerOnScreen();
@@ -164,6 +190,69 @@ public class AppController {
         } else {
             requestsView.showCreateReportDialog(client);
         }
+    }
+    
+    public void submitReportCreation(String clientId, String description, String type, String priority, String zone) {
+        // Limpiamos los espacios de los textos que vienen de la vista (ej: "Alta " -> "Alta", "Mecanico General" -> "MecanicoGeneral")
+        ResponseDTO response = registerReportUseCase.execute(
+            clientId, 
+            description, 
+            type.replace(" ", ""), 
+            priority.replace(" ", ""), 
+            zone.replace(" ", "")
+        );
+        showNotification(response.isSuccess(), response.getMessage());
+        refreshRequestsView();
+    }
+
+    public void assignReportResources(String techId, String unitId, String kitId) {
+        ResponseDTO response = assignManualEmergencyUseCase.execute(techId, unitId, kitId);
+        showNotification(response.isSuccess(), response.getMessage());
+        refreshRequestsView();
+        refreshTechniciansView();
+        refreshUnitsView();
+        refreshKitsView();
+    }
+
+    public void cancelReport(String ticketId) {
+        ResponseDTO response = requestReportCancellationUseCase.execute(ticketId);
+        showNotification(response.isSuccess(), response.getMessage());
+        refreshRequestsView();
+    }
+
+    public void undoReport() {
+        ResponseDTO response = undoReportAssignmentUseCase.execute();
+        showNotification(response.isSuccess(), response.getMessage());
+        refreshRequestsView();
+        refreshTechniciansView();
+        refreshUnitsView();
+        refreshKitsView();
+    }
+
+    public void finishReport(String ticketId) {
+        ResponseDTO response = finishReportInFieldUseCase.execute(ticketId);
+        showNotification(response.isSuccess(), response.getMessage());
+        refreshRequestsView();
+    }
+
+    public void approveReport() {
+        ResponseDTO response = approveReportActionUseCase.execute();
+        showNotification(response.isSuccess(), response.getMessage());
+        refreshRequestsView();
+        refreshTechniciansView();
+        refreshUnitsView();
+        refreshKitsView();
+    }
+
+    public void rejectReport() {
+        ResponseDTO response = rejectReportActionUseCase.execute();
+        showNotification(response.isSuccess(), response.getMessage());
+        refreshRequestsView();
+    }
+
+    public void exportDailyReport() {
+        ResponseDTO response = exportDailyReportCSVUseCase.execute();
+        showNotification(response.isSuccess(), response.getMessage());
     }
 
     /**
@@ -225,6 +314,39 @@ public class AppController {
         	refreshTechniciansView();
         }
     }
+    
+    private void refreshAllViews() {
+        refreshClientsView();
+        refreshKitsView();
+        refreshUnitsView();
+        refreshTechniciansView();
+        refreshRequestsView();
+        refreshDashboardView();
+    }
+
+    private void refreshRequestsView() {
+        requestsView.clearPanels();
+        
+        // 1. Mostrar Pendientes
+        SimpleList.Iterator<ReportDTO> iterPending = getSortedAndFilteredReportsUseCase.execute().iterador();
+        while (iterPending.hasNext()) {
+            ReportDTO rep = iterPending.Next();
+            if (rep.canCancel()) { 
+                requestsView.addReportCard(rep, "PENDING");
+            }
+        }
+        // 2. Mostrar En Progreso
+        SimpleList.Iterator<ReportDTO> iterOngoing = getOnGoingReportsUseCase.execute().iterador();
+        while (iterOngoing.hasNext()) {
+            requestsView.addReportCard(iterOngoing.Next(), "ONGOING");
+        }
+        // 3. Mostrar Por Confirmar
+        SimpleList.Iterator<ReportDTO> iterConfirm = getToConfirmReportsUseCase.execute().iterador();
+        while (iterConfirm.hasNext()) {
+            requestsView.addReportCard(iterConfirm.Next(), "CONFIRM");
+        }
+    }
+    
 
     /**
      * Limpia la tabla de clientes y la vuelve a dibujar con lo que hay en memoria.
@@ -282,6 +404,55 @@ public class AppController {
                     tech.getZone().getDisplayName(), canEdit);
         }
     }
+    
+    /**
+     * Calcula las estadisticas actuales del sistema iterando sobre las estructuras
+     * de datos y envia los resultados a la vista del Dashboard.
+     */
+    private void refreshDashboardView() {
+        // 1. Contar Unidades Activas (Disponibles o Asignadas)
+        int activeUnits = 0;
+        SimpleList.Iterator<ServiceUnit> unitIt = serviceUnitRepository.getAllUnits().iterador();
+        while (unitIt.hasNext()) {
+            UnitStatus status = unitIt.Next().getStatus();
+            if (status == co.edu.udistrital.model.enums.UnitStatus.AVAILABLE || 
+                status == co.edu.udistrital.model.enums.UnitStatus.ASSIGNED) {
+                activeUnits++;
+            }
+        }
+
+        // 2. Contar Casos Criticos (Prioridad ALTA y que esten Pendientes o En Progreso)
+        int criticalCases = 0;
+        SimpleList.Iterator<Report> reportIt = reportRepository.getAllReports().iterador();
+        while (reportIt.hasNext()) {
+            Report r = reportIt.Next();
+            if (r.getPriority() == co.edu.udistrital.model.enums.CriticLevel.HIGH && 
+               (r.getStatus() == co.edu.udistrital.model.enums.ReportStatus.PENDING || 
+                r.getStatus() == co.edu.udistrital.model.enums.ReportStatus.ON_GOING)) {
+                criticalCases++;
+            }
+        }
+
+        // 3. Contar Elementos en Mantenimiento (Kits en la pila + Unidades dañadas)
+        int maintenanceCount = 0;
+        maintenanceCount += kitRepository.getMaintenanceKits().getSize();
+        
+        SimpleList.Iterator<ServiceUnit> maintUnitIt = serviceUnitRepository.getAllUnits().iterador();
+        while(maintUnitIt.hasNext()) {
+            if (maintUnitIt.Next().getStatus() == co.edu.udistrital.model.enums.UnitStatus.MAINTENANCE) {
+                maintenanceCount++;
+            }
+        }
+
+        // Se envian los datos calculados a la vista
+        if (dashboardView != null) {
+            dashboardView.updateStatistics(
+                String.valueOf(activeUnits), 
+                String.valueOf(criticalCases), 
+                String.valueOf(maintenanceCount)
+            );
+        }
+    }
 
     /**
      * Saca una ventanita de alerta pa avisarle al usuario que paso con lo que intento hacer.
@@ -322,5 +493,39 @@ public class AppController {
     public void logout() {
         this.currentRole = null;
         startApplication(this.primaryStage);
+    }
+    
+    /**
+     * Método encargado de poblar el sistema con datos de prueba (Seed Data)
+     * para facilitar la sustentación y evitar registrar todo manualmente.
+     */
+    private void seedData() {
+        System.out.println("--- INICIANDO CARGA DE DATOS SEMILLA ---");
+        
+        // 1. Crear Clientes
+        System.out.println("Cliente 1: " + registerClientUseCase.ResponseDTO("101010", "Transportes Rapidos SAS", "Empresarial", "3001112233").getMessage());
+        System.out.println("Cliente 2: " + registerClientUseCase.ResponseDTO("202020", "Seguros TodoRiesgo", "Seguros", "3104445566").getMessage());
+        
+        // 2. Crear Técnicos
+        System.out.println("Tecnico 1: " + registerTechnicianUseCase.execute("Carlos Ramirez", "OperadordeGrua", "Kennedy").getMessage());
+        System.out.println("Tecnico 2: " + registerTechnicianUseCase.execute("Julian Perez", "MecanicoGeneral", "Suba").getMessage());
+
+        // 3. Crear Unidades de Servicio
+        System.out.println("Unidad 1: " + registerServiceUnitUseCase.execute("Grua", "Kennedy", 2).getMessage());
+        System.out.println("Unidad 2: " + registerServiceUnitUseCase.execute("Moto", "Suba", 3).getMessage());
+
+        // 4. Crear Kits
+        System.out.println("Kit 1: " + registerKitUseCase.execute("KitdeGrua", 2).getMessage());
+        System.out.println("Kit 2: " + registerKitUseCase.execute("KitGeneral", 4).getMessage());
+
+        // 5. Crear Solicitudes
+        // CORRECCIÓN: Mandamos los textos con espacios exactamente igual a como los genera el ComboBox de la interfaz.
+     // 5. Crear Solicitudes
+        // CORRECCIÓN: Quitamos los espacios para que el Factory los reconozca
+        System.out.println("Siniestro 1: " + registerReportUseCase.execute("101010", "Camión varado por motor", "MecanicoGeneral", "Alta", "Suba").getMessage());
+        System.out.println("Siniestro 2: " + registerReportUseCase.execute("202020", "Estrellada en la principal", "OperadordeGrua", "Alta", "Kennedy").getMessage());
+        System.out.println("Siniestro 3: " + registerReportUseCase.execute("101010", "Llanta pinchada sin repuesto", "OperarioMontallantas", "Media", "Suba").getMessage());
+        
+        System.out.println("--- FIN CARGA DE DATOS ---");
     }
 }

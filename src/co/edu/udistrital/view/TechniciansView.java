@@ -8,14 +8,15 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import java.util.Optional;
 
 /**
  * Clase que define la vista para la gestion de tecnicos.
  * Se encarga de la visualizacion del personal tecnico y gestiona los componentes 
  * necesarios para el registro de nuevos recursos en el sistema.
- * 
- * @author Jimmy86gb
+ * * @author Jimmy86gb
  */
 public class TechniciansView {
     private VBox rootContainer;
@@ -24,13 +25,6 @@ public class TechniciansView {
     private AppController appController;
     private ProfileType role;
     
-    /**
-     * Constructor de la clase.
-     * Se inicializan los componentes graficos, se define el diseno de la tabla y se 
-     * configuran los permisos de visualizacion segun el rol del usuario autenticado.
-     * 
-     * @param role Perfil del usuario que accede a la vista.
-     */
     public TechniciansView(ProfileType role) {
         this.role = role;
         rootContainer = new VBox(25);
@@ -76,21 +70,8 @@ public class TechniciansView {
         rootContainer.getChildren().addAll(headerBox, tableContainer);
     }
 
-    /**
-     * Se asigna el controlador que gestionara los eventos de la vista.
-     * 
-     * @param controller Instancia del controlador de la aplicacion.
-     */
-    public void setController(AppController controller) { 
-    	this.appController = controller; 
-    	}
+    public void setController(AppController controller) { this.appController = controller; }
 
-    /**
-     * Se genera y configura un encabezado de tabla con estilos predefinidos.
-     * 
-     * @param text Texto del encabezado.
-     * @param col Indice de la columna.
-     */
     private void addHeaderCell(String text, int col) {
         Label lbl = new Label(text);
         lbl.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
@@ -99,25 +80,11 @@ public class TechniciansView {
         dataGrid.add(lbl, col, 0);
     }
 
-    /**
-     * Se eliminan los registros actuales de la tabla manteniendo el encabezado.
-     */
     public void clearTable() {
         dataGrid.getChildren().removeIf(node -> GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) > 0);
         currentRow = 1;
     }
 
-    /**
-     * Se inserta una nueva fila con la informacion de un tecnico en la tabla.
-     * Se aplican estilos segun el estado y se gestiona la habilitacion de los controles.
-     * 
-     * @param id Identificador unico del tecnico.
-     * @param name Nombre completo del tecnico.
-     * @param specialty Especialidad tecnica.
-     * @param status Estado operativo.
-     * @param zone Zona de operacion.
-     * @param isEditable Booleano que define la disponibilidad del boton de accion.
-     */
     public void addTechnician(String id, String name, String specialty, String status, String zone, boolean isEditable) {
         Label lblId = createDataCell(id.substring(0, 8));
         Label lblName = createDataCell(name);
@@ -133,12 +100,25 @@ public class TechniciansView {
         } else if (status.equals("Ocupado")) {
             lblStatus.setStyle("-fx-background-color: #FEF3C7; -fx-text-fill: #B45309; -fx-background-radius: 12;");
         } else {
-            lblStatus.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-background-radius: 12;");
+            lblStatus.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -background-radius: 12;");
         }
 
-        Button btnAction = new Button(role == ProfileType.ADMIN ? "Corregir Estado" : "Asignar");
+        Button btnAction = new Button("Copiar ID");
         btnAction.setStyle("-fx-background-color: white; -fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-cursor: hand;");
         btnAction.setDisable(!isEditable);
+
+        // ACCION: Copia el UUID completo al portapapeles del sistema
+        btnAction.setOnAction(e -> {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent content = new ClipboardContent();
+            content.putString(id);
+            clipboard.setContent(content);
+
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText(null);
+            alert.setContentText("¡ID del Técnico copiado al portapapeles!\nYa puedes hacer Ctrl+V.");
+            alert.showAndWait();
+        });
 
         dataGrid.add(lblId, 0, currentRow);
         dataGrid.add(lblName, 1, currentRow);
@@ -149,12 +129,6 @@ public class TechniciansView {
         currentRow++;
     }
 
-    /**
-     * Se crea una etiqueta configurada con estilos visuales para la presentacion de datos.
-     * 
-     * @param text Contenido de la etiqueta.
-     * @return Objeto Label configurado.
-     */
     private Label createDataCell(String text) {
         Label lbl = new Label(text);
         lbl.setFont(Font.font("Segoe UI", 14));
@@ -162,10 +136,6 @@ public class TechniciansView {
         return lbl;
     }
 
-    /**
-     * Se despliega un cuadro de dialogo para el ingreso de datos de un nuevo tecnico.
-     * La informacion capturada es remitida al controlador para su procesamiento.
-     */
     private void showAddTechnicianDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Registrar Tecnico");
@@ -197,10 +167,5 @@ public class TechniciansView {
         }
     }
 
-    /**
-     * Se obtiene el contenedor principal de la vista.
-     * 
-     * @return Contenedor VBox de la vista.
-     */
     public VBox getView() { return rootContainer; }
 }

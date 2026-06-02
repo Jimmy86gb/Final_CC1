@@ -1,7 +1,7 @@
 package co.edu.udistrital.model.enums;
 
 public enum CriticLevel {
-	LOW("Bajo"), MEDIUM("Medio"), HIGH("Alto");
+	LOW("Baja"), MEDIUM("Media"), HIGH("Alta");
 
 	private final String displayName;
 
