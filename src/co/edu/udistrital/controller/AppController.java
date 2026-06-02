@@ -174,7 +174,9 @@ public class AppController {
     public void startApplication(Stage primaryStage) {
         this.primaryStage = primaryStage;
         loadSystemDataUseCase.execute();
-        if (clientRepository.getAllClients().getSize() == 0) injectSeedData();
+        if (clientRepository.getAllClients().getSize() == 0) {
+        	injectSeedData();
+        }
 
         loginView = new LoginView();
         loginView.setOnLoginAction(() -> {
@@ -186,16 +188,21 @@ public class AppController {
                 loginView.showMessage(session.getMessage());
             }
         });
+        
         primaryStage.setScene(loginView.getScene());
         primaryStage.show();
     }
     
     public void loadData() {
         loadSystemDataUseCase.execute();
-        if (clientRepository.getAllClients().getSize() == 0) injectSeedData();
+        if (clientRepository.getAllClients().getSize() == 0) {
+        	injectSeedData();
+        }
     }
     
-    public void saveData() { saveSystemDataUseCase.execute(); }
+    public void saveData() { 
+    	saveSystemDataUseCase.execute(); 
+    }
 
     private void initializeSystem(ProfileType role) {
         this.currentRole = role;
@@ -231,28 +238,35 @@ public class AppController {
     public String getConsoleHistory() { return consoleHistory.toString(); }
 
     public void performUndo() {
+    	
         if (currentRole != ProfileType.ADMIN) {
             showNotification(false, "Acceso denegado: Solo Administradores pueden revertir operaciones.");
             return;
         }
+        
         ResponseDTO res = undoReportResourcesUseCase.execute();
+        
         if (res.isSuccess()) {
             logAction("REVERSION On-Going: " + res.getMessage());
             handleResponse(res, this::refreshAllViews);
             return;
         }
+        
         res = rejectReportActionUseCase.execute();
+        
         if (res.isSuccess()) {
             logAction("REVERSION Confirmacion: " + res.getMessage());
             handleResponse(res, this::refreshAllViews);
             return;
         }
+        
         res = rejectUnitStatusUseCase.execute();
         if (res.isSuccess()) {
             logAction("REVERSION Estado Unidad: " + res.getMessage());
             handleResponse(res, this::refreshAllViews);
             return;
         }
+        
         showNotification(false, "No hay operaciones pendientes que se puedan revertir.");
     }
     
@@ -316,12 +330,12 @@ public class AppController {
         handleResponse(res, this::refreshAllViews);
     }
 
- // MÉTODO AGREGADO: Permite el cambio directo Inactivo/Disponible
     public void updateKitStatus(String id, String type, String newStatus) {
         ResponseDTO res = updateKitUseCase.execute(id, type, newStatus);
         if (res.isSuccess()) logAction("ESTADO KIT " + id.substring(0, 8) + " → " + newStatus);
         handleResponse(res, this::refreshAllViews);
     }
+    
     public void returnKitToService() {
         ResponseDTO res = returnKitToServiceUseCase.execute();
         if (res.isSuccess()) logAction("KIT RETORNADO: Tope de pila de mantenimiento vuelve a servicio.");

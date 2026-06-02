@@ -2,6 +2,7 @@ package co.edu.udistrital.view;
 
 import co.edu.udistrital.controller.AppController;
 import co.edu.udistrital.model.dtos.KitDTO;
+import co.edu.udistrital.model.structures.SimpleList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -14,7 +15,7 @@ import javafx.scene.input.ClipboardContent;
 public class KitsView {
     private VBox rootContainer;
     private VBox availableContainer;
-    private VBox unavailableContainer;
+    private VBox maintenanceContainer;
     private AppController appController;
     private String role;
 
@@ -28,20 +29,24 @@ public class KitsView {
         Label lblTitle = new Label("Inventario y Mantenimiento de Kits");
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
         
+        Button btnNewKit = new Button("+ Registrar Kit");
+        btnNewKit.setStyle("-fx-background-color: #8B5CF6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-cursor: hand;");
+        btnNewKit.setOnAction(e -> showAddKitDialog());
+        
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        headerBox.getChildren().addAll(lblTitle, spacer); 
+        headerBox.getChildren().addAll(lblTitle, spacer, btnNewKit);
 
         HBox columnsContainer = new HBox(20);
         availableContainer = new VBox(12);
-        unavailableContainer = new VBox(12);
+        maintenanceContainer = new VBox(12);
         
-        VBox colAvailable = createColumn("✅ Kits Disponibles", "#D1FAE5", availableContainer);
-        VBox colUnavailable = createColumn("⚠️ En Mantenimiento / Inactivos", "#FEE2E2", unavailableContainer);
+        VBox colAvailable = createColumn("✅ Kits Disponibles / Inactivos", "#D1FAE5", availableContainer);
+        VBox colMaintenance = createColumn("🛠 Kits en Mantenimiento (Pila)", "#FEE2E2", maintenanceContainer);
         
-        columnsContainer.getChildren().addAll(colAvailable, colUnavailable);
+        columnsContainer.getChildren().addAll(colAvailable, colMaintenance);
         HBox.setHgrow(colAvailable, Priority.ALWAYS);
-        HBox.setHgrow(colUnavailable, Priority.ALWAYS);
+        HBox.setHgrow(colMaintenance, Priority.ALWAYS);
 
         rootContainer.getChildren().addAll(headerBox, columnsContainer);
     }
@@ -72,7 +77,7 @@ public class KitsView {
 
     public void clearTable() {
         availableContainer.getChildren().clear();
-        unavailableContainer.getChildren().clear();
+        maintenanceContainer.getChildren().clear();
     }
 
     public void addKit(KitDTO kit) {
@@ -87,7 +92,6 @@ public class KitsView {
         lblType.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
         
         Label lblStatus = new Label("Estado: " + kit.getStatus());
-        lblStatus.setFont(Font.font("Segoe UI", 12));
 
         HBox actions = new HBox(10);
         actions.setAlignment(Pos.CENTER_RIGHT);
@@ -96,8 +100,9 @@ public class KitsView {
         btnCopy.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(kit.getId().toString()); }}));
         actions.getChildren().add(btnCopy);
 
+        // 1. LÓGICA DE MANTENIMIENTO (PILA LIFO)
         if (kit.getStatus().equalsIgnoreCase("Mantenimiento")) {
-        	if (role.equals("ADMIN")) {
+            if (role.equals("ADMIN")) {
                 Button btnReturn = new Button("Retornar (Pila)");
                 btnReturn.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-cursor: hand;");
                 btnReturn.setOnAction(e -> appController.returnKitToService());
@@ -108,25 +113,66 @@ public class KitsView {
                 
                 actions.getChildren().addAll(btnReturn, btnRetire);
             }
-        } else {
-            // AQUÍ EL TOGGLE DISPONIBLE / INACTIVO
-            ComboBox<String> stateBox = new ComboBox<>();
-            stateBox.getItems().addAll("Disponible", "Inactivo");
-            stateBox.setValue(kit.getStatus());
-            
-            Button btnApply = new Button("Aplicar");
-            btnApply.setOnAction(e -> appController.updateKitStatus(kit.getId().toString(), kit.getType(), stateBox.getValue()));
-            
-            actions.getChildren().addAll(stateBox, btnApply);
+        } 
+        // 2. LÓGICA DE ACTIVACIÓN / MANTENIMIENTO MANUAL
+        else {
+            // Todos pueden enviar a mantenimiento si está disponible
+            if(kit.getStatus().equalsIgnoreCase("Disponible")) {
+                Button btnMaint = new Button("Mantenimiento");
+                btnMaint.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand;");
+                btnMaint.setOnAction(e -> appController.updateKitToMaintenance(kit.getId().toString(), kit.getType()));
+                actions.getChildren().add(btnMaint);
+            }
+
+            // ADMIN controla el Toggle de Activar/Desactivar
+            if (role.equals("ADMIN")) {
+                boolean isAvailable = kit.getStatus().equalsIgnoreCase("Disponible");
+                Button btnToggle = new Button(isAvailable ? "Desactivar" : "Activar");
+                btnToggle.setStyle(isAvailable ? "-fx-background-color: #6B7280; -fx-text-fill: white;" : "-fx-background-color: #3B82F6; -fx-text-fill: white;");
+                
+                btnToggle.setOnAction(e -> {
+                    String newStatus = isAvailable ? "Inactivo" : "Disponible";
+                    appController.updateKitStatus(kit.getId().toString(), kit.getType(), newStatus);
+                });
+                actions.getChildren().add(btnToggle);
+            }
         }
 
         card.getChildren().addAll(lblId, lblType, lblStatus, actions);
 
-        if (kit.getStatus().equalsIgnoreCase("Disponible")) {
-            availableContainer.getChildren().add(card);
+        if (kit.getStatus().equalsIgnoreCase("Mantenimiento")) {
+            maintenanceContainer.getChildren().add(card);
         } else {
-            unavailableContainer.getChildren().add(card);
+            availableContainer.getChildren().add(card);
         }
+    }
+
+    private void showAddKitDialog() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Registrar Kit");
+        
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
+
+        ComboBox<String> typeBox = new ComboBox<>();
+        SimpleList.Iterator<String> it = appController.getKitTypeLabels().iterador();
+        while(it.hasNext()) typeBox.getItems().add(it.Next());
+        typeBox.getSelectionModel().selectFirst();
+
+        TextField qtyField = new TextField("1");
+
+        grid.add(new Label("Tipo de Kit:"), 0, 0); grid.add(typeBox, 1, 0);
+        grid.add(new Label("Cantidad:"), 0, 1);    grid.add(qtyField, 1, 1);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(res -> {
+            if (res == ButtonType.OK) {
+                try { appController.registerKit(typeBox.getValue(), Integer.parseInt(qtyField.getText())); }
+                catch (NumberFormatException e) { new Alert(Alert.AlertType.ERROR, "Cantidad inválida").show(); }
+            }
+        });
     }
 
     public VBox getView() { return rootContainer; }
