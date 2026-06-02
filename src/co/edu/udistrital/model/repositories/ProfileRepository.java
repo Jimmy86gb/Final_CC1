@@ -10,12 +10,14 @@ public class ProfileRepository {
 	/**
 	 * Lista que contiene la lista de usuarios en el sistema
 	 */
-	private final SimpleList<Profile> usersList = new SimpleList<>();
+	private SimpleList<Profile> usersList;
 
 	/**
-	 * Constructor que inicializa los usuarios base del sistema
+	 * Constructor que inicializa los usuarios base del sistema y la lista de
+	 * usuarios
 	 */
 	public ProfileRepository() {
+		this.usersList = new SimpleList<Profile>();
 		usersList.add(new Profile("admin", "admin1234", ProfileType.ADMIN));
 		usersList.add(new Profile("operario", "operario1234", ProfileType.OPERATOR));
 	}
@@ -37,5 +39,19 @@ public class ProfileRepository {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * @return La lista guardada en la ejecucion actual
+	 */
+	public SimpleList<Profile> getUsersList() {
+		return usersList;
+	}
+
+	/**
+	 * @param usersList La lista guardada en la base de datos
+	 */
+	public void setUsersList(SimpleList<Profile> usersList) {
+		this.usersList = usersList;
 	}
 }

@@ -14,9 +14,16 @@ import co.edu.udistrital.model.structures.SimpleList.Iterator;
 public class ClientRepository {
 
 	/**
-	 * Lista estatica de clientes que almacenara a todos en memoria
+	 * Lista de clientes que almacenara a todos en memoria
 	 */
-	private final SimpleList<Client> clientList = new SimpleList<Client>();
+	private SimpleList<Client> clientList;
+
+	/**
+	 * Constructor que inicializa la lista de datos de tipo cliente
+	 */
+	public ClientRepository() {
+		this.clientList = new SimpleList<Client>();
+	}
 
 	/**
 	 * Metodo que guarda un nuevo cliente en la memoria de clientes
@@ -97,5 +104,19 @@ public class ClientRepository {
 			}
 		}
 		return filteredList;
+	}
+
+	/**
+	 * @return Los clientes actuales del sistema
+	 */
+	public SimpleList<Client> getClientList() {
+		return clientList;
+	}
+
+	/**
+	 * @param clientList Los clientes a inicializar en el sistema
+	 */
+	public void setClientList(SimpleList<Client> clientList) {
+		this.clientList = clientList;
 	}
 }

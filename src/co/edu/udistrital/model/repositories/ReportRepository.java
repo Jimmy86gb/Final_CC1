@@ -10,6 +10,7 @@ import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 import co.edu.udistrital.model.structures.Stack;
 
+// Terminar comentarios
 /**
  * Clase que representa la memoria y administracion referente a los reportes en
  * el sistema
@@ -21,32 +22,32 @@ public class ReportRepository {
 	/**
 	 * Cola de la mas alta prioridad para los reportes sacados de la stack ongoing
 	 */
-	private final Queue<Report> undoQueue = new Queue<Report>();
+	private Queue<Report> undoQueue = new Queue<Report>();
 
 	/**
 	 * Cola de alta prioridad para alto impacto en transito o gravedad del accidente
 	 */
-	private final Queue<Report> highPriorityQueue = new Queue<Report>();
+	private Queue<Report> highPriorityQueue = new Queue<Report>();
 
 	/**
 	 * Cola de prioridad media para clientes empresariales
 	 */
-	private final Queue<Report> mediumPriorityQueue = new Queue<Report>();
+	private Queue<Report> mediumPriorityQueue = new Queue<Report>();
 
 	/**
 	 * Cola de baja prioridad para personas comunes
 	 */
-	private final Queue<Report> lowPriorityQueue = new Queue<Report>();
+	private Queue<Report> lowPriorityQueue = new Queue<Report>();
 
 	/**
 	 * Pila de reportes en proceso de ser completados
 	 */
-	private final Stack<Report> onGoingReportStack = new Stack<Report>();
+	private Stack<Report> onGoingReportStack = new Stack<Report>();
 
 	/**
 	 * Pila de reportes para confirmar si se cerro un caso
 	 */
-	private final Stack<Report> toConfirmStack = new Stack<Report>();
+	private Stack<Report> toConfirmStack = new Stack<Report>();
 
 	/**
 	 * Lista de todos los reportes sin importar su estado
@@ -363,5 +364,96 @@ public class ReportRepository {
 
 		target = extractFromQueue(lowPriorityQueue, ticketID);
 		return target;
+	}
+
+	/**
+	 * @return La cola de deshacer de la ejecucion actual
+	 */
+	public Queue<Report> getUndoQueue() {
+		return undoQueue;
+	}
+
+	/**
+	 * @param undoQueue La cola de deshacer de la base de datos
+	 */
+	public void setUndoQueue(Queue<Report> undoQueue) {
+		this.undoQueue = undoQueue;
+	}
+
+	/**
+	 * @return the highPriorityQueue
+	 */
+	public Queue<Report> getHighPriorityQueue() {
+		return highPriorityQueue;
+	}
+
+	/**
+	 * @param highPriorityQueue the highPriorityQueue to set
+	 */
+	public void setHighPriorityQueue(Queue<Report> highPriorityQueue) {
+		this.highPriorityQueue = highPriorityQueue;
+	}
+
+	/**
+	 * @return the mediumPriorityQueue
+	 */
+	public Queue<Report> getMediumPriorityQueue() {
+		return mediumPriorityQueue;
+	}
+
+	/**
+	 * @param mediumPriorityQueue the mediumPriorityQueue to set
+	 */
+	public void setMediumPriorityQueue(Queue<Report> mediumPriorityQueue) {
+		this.mediumPriorityQueue = mediumPriorityQueue;
+	}
+
+	/**
+	 * @return the lowPriorityQueue
+	 */
+	public Queue<Report> getLowPriorityQueue() {
+		return lowPriorityQueue;
+	}
+
+	/**
+	 * @param lowPriorityQueue the lowPriorityQueue to set
+	 */
+	public void setLowPriorityQueue(Queue<Report> lowPriorityQueue) {
+		this.lowPriorityQueue = lowPriorityQueue;
+	}
+
+	/**
+	 * @return the onGoingReportStack
+	 */
+	public Stack<Report> getOnGoingReportStack() {
+		return onGoingReportStack;
+	}
+
+	/**
+	 * @param onGoingReportStack the onGoingReportStack to set
+	 */
+	public void setOnGoingReportStack(Stack<Report> onGoingReportStack) {
+		this.onGoingReportStack = onGoingReportStack;
+	}
+
+	/**
+	 * @return the toConfirmStack
+	 */
+	public Stack<Report> getToConfirmStack() {
+		return toConfirmStack;
+	}
+
+	/**
+	 * @param toConfirmStack the toConfirmStack to set
+	 */
+	public void setToConfirmStack(Stack<Report> toConfirmStack) {
+		this.toConfirmStack = toConfirmStack;
+	}
+
+	/**
+	 * @return the allHistoricalReports
+	 */
+	public SimpleList<Report> getAllHistoricalReports() {
+		return allHistoricalReports;
 	}
 }
