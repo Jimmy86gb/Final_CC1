@@ -1,12 +1,16 @@
 package co.edu.udistrital.model.structures;
 
+import java.io.Serializable;
+
 /**
  * Cada uno de los nodos que conforman la lista enlazada
  *
  * @author Jimmy86gb
  * @param <T> lo que sea que vayamos a meter dentro del nodo
  */
-public class Node<T> {
+public class Node<T> implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private T data;
 	private Node<T> next;
