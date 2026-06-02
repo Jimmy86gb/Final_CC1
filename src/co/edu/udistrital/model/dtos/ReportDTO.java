@@ -66,8 +66,8 @@ public class ReportDTO {
 	 */
 	public ReportDTO(UUID ticketID, String clientID, String clientName, String clientContact, String problemDescription,
 			String problemType, String priority, String reportZone, String reportTime, String reportStatus,
-			UUID technicianID, String technicianName, String technicianSpeciality, UUID unitID, UUID kitID,
-			String unitType, boolean canCancel, boolean canUndo, boolean canFinish, boolean canConfirm) {
+			UUID technicianID, String technicianName, String technicianSpeciality, UUID unitID, String unitType,
+			UUID kitID, boolean canCancel, boolean canUndo, boolean canFinish, boolean canConfirm) {
 
 		this.ticketID = ticketID;
 		this.clientID = clientID;

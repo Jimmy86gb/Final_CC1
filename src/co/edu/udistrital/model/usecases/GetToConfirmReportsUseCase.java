@@ -67,6 +67,7 @@ public class GetToConfirmReportsUseCase {
 			String techName = "Sin asignar";
 			String techSpec = "N/A";
 			UUID unitID = null;
+			String unitType = "N/A";
 			UUID kitID = null;
 
 			if (report.getAssignedTechnician() != null) {
@@ -77,6 +78,7 @@ public class GetToConfirmReportsUseCase {
 
 			if (report.getAssignedUnit() != null) {
 				unitID = report.getAssignedUnit().getId();
+				unitType = report.getAssignedUnit().getType().getDisplayName();
 			}
 
 			if (report.getAssignedKit() != null) {
@@ -88,8 +90,8 @@ public class GetToConfirmReportsUseCase {
 			boolean canFinish = false;
 
 			ReportDTO dto = new ReportDTO(ticketID, clientID, clientName, clientContact, problemDesc, problemType,
-					priority, zone, time, status, techID, techName, techSpec, unitID, kitID, canCancel, canUndo,
-					canFinish, isTopElement);
+					priority, zone, time, status, techID, techName, techSpec, unitID, unitType, kitID, canCancel,
+					canUndo, canFinish, isTopElement);
 
 			resultList.add(dto);
 

@@ -62,9 +62,11 @@ public class GetNextPendingReportUseCase {
 				? nextReport.getAssignedTechnician().getSpecialty().getDisplayName()
 				: "N/A";
 		UUID unitID = nextReport.getAssignedUnit() != null ? nextReport.getAssignedUnit().getId() : null;
+		String unitType = nextReport.getAssignedUnit() != null ? nextReport.getAssignedUnit().getType().getDisplayName()
+				: null;
 		UUID kitID = nextReport.getAssignedKit() != null ? nextReport.getAssignedKit().getId() : null;
 
 		return new ReportDTO(ticketID, clientID, clientName, clientContact, problemDesc, problemType, priority, zone,
-				time, status, techID, techName, techSpec, unitID, kitID, false, false, false, false);
+				time, status, techID, techName, techSpec, unitID, unitType, kitID, false, false, false, false);
 	}
 }
