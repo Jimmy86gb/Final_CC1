@@ -218,6 +218,20 @@ public class ReportRepository {
 	}
 
 	/**
+	 * Metodo que añade a los pendientes los reportes cuyo cancelamiento no fue
+	 * aprobado
+	 * 
+	 * @param report El reporte que salio de la pila
+	 */
+	public void registerReport(Report report) {
+		switch (report.getPriority()) {
+		case HIGH -> highPriorityQueue.enqueue(report);
+		case MEDIUM -> mediumPriorityQueue.enqueue(report);
+		case LOW -> lowPriorityQueue.enqueue(report);
+		}
+	}
+
+	/**
 	 * Metodo que retorna el siguiente reporte a procesar segun el orden de
 	 * prioridades, sin sacarlo de la cola.
 	 * 
