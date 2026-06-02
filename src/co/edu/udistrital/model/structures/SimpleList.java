@@ -101,7 +101,7 @@ public class SimpleList<T> {
 		return head == null;
 	}
 
-	public int getsize() {
+	public int getSize() {
 		return size;
 	}
 
