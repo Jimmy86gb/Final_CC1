@@ -15,7 +15,7 @@ public class KitFactory {
 	 * @return Enum kit a usar en la logica
 	 */
 	public KitType generateKitType(String kitType) {
-		return switch (kitType.toLowerCase().trim()) {
+		return switch (kitType.replaceAll("\\s+", "").toLowerCase()) {
 		case "kitdegrua" -> KitType.CRANE_KIT;
 		case "kitdeelectricidad" -> KitType.ELECTRICITY_KIT;
 		case "kitgeneral" -> KitType.GENERAL_KIT;

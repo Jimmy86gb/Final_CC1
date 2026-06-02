@@ -16,7 +16,7 @@ public class UnitFactory {
 	 * @return Zona en enum
 	 */
 	public UnitType generateUnitType(String unitType) {
-		return switch (unitType.toLowerCase().trim()) {
+		return switch (unitType.replaceAll("\\s+", "").toLowerCase()) {
 		case "grua" -> UnitType.CRANE;
 		case "moto" -> UnitType.MOTORCYCLE;
 		case "camioneta" -> UnitType.TRUCK;

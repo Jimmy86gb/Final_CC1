@@ -16,7 +16,7 @@ public class TechnicianStatusFactory {
 	 * @return Especialidad en enum del tecnico
 	 */
 	public TechnicianStatus generaTechnicianStatus(String technicianStatus) {
-		return switch (technicianStatus.toLowerCase()) {
+		return switch (technicianStatus.replaceAll("\\s+", "").toLowerCase()) {
 		case "disponible" -> TechnicianStatus.AVAILABLE;
 		case "ocupado" -> TechnicianStatus.BUSY;
 		case "inactivo" -> TechnicianStatus.INACTIVE;

@@ -15,15 +15,12 @@ public class CriticFactory {
 	 * @param critictLevel Nivel de riesgo del pedido en string
 	 * @return Nivel de riesgo en enum para usar en la logica
 	 */
-	public CriticLevel generateCriticLevel(String priority) {
-        // Normalizamos el texto a minusculas para evitar fallos por mayusculas
-        String cleanPriority = priority.toLowerCase().trim();
-        
-        return switch (cleanPriority) {
-            case "alta", "high" -> CriticLevel.HIGH;
-            case "media", "medium" -> CriticLevel.MEDIUM;
-            case "baja", "low" -> CriticLevel.LOW;
-            default -> throw new IllegalArgumentException("Tipo de riesgo no soportado: " + priority);
-        };
-    }
+	public CriticLevel generateCriticLevel(String critictLevel) {
+		return switch (critictLevel.replaceAll("\\s+", "").toLowerCase()) {
+		case "bajo" -> CriticLevel.LOW;
+		case "medio" -> CriticLevel.MEDIUM;
+		case "alto" -> CriticLevel.HIGH;
+		default -> throw new IllegalArgumentException("Tipo de riesgo no soportado: " + critictLevel);
+		};
+	}
 }
