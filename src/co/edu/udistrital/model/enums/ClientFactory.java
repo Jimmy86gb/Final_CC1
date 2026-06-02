@@ -16,7 +16,7 @@ public class ClientFactory {
 	 * @return Tipo de cliente equivalente en enum
 	 */
 	public ClientType generateClientType(String clientType) {
-		return switch (clientType.toLowerCase().trim()) {
+		return switch (clientType.replaceAll("\\s+", "").toLowerCase()) {
 		case "particular" -> ClientType.PRIVATE;
 		case "seguros" -> ClientType.INSURANCE;
 		case "empresarial" -> ClientType.TRANSPORT_COMPANY;

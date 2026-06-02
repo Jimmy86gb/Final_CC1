@@ -17,7 +17,7 @@ public class UnitStatusFactory {
 	 * @return Su equivalente en ENUM
 	 */
 	public UnitStatus generateUnitStatus(String unitStatus) {
-		return switch (unitStatus.toLowerCase().trim()) {
+		return switch (unitStatus.replaceAll("\\s+", "").toLowerCase()) {
 		case "disponible" -> UnitStatus.AVAILABLE;
 		case "asignada" -> UnitStatus.ASSIGNED;
 		case "enmantenimiento" -> UnitStatus.MAINTENANCE;

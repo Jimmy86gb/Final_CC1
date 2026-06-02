@@ -16,7 +16,7 @@ public class TechnicianFactory {
 	 * @return Especialidad en enum del tecnico
 	 */
 	public TechnicianSpecialty generaTechnicianSpecialty(String technicianSpeciality) {
-		return switch (technicianSpeciality.toLowerCase().trim()) {
+		return switch (technicianSpeciality.replaceAll("\\s+", "").toLowerCase()) {
 		case "electricoautomotriz" -> TechnicianSpecialty.AUTOMOTIVE_ELECTRICITY;
 		case "operadordegrua" -> TechnicianSpecialty.CRANE_OPERATION;
 		case "mecanicogeneral" -> TechnicianSpecialty.GENERAL_MECHANICS;

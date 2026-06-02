@@ -16,7 +16,7 @@ public class ZoneFactory {
 	 * @return Zona en enum
 	 */
 	public OperationZone generateOperationZone(String zone) {
-		return switch (zone.toLowerCase().trim()) {
+		return switch (zone.replaceAll("\\s+", "").toLowerCase()) {
 		case "usaquen" -> OperationZone.USAQUEN;
 		case "chapinero" -> OperationZone.CHAPINERO;
 		case "santafe" -> OperationZone.SANTA_FE;

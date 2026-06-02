@@ -16,7 +16,7 @@ public class CriticFactory {
 	 * @return Nivel de riesgo en enum para usar en la logica
 	 */
 	public CriticLevel generateCriticLevel(String critictLevel) {
-		return switch (critictLevel.toLowerCase()) {
+		return switch (critictLevel.replaceAll("\\s+", "").toLowerCase()) {
 		case "bajo" -> CriticLevel.LOW;
 		case "medio" -> CriticLevel.MEDIUM;
 		case "alto" -> CriticLevel.HIGH;
