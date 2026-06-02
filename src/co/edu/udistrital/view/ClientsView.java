@@ -16,9 +16,9 @@ public class ClientsView {
     private GridPane dataGrid;
     private int currentRow = 1;
     private AppController appController;
-    private ProfileType role;
+    private String role;
     
-    public ClientsView(ProfileType role) {
+    public ClientsView(String role) {
         this.role = role;
         rootContainer = new VBox(25);
         
@@ -31,7 +31,7 @@ public class ClientsView {
         Button btnNewClient = new Button("+ Nuevo Cliente");
         btnNewClient.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-padding: 8 16; -fx-cursor: hand;");
         btnNewClient.setOnAction(e -> showAddClientDialog(""));
-        if(role == ProfileType.ADMIN) btnNewClient.setDisable(true);
+        if(role.equals("ADMIN")) btnNewClient.setDisable(true);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);

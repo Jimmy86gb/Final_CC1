@@ -15,7 +15,7 @@ import javafx.scene.text.FontWeight;
 
 public class RequestsView {
     private VBox rootContainer;
-    private ProfileType role;
+    private String role;
     private AppController appController;
     
     // Contenedores directos
@@ -23,7 +23,7 @@ public class RequestsView {
     private VBox ongoingCasesContainer;
     private VBox confirmCasesContainer;
     
-    public RequestsView(ProfileType role) {
+    public RequestsView(String role) {
         this.role = role;
         rootContainer = new VBox(25);
         rootContainer.setPadding(new Insets(20));
@@ -47,7 +47,7 @@ public class RequestsView {
             else new Alert(Alert.AlertType.INFORMATION, "No hay emergencias en espera.").showAndWait();
         });
 
-        if (role == ProfileType.ADMIN) {
+        if ((role.equals("ADMIN"))) {
             btnNewRequest.setDisable(true);
             btnAssignManual.setDisable(true);
         }
@@ -163,14 +163,14 @@ public class RequestsView {
         actions.setAlignment(Pos.CENTER_RIGHT);
         actions.setPadding(new Insets(10, 0, 0, 0));
 
-        if (targetPanel.equals("PENDING") && role == ProfileType.OPERATOR) {
+        if (targetPanel.equals("PENDING") && role.equals("OPERATOR")) {
             Button btnCancel = new Button("Cancelar Cita");
             btnCancel.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-cursor: hand;");
             btnCancel.setOnAction(e -> appController.cancelReport(report.getTicketID().toString()));
             actions.getChildren().add(btnCancel);
         }
 
-        if (targetPanel.equals("ONGOING") && role == ProfileType.OPERATOR) {
+        if (targetPanel.equals("ONGOING") && role.equals("OPERATOR")) {
             if (report.canUndo()) {
                 Button btnUndo = new Button("Deshacer ↩");
                 btnUndo.setStyle("-fx-background-color: #FEF3C7; -fx-text-fill: #B45309; -fx-cursor: hand;");
@@ -185,7 +185,7 @@ public class RequestsView {
             }
         }
         
-        if (targetPanel.equals("CONFIRM") && role == ProfileType.ADMIN && report.canConfirm()) {
+        if (targetPanel.equals("CONFIRM") && (role.equals("ADMIN")) && report.canConfirm()) {
             Button btnApprove = new Button("Aprobar");
             btnApprove.setStyle("-fx-background-color: #D1FAE5; -fx-text-fill: #065F46; -fx-cursor: hand;");
             btnApprove.setOnAction(e -> appController.approveReport());

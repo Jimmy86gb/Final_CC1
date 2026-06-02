@@ -82,6 +82,7 @@ public class AppController {
     private LoadSystemDataUseCase loadSystemDataUseCase;
 
     private ProfileType currentRole;
+    private String roleType;
     private Stage primaryStage;
     private StringBuilder consoleHistory = new StringBuilder("Sistema AutoRescate Iniciado...\n");
 
@@ -170,13 +171,18 @@ public class AppController {
 
     private void initializeSystem(ProfileType role) {
         this.currentRole = role;
-        mainView = new MainView(role);
-        dashboardView = new DashboardView(role, this);
-        requestsView = new RequestsView(role);
-        unitsView = new UnitsView(role);
-        techniciansView = new TechniciansView(role);
-        kitsView = new KitsView(role);
-        clientsView = new ClientsView(role);
+        if(role == ProfileType.ADMIN) {
+        	roleType = "ADMIN";
+        }else {
+        	roleType = "OPERATOR";
+        }
+        mainView = new MainView(roleType);
+        dashboardView = new DashboardView(roleType, this);
+        requestsView = new RequestsView(roleType);
+        unitsView = new UnitsView(roleType);
+        techniciansView = new TechniciansView(roleType);
+        kitsView = new KitsView(roleType);
+        clientsView = new ClientsView(roleType);
 
         mainView.setNavigationController(this);
         clientsView.setController(this);

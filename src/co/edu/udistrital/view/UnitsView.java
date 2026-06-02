@@ -18,9 +18,9 @@ public class UnitsView {
     private GridPane dataGrid;
     private int currentRow = 1;
     private AppController appController;
-    private ProfileType role;
+    private String role;
 
-    public UnitsView(ProfileType role) {
+    public UnitsView(String role) {
         this.role = role;
         rootContainer = new VBox(25);
         
@@ -33,7 +33,7 @@ public class UnitsView {
         Button btnNewUnit = new Button("+ Registrar Unidad");
         btnNewUnit.setStyle("-fx-background-color: #2563EB; -fx-text-fill: white; -fx-padding: 8 16; -fx-cursor: hand;");
         btnNewUnit.setOnAction(e -> showAddUnitDialog());
-        if (role == ProfileType.ADMIN) btnNewUnit.setDisable(true);
+        if ((role.equals("ADMIN"))) btnNewUnit.setDisable(true);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -41,7 +41,7 @@ public class UnitsView {
 
         // Panel de Aprobación de Unidades para ADMIN
         HBox confirmPanel = new HBox(15);
-        if (role == ProfileType.ADMIN) {
+        if ((role.equals("ADMIN"))) {
             confirmPanel.setAlignment(Pos.CENTER_LEFT);
             confirmPanel.setPadding(new Insets(15));
             confirmPanel.setStyle("-fx-background-color: #E0E7FF; -fx-border-color: #3730A3; -fx-border-radius: 8;");
@@ -76,7 +76,7 @@ public class UnitsView {
 
         tableContainer.getChildren().add(dataGrid);
         
-        if (role == ProfileType.ADMIN) rootContainer.getChildren().addAll(headerBox, confirmPanel, tableContainer);
+        if ((role.equals("ADMIN"))) rootContainer.getChildren().addAll(headerBox, confirmPanel, tableContainer);
         else rootContainer.getChildren().addAll(headerBox, tableContainer);
     }
 

@@ -17,9 +17,9 @@ public class TechniciansView {
     private GridPane dataGrid;
     private int currentRow = 1;
     private AppController appController;
-    private ProfileType role;
+    private String role;
     
-    public TechniciansView(ProfileType role) {
+    public TechniciansView(String role) {
         this.role = role;
         rootContainer = new VBox(25);
         
@@ -32,7 +32,7 @@ public class TechniciansView {
         Button btnNewTechnician = new Button("+ Registrar Tecnico");
         btnNewTechnician.setStyle("-fx-background-color: #8B5CF6; -fx-text-fill: white; -fx-padding: 8 16; -fx-cursor: hand;");
         btnNewTechnician.setOnAction(e -> showAddTechnicianDialog());
-        if (role == ProfileType.ADMIN) btnNewTechnician.setDisable(true);
+        if ((role.equals("ADMIN"))) btnNewTechnician.setDisable(true);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);

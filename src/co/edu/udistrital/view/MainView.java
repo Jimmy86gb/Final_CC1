@@ -1,7 +1,6 @@
 package co.edu.udistrital.view;
 
 import co.edu.udistrital.controller.AppController;
-import co.edu.udistrital.model.enums.ProfileType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -27,7 +26,7 @@ public class MainView {
     private BorderPane rootPane;
     private StackPane contentArea;
     private AppController appController;
-    private ProfileType role;
+    private String role;
 
     /**
      * Constructor de la clase.
@@ -36,7 +35,7 @@ public class MainView {
      * 
      * @param role Perfil del usuario autenticado para la configuracion de permisos.
      */
-    public MainView(ProfileType role) {
+    public MainView(String role) {
         this.role = role;
 
         rootPane = new BorderPane();
@@ -103,7 +102,7 @@ public class MainView {
         topNav.getChildren().add(btnClients);
 
         Label lblRole = new Label(
-                role == ProfileType.OPERATOR
+                role.equals("OPERATOR")
                         ? "Despachador"
                         : "ADMIN"
         );
@@ -161,7 +160,7 @@ public class MainView {
      * 
      * @return Tipo de perfil del usuario.
      */
-    public ProfileType getRole() {
+    public String getRole() {
         return role;
     }
 }
