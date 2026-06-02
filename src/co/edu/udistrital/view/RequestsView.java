@@ -246,24 +246,6 @@ public class RequestsView {
 		grid.setHgap(10);
 		grid.setVgap(10);
 		grid.setPadding(new Insets(20));
-        // Se agrega directamente a la lista en vez de usar lookup
-        if (targetPanel.equals("PENDING")) pendingCasesContainer.getChildren().add(card);
-        else if (targetPanel.equals("ONGOING")) ongoingCasesContainer.getChildren().add(card);
-        else if (targetPanel.equals("CONFIRM")) confirmCasesContainer.getChildren().add(card);
-    }
-
-    private void showAssignManualDialog(ReportDTO report) {
-        // NULL SAFETY ADICIONAL PARA LA VISTA:
-        String safeZone = report.getReportZone() != null ? report.getReportZone() : "Desconocida";
-        String safeSpec = report.getProblemType() != null ? report.getProblemType() : "Desconocida";
-
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Análisis de Asignación");
-        dialog.setHeaderText("Despacho sugerido para Zona: " + safeZone + "\nRequiere: " + safeSpec);
-        
-        GridPane grid = new GridPane();
-        grid.setHgap(10); grid.setVgap(10);
-        grid.setPadding(new Insets(20));
 
 		// 1. TÉCNICOS: Carga dinámica desde el backend
 		ComboBox<EntityItem> techBox = new ComboBox<>();
@@ -273,15 +255,14 @@ public class RequestsView {
 			techBox.getItems().add(tIt.Next());
 		}
 		techBox.getSelectionModel().selectFirst();
-        ComboBox<EntityItem> techBox = new ComboBox<>();
-        SimpleList.Iterator<EntityItem> tIt = appController.getSuggestedTechnicians(safeZone, safeSpec).iterador();
-        while(tIt.hasNext()) techBox.getItems().add(tIt.Next());
-        techBox.getSelectionModel().selectFirst();
 
-        ComboBox<EntityItem> unitBox = new ComboBox<>();
-        SimpleList.Iterator<EntityItem> uIt = appController.getSuggestedUnits(safeZone).iterador();
-        while(uIt.hasNext()) unitBox.getItems().add(uIt.Next());
-        unitBox.getSelectionModel().selectFirst();
+		// 2. UNIDADES: Carga dinámica filtrada por zona
+		ComboBox<EntityItem> unitBox = new ComboBox<>();
+		SimpleList.Iterator<EntityItem> uIt = appController.getSuggestedUnits(report.getReportZone()).iterador();
+		while (uIt.hasNext()) {
+			unitBox.getItems().add(uIt.Next());
+		}
+		unitBox.getSelectionModel().selectFirst();
 
 		// 3. KITS (CORREGIDO): Ahora le pasamos el tipo de problema para que traiga el
 		// Kit exacto
@@ -291,10 +272,6 @@ public class RequestsView {
 			kitBox.getItems().add(kIt.Next());
 		}
 		kitBox.getSelectionModel().selectFirst();
-        ComboBox<EntityItem> kitBox = new ComboBox<>();
-        SimpleList.Iterator<EntityItem> kIt = appController.getAvailableKitsForUI(safeSpec).iterador();
-        while(kIt.hasNext()) kitBox.getItems().add(kIt.Next());
-        kitBox.getSelectionModel().selectFirst();
 
 		grid.add(new Label("Técnico Sugerido:"), 0, 0);
 		grid.add(techBox, 1, 0);
