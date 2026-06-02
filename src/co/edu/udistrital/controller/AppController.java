@@ -56,6 +56,8 @@ public class AppController {
 
     private ProfileType currentRole;
     private Stage primaryStage;
+    
+    private StringBuilder consoleHistory = new StringBuilder("Sistema iniciado...\n");
 
     public AppController() {
         this.clientRepository = new ClientRepository();
@@ -124,9 +126,22 @@ public class AppController {
         requestsView.setController(this);
         dashboardView.setController(this);
 
+        dashboardView.updateLog(getConsoleHistory());
         refreshAllViews();
         primaryStage.setScene(mainView.getScene());
         primaryStage.centerOnScreen();
+    }
+    
+    /**
+     * Helper para enviar mensajes al log del Dashboard (Consola)
+     */
+ // 2. Modifica tu método logToDashboard
+    private void logToDashboard(String message) {
+        String entry = "> " + message + "\n";
+        consoleHistory.append(entry); // Guardamos en la "memoria" del controlador
+        if (dashboardView != null) {
+            dashboardView.updateLog(message);
+        }
     }
 
     // --- FLUJO DE EMERGENCIAS ---
@@ -149,13 +164,12 @@ public class AppController {
         return getNextPendingReportUseCase.execute();
     }
 
- // Ejemplo en AppController.java
     public void assignReportResources(String techId, String unitId, String kitId) {
-        ResponseDTO res = assignResourcesReportUseCase.execute(techId, unitId, kitId);
-        if(res.isSuccess()) {
-            dashboardView.updateLog("Asignación realizada: Tech " + techId + " a Unidad " + unitId);
+        ResponseDTO response = assignResourcesReportUseCase.execute(techId, unitId, kitId);
+        if (response.isSuccess()) {
+            logToDashboard("ASIGNACIÓN: TKT Asignado a Técnico " + techId);
         }
-        handleResponse(res, this::refreshAllViews);
+        handleResponse(response, this::refreshAllViews);
     }
 
     public void undoReport() {
@@ -167,7 +181,11 @@ public class AppController {
     }
 
     public void approveReport() {
-        handleResponse(approveReportActionUseCase.execute(), this::refreshAllViews);
+        ResponseDTO response = approveReportActionUseCase.execute();
+        if (response.isSuccess()) {
+            logToDashboard("APROBACIÓN: Servicio consolidado y cerrado.");
+        }
+        handleResponse(response, this::refreshAllViews);
     }
 
     public void rejectReport() {
@@ -265,6 +283,10 @@ public class AppController {
         }
         return list;
     }
+    
+    public String getConsoleHistory() {
+        return consoleHistory.toString();
+    }
 
     // --- REFRESHERS CON ITERADORES NATIVOS ---
 
@@ -357,17 +379,18 @@ public class AppController {
      * Permite al supervisor revertir la última operación realizada en el sistema.
      * Esto cumple con el requerimiento de restaurar consistencia ante errores de despacho.
      */
+ // --- AHORA, MODIFICA TUS MÉTODOS DE ACCIÓN ASÍ ---
+
     public void performUndo() {
         if (currentRole != ProfileType.ADMIN) {
-            showNotification(false, "Acceso denegado: Solo supervisores pueden revertir operaciones.");
+            showNotification(false, "Acceso denegado.");
             return;
         }
-        
-        // Llamamos al caso de uso de deshacer
         ResponseDTO response = undoReportResourcesUseCase.execute();
-        
-        showNotification(response.isSuccess(), response.getMessage());
-        refreshAllViews(); // Refrescamos todo para ver el estado restaurado
+        if (response.isSuccess()) {
+            logToDashboard("REVERSIÓN: " + response.getMessage());
+        }
+        handleResponse(response, this::refreshAllViews);
     }
 
     // --- NAVEGACIÓN ---

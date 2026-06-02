@@ -77,6 +77,10 @@ public class DashboardView {
         }
 
         rootContainer.getChildren().addAll(lblTitle, cardsContainer, lblLog, consoleLog, actionsContainer);
+    
+        if (appController != null) {
+            consoleLog.setText(appController.getConsoleHistory());
+        }
     }
 
     /**
