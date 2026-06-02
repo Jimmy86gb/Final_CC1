@@ -7,26 +7,10 @@ import co.edu.udistrital.model.repositories.KitRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 
-/**
- * Clase encargada de ejecutar el caso de uso de devolucion de lista de kits
- * disponibles para usar segun su tipo
- *
- * @author Juan David Diaz Perez
- */
 public class GetAvailableKitsByTypeUseCase {
-
-	/**
-	 * Instaciacion privada del repositorio de memoria de kits
-	 */
 	private final KitRepository kitRepository;
 
-	/**
-	 * Constructor que inyecta el repositorio de kits al caso de uso
-	 * 
-	 * @param kitRepository Repositorio de memoria de kits
-	 */
 	public GetAvailableKitsByTypeUseCase(KitRepository kitRepository) {
-
 		this.kitRepository = kitRepository;
 	}
 

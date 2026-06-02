@@ -27,22 +27,22 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class RequestsView {
-	private VBox rootContainer;
-	private ProfileType role;
-	private AppController appController;
-
-	// Contenedores directos
-	private VBox pendingCasesContainer;
-	private VBox ongoingCasesContainer;
-	private VBox confirmCasesContainer;
-
-	public RequestsView(ProfileType role) {
-		this.role = role;
-		rootContainer = new VBox(25);
-		rootContainer.setPadding(new Insets(20));
-
-		HBox headerBox = new HBox();
-		headerBox.setAlignment(Pos.CENTER_LEFT);
+    private VBox rootContainer;
+    private String role;
+    private AppController appController;
+    
+    // Contenedores directos
+    private VBox pendingCasesContainer;
+    private VBox ongoingCasesContainer;
+    private VBox confirmCasesContainer;
+    
+    public RequestsView(String role) {
+        this.role = role;
+        rootContainer = new VBox(25);
+        rootContainer.setPadding(new Insets(20));
+        
+        HBox headerBox = new HBox();
+        headerBox.setAlignment(Pos.CENTER_LEFT);
 
 		Label lblTitle = new Label("Despacho y Control de Emergencias");
 		lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
@@ -65,10 +65,10 @@ public class RequestsView {
 			}
 		});
 
-		if (role == ProfileType.ADMIN) {
-			btnNewRequest.setDisable(true);
-			btnAssignManual.setDisable(true);
-		}
+        if ((role.equals("ADMIN"))) {
+            btnNewRequest.setDisable(true);
+            btnAssignManual.setDisable(true);
+        }
 
 		Region spacer = new Region();
 		HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -190,38 +190,38 @@ public class RequestsView {
 		actions.setAlignment(Pos.CENTER_RIGHT);
 		actions.setPadding(new Insets(10, 0, 0, 0));
 
-		if (targetPanel.equals("PENDING") && role == ProfileType.OPERATOR) {
-			Button btnCancel = new Button("Cancelar Cita");
-			btnCancel.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-cursor: hand;");
-			btnCancel.setOnAction(e -> appController.cancelReport(report.getTicketID().toString()));
-			actions.getChildren().add(btnCancel);
-		}
+        if (targetPanel.equals("PENDING") && role.equals("OPERATOR")) {
+            Button btnCancel = new Button("Cancelar Cita");
+            btnCancel.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-cursor: hand;");
+            btnCancel.setOnAction(e -> appController.cancelReport(report.getTicketID().toString()));
+            actions.getChildren().add(btnCancel);
+        }
 
-		if (targetPanel.equals("ONGOING") && role == ProfileType.OPERATOR) {
-			if (report.canUndo()) {
-				Button btnUndo = new Button("Deshacer ↩");
-				btnUndo.setStyle("-fx-background-color: #FEF3C7; -fx-text-fill: #B45309; -fx-cursor: hand;");
-				btnUndo.setOnAction(e -> appController.rejectReport());
-				actions.getChildren().add(btnUndo);
-			}
-			if (report.canFinish()) {
-				Button btnFinish = new Button("Finalizar ✔");
-				btnFinish.setStyle("-fx-background-color: #DBEAFE; -fx-text-fill: #1E40AF; -fx-cursor: hand;");
-				btnFinish.setOnAction(e -> appController.finishReport(report.getTicketID().toString()));
-				actions.getChildren().add(btnFinish);
-			}
-		}
-
-		if (targetPanel.equals("CONFIRM") && role == ProfileType.ADMIN && report.canConfirm()) {
-			Button btnApprove = new Button("Aprobar");
-			btnApprove.setStyle("-fx-background-color: #D1FAE5; -fx-text-fill: #065F46; -fx-cursor: hand;");
-			btnApprove.setOnAction(e -> appController.approveReport());
-
-			Button btnReject = new Button("Rechazar");
-			btnReject.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-cursor: hand;");
-			btnReject.setOnAction(e -> appController.rejectReport());
-			actions.getChildren().addAll(btnApprove, btnReject);
-		}
+        if (targetPanel.equals("ONGOING") && role.equals("OPERATOR")) {
+            if (report.canUndo()) {
+                Button btnUndo = new Button("Deshacer ↩");
+                btnUndo.setStyle("-fx-background-color: #FEF3C7; -fx-text-fill: #B45309; -fx-cursor: hand;");
+                btnUndo.setOnAction(e -> appController.rejectReport());
+                actions.getChildren().add(btnUndo);
+            }
+            if (report.canFinish()) {
+                Button btnFinish = new Button("Finalizar ✔");
+                btnFinish.setStyle("-fx-background-color: #DBEAFE; -fx-text-fill: #1E40AF; -fx-cursor: hand;");
+                btnFinish.setOnAction(e -> appController.finishReport(report.getTicketID().toString()));
+                actions.getChildren().add(btnFinish);
+            }
+        }
+        
+        if (targetPanel.equals("CONFIRM") && (role.equals("ADMIN")) && report.canConfirm()) {
+            Button btnApprove = new Button("Aprobar");
+            btnApprove.setStyle("-fx-background-color: #D1FAE5; -fx-text-fill: #065F46; -fx-cursor: hand;");
+            btnApprove.setOnAction(e -> appController.approveReport());
+            
+            Button btnReject = new Button("Rechazar");
+            btnReject.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-cursor: hand;");
+            btnReject.setOnAction(e -> appController.rejectReport());
+            actions.getChildren().addAll(btnApprove, btnReject);
+        }
 
 		card.getChildren().addAll(header, lblClient, lblZone, lblSpec, lblDesc, actions);
 

@@ -16,9 +16,9 @@ public class KitsView {
     private GridPane dataGrid;
     private int currentRow = 1;
     private AppController appController;
-    private ProfileType role;
+    private String role;
     
-    public KitsView(ProfileType role) {
+    public KitsView(String role) {
         this.role = role;
         rootContainer = new VBox(25);
         rootContainer.setPadding(new Insets(30));
@@ -32,7 +32,7 @@ public class KitsView {
         Button btnNewKit = new Button("+ Añadir Lote de Kits");
         btnNewKit.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;");
         btnNewKit.setOnAction(e -> showAddKitDialog());
-        if (role != ProfileType.ADMIN) btnNewKit.setDisable(true);
+        if (!(role.equals("ADMIN"))) btnNewKit.setDisable(true);
         
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -55,7 +55,7 @@ public class KitsView {
         btnRetireKit.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-cursor: hand;");
         btnRetireKit.setOnAction(e -> appController.retireKitFromMaintenance());
         
-        if (role != ProfileType.ADMIN) {
+        if (!(role.equals("ADMIN"))) {
             btnReturnKit.setDisable(true);
             btnRetireKit.setDisable(true);
         }
@@ -107,7 +107,7 @@ public class KitsView {
 
         HBox actions = new HBox(10);
         
-        if (kit.getStatus().equalsIgnoreCase("Disponible") && role == ProfileType.ADMIN) {
+        if (kit.getStatus().equalsIgnoreCase("Disponible") && (role.equals("ADMIN"))) {
             Button btnMaint = new Button("Enviar a Mantenimiento");
             btnMaint.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand;");
             btnMaint.setOnAction(e -> appController.updateKitToMaintenance(fullId, kit.getType()));

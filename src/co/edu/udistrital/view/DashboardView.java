@@ -11,7 +11,7 @@ import javafx.scene.text.FontWeight;
 
 public class DashboardView {
     private VBox rootContainer;
-    private ProfileType role;
+    private String role;
     private AppController appController;
     
     private Label lblActiveUnits;
@@ -20,7 +20,7 @@ public class DashboardView {
     private Label lblTotalRequests;
     private TextArea consoleLog;
 
-    public DashboardView(ProfileType role, AppController controller) {
+    public DashboardView(String role, AppController controller) {
         this.role = role;
         this.appController = controller;
         rootContainer = new VBox(20);
@@ -67,7 +67,7 @@ public class DashboardView {
 
         actionsContainer.getChildren().add(btnUndoGlobal);
 
-        if (role == ProfileType.ADMIN) {
+        if ((role.equals("ADMIN"))) {
             Button btnCSV = new Button("Exportar reporte diario (CSV)");
             btnCSV.setStyle("-fx-background-color:#10B981; -fx-text-fill:white; -fx-padding: 10 20; -fx-cursor: hand;");
             btnCSV.setOnAction(e -> { if(appController != null) appController.exportDailyReport(); });
