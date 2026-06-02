@@ -2,6 +2,7 @@ package co.edu.udistrital.model.usecases;
 
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+
 import co.edu.udistrital.model.dtos.ReportDTO;
 import co.edu.udistrital.model.entities.Report;
 import co.edu.udistrital.model.repositories.ReportRepository;

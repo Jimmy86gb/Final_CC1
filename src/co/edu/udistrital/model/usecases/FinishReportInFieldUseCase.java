@@ -1,6 +1,7 @@
 package co.edu.udistrital.model.usecases;
 
 import java.util.UUID;
+
 import co.edu.udistrital.model.dtos.ResponseDTO;
 import co.edu.udistrital.model.entities.Report;
 import co.edu.udistrital.model.enums.ReportStatus;
