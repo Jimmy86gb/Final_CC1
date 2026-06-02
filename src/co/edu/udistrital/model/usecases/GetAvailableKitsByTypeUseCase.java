@@ -38,7 +38,7 @@ public class GetAvailableKitsByTypeUseCase {
 	 * @return Enum del tipo del kit
 	 */
 	private KitType getType(String technicianSpeciality) {
-		return switch (technicianSpeciality.toLowerCase().trim()) {
+		return switch (technicianSpeciality.replaceAll("\\s+", "").toLowerCase()) {
 		case "electricoautomotriz" -> KitType.ELECTRICITY_KIT;
 		case "operadordegrua" -> KitType.CRANE_KIT;
 		case "mecanicogeneral" -> KitType.GENERAL_KIT;
