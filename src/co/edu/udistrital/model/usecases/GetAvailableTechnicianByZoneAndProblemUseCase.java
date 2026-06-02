@@ -69,6 +69,8 @@ public class GetAvailableTechnicianByZoneAndProblemUseCase {
 
 			resultList.add(dto);
 		}
+		
+		
 
 		return resultList;
 	}

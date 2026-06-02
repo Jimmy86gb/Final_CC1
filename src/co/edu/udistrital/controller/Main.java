@@ -11,25 +11,25 @@ import javafx.stage.Stage;
  */
 public class Main extends Application {
 
-    /**
-     * Creamos el controlador y le Pasa el escenario principal para que empiece 
-     * a mostrar las ventanas. Es el puente entre el arranque y la logica.
-     * 
-     * @param primaryStage El escenario principal de JavaFX donde se monta todo.
-     */
+    private AppController controller;
+
     @Override
-    public void start(Stage primaryStage) {
-        // Crea el cerebro del programa y le pasa la ventana principal
-        AppController controller = new AppController();
-        controller.startApplication(primaryStage);
+    public void init() throws Exception {
+        controller = new AppController();
+
+        controller.loadData();
     }
 
-    /**
-     * El metodo main clasico de Java. 
-     * Llama al launch de JavaFX para que se inicie todo el ciclo de vida de la aplicacion.
-     * 
-     * @param args Argumentos que vienen de la consola.
-     */
+    @Override
+    public void start(Stage stage) {
+        controller.startApplication(stage);
+    }
+
+    @Override
+    public void stop() throws Exception {
+        controller.saveData();
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
