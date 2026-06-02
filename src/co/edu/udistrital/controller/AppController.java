@@ -149,7 +149,7 @@ public class AppController {
         this.primaryStage = primaryStage;
         
         loadSystemDataUseCase.execute(); // Persistencia inicial
-        injectSeedData();
+
         if (clientRepository.getAllClients().getSize() == 0) {
             injectSeedData();
         }
@@ -222,46 +222,53 @@ public class AppController {
 
     // --- FILTRADOS DE SUGERENCIAS USANDO DTOs CORRECTAMENTE ---
     public SimpleList<EntityItem> getSuggestedTechnicians(String zone, String spec) {
+    	String safeZone = zone != null ? zone : "";
+        String safeSpec = spec != null ? spec : "";
+        
         SimpleList<EntityItem> list = new SimpleList<>();
-        SimpleList.Iterator<TechnicianDTO> it = getAvailableTechnicianByZoneAndProblemUseCase.execute(zone, spec).iterador();
+        SimpleList.Iterator<TechnicianDTO> it = getAvailableTechnicianByZoneAndProblemUseCase.execute(safeZone, safeSpec).iterador();
         while(it.hasNext()) { TechnicianDTO t = it.Next(); list.add(new EntityItem(t.getId().toString(), t.getName() + " (" + t.getSpecialty() + ")")); }
         return list;
     }
 
     public SimpleList<EntityItem> getSuggestedUnits(String zone) {
+    	String safeZone = zone != null ? zone : "";
+        
         SimpleList<EntityItem> list = new SimpleList<>();
-        SimpleList.Iterator<ServiceUnitDTO> it = getAvailableUnitsByZoneUseCase.execute(zone).iterador();
+        SimpleList.Iterator<ServiceUnitDTO> it = getAvailableUnitsByZoneUseCase.execute(safeZone).iterador();
         while(it.hasNext()) { ServiceUnitDTO u = it.Next(); list.add(new EntityItem(u.getId().toString(), u.getType())); }
         return list;
     }
 
     public SimpleList<EntityItem> getAvailableKitsForUI(String type) {
+    	String safeType = type != null ? type : "";
+        
         SimpleList<EntityItem> list = new SimpleList<>();
-        SimpleList.Iterator<KitDTO> it = getAvailableKitsByTypeUseCase.execute(type).iterador();
+        SimpleList.Iterator<KitDTO> it = getAvailableKitsByTypeUseCase.execute(safeType).iterador();
         while(it.hasNext()) { KitDTO k = it.Next(); list.add(new EntityItem(k.getId().toString(), k.getType())); }
         return list;
     }
 
     // --- MÉTODOS CRUD (CREAR Y ACTUALIZAR) ---
     public void registerClient(String id, String name, String type, String contact) {
-        handleResponse(registerClientUseCase.ResponseDTO(id, name, type.replace(" ", ""), contact), this::refreshAllViews);
+        handleResponse(registerClientUseCase.ResponseDTO(id, name, type, contact), this::refreshAllViews);
     }
     public void updateClient(String id, String name, String type, String contact) {
-        handleResponse(updateClientUseCase.execute(id, name, type.replace(" ", ""), contact), this::refreshAllViews);
+        handleResponse(updateClientUseCase.execute(id, name, type, contact), this::refreshAllViews);
     }
     
     public void registerTechnician(String name, String specialty, String zone) {
-        handleResponse(registerTechnicianUseCase.execute(name, specialty.replace(" ", ""), zone.replace(" ", "")), this::refreshAllViews);
+        handleResponse(registerTechnicianUseCase.execute(name, specialty, zone), this::refreshAllViews);
     }
     public void updateTechnician(String id, String name, String specialty, String zone, String status) {
-        handleResponse(updateTechnicianUseCase.execute(id, name, specialty.replace(" ", ""), zone.replace(" ", ""), status.replace(" ", "")), this::refreshAllViews);
+        handleResponse(updateTechnicianUseCase.execute(id, name, specialty, zone, status), this::refreshAllViews);
     }
 
     public void registerUnit(String type, String zone, int quantity) {
-        handleResponse(registerServiceUnitUseCase.execute(type.replace(" ", ""), zone.replace(" ", ""), quantity), this::refreshAllViews);
+        handleResponse(registerServiceUnitUseCase.execute(type, zone, quantity), this::refreshAllViews);
     }
     public void updateServiceUnit(String id, String type, String status, String zone) {
-        handleResponse(updateServiceUnitUseCase.execute(id, type.replace(" ", ""), status.replace(" ", ""), zone.replace(" ", "")), this::refreshAllViews);
+        handleResponse(updateServiceUnitUseCase.execute(id, type, status, zone), this::refreshAllViews);
     }
     public void approveUnitStatus() { // Usado por Admin para unidades "Por Confirmar"
         handleResponse(approveUnitStatusUseCase.execute(), this::refreshAllViews);
@@ -271,10 +278,10 @@ public class AppController {
     }
 
     public void registerKit(String type, int quantity) {
-        handleResponse(registerKitUseCase.execute(type.replace(" ", ""), quantity), this::refreshAllViews);
+        handleResponse(registerKitUseCase.execute(type, quantity), this::refreshAllViews);
     }
     public void updateKitToMaintenance(String id, String type) {
-        handleResponse(updateKitUseCase.execute(id, type.replace(" ", ""), "Mantenimiento"), this::refreshAllViews);
+        handleResponse(updateKitUseCase.execute(id, type, "Mantenimiento"), this::refreshAllViews);
     }
     public void returnKitToService() {
         handleResponse(returnKitToServiceUseCase.execute(), this::refreshAllViews);
@@ -293,7 +300,7 @@ public class AppController {
         }
     }
     public void submitReportCreation(String cliId, String desc, String type, String prio, String zone) {
-        ResponseDTO res = registerReportUseCase.execute(cliId, desc, type.replace(" ", ""), prio.replace(" ", ""), zone.replace(" ", ""));
+        ResponseDTO res = registerReportUseCase.execute(cliId, desc, type, prio, zone);
         if(res.isSuccess()) logAction("EMERGENCIA REGISTRADA: Cliente " + cliId);
         handleResponse(res, this::refreshAllViews);
     }

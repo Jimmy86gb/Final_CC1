@@ -205,26 +205,30 @@ public class RequestsView {
     }
 
     private void showAssignManualDialog(ReportDTO report) {
+        // NULL SAFETY ADICIONAL PARA LA VISTA:
+        String safeZone = report.getReportZone() != null ? report.getReportZone() : "Desconocida";
+        String safeSpec = report.getProblemType() != null ? report.getProblemType() : "Desconocida";
+
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Análisis de Asignación");
-        dialog.setHeaderText("Despacho sugerido para Zona: " + report.getReportZone() + "\nRequiere: " + report.getProblemType());
+        dialog.setHeaderText("Despacho sugerido para Zona: " + safeZone + "\nRequiere: " + safeSpec);
         
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
         grid.setPadding(new Insets(20));
 
         ComboBox<EntityItem> techBox = new ComboBox<>();
-        SimpleList.Iterator<EntityItem> tIt = appController.getSuggestedTechnicians(report.getReportZone(), report.getProblemType()).iterador();
+        SimpleList.Iterator<EntityItem> tIt = appController.getSuggestedTechnicians(safeZone, safeSpec).iterador();
         while(tIt.hasNext()) techBox.getItems().add(tIt.Next());
         techBox.getSelectionModel().selectFirst();
 
         ComboBox<EntityItem> unitBox = new ComboBox<>();
-        SimpleList.Iterator<EntityItem> uIt = appController.getSuggestedUnits(report.getReportZone()).iterador();
+        SimpleList.Iterator<EntityItem> uIt = appController.getSuggestedUnits(safeZone).iterador();
         while(uIt.hasNext()) unitBox.getItems().add(uIt.Next());
         unitBox.getSelectionModel().selectFirst();
 
         ComboBox<EntityItem> kitBox = new ComboBox<>();
-        SimpleList.Iterator<EntityItem> kIt = appController.getAvailableKitsForUI(null).iterador();
+        SimpleList.Iterator<EntityItem> kIt = appController.getAvailableKitsForUI(safeSpec).iterador();
         while(kIt.hasNext()) kitBox.getItems().add(kIt.Next());
         kitBox.getSelectionModel().selectFirst();
 
