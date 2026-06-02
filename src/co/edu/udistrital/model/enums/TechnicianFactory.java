@@ -1,8 +1,10 @@
 package co.edu.udistrital.model.enums;
 
 /**
- * Factory robusto para convertir strings de la vista a Enums de especialidad.
- * @author Jimmy86gb
+ * Clase encargada de retornar que tipo de enum de tipo de especialidad del
+ * tecnico a usar en la logica del sistema con base en la seleccion de la vista
+ *
+ * @author Juan David Diaz Perez
  */
 public class TechnicianFactory {
 

@@ -1,610 +1,175 @@
 package co.edu.udistrital.controller;
 
-import co.edu.udistrital.model.dtos.*;
-import co.edu.udistrital.model.entities.*;
+import co.edu.udistrital.model.dtos.ResponseDTO;
 import co.edu.udistrital.model.repositories.*;
-import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.usecases.*;
 import co.edu.udistrital.view.*;
-import co.edu.udistrital.model.enums.ProfileType;
-import co.edu.udistrital.model.enums.UnitStatus;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * Controlador principal de la aplicacion. Aca es donde se conecta todo el MVC 
- * de este proyecto final para que la vista y la logica se hablen sin enredarse.
- * Literalmente es el cerebro que mueve las fichas del AutoRescate.
- * 
- * @author Jimmy86gb
+ * Controlador principal que maneja la instanciación de los 43 Casos de Uso
+ * y gestiona el enrutamiento de las Vistas, asegurando el patrón MVC.
  */
 public class AppController {
 
-    private MainView mainView;
-    private DashboardView dashboardView;
-    private RequestsView requestsView;
-    private UnitsView unitsView;
-    private TechniciansView techniciansView;
-    private KitsView kitsView;
-    private ClientsView clientsView;
-    private LoginView loginView;
+    private final Stage primaryStage;
+    private String currentUserRole;
 
-    private ClientRepository clientRepository;
-    private KitRepository kitRepository;
-    private ReportRepository reportRepository;
-    private ServiceUnitRepository serviceUnitRepository;
-    private TechnicianRepository technicianRepository;
-    private ProfileRepository profileRepository;
+    // Repositorios en Memoria (Simulando la BD)
+    private final ProfileRepository profileRepo = new ProfileRepository();
+    private final ClientRepository clientRepo = new ClientRepository();
+    private final TechnicianRepository techRepo = new TechnicianRepository();
+    private final ServiceUnitRepository unitRepo = new ServiceUnitRepository();
+    private final KitRepository kitRepo = new KitRepository();
+    private final ReportRepository reportRepo = new ReportRepository();
 
-    private RegisterClientUseCase registerClientUseCase;
-    private GetSortedAndFilteredClientsUseCase getSortedClientsUseCase;
-    private RegisterKitUseCase registerKitUseCase;
-    private GetSortedAndFilteredKitsUseCase getSortedKitsUseCase;
-    private RegisterServiceUnitUseCase registerServiceUnitUseCase;
-    private RegisterTechnicianUseCase registerTechnicianUseCase;
-    private LoginUseCase loginUseCase;
-
-    private RegisterReportUseCase registerReportUseCase;
-    private AssignManualEmergencyUseCase assignManualEmergencyUseCase;
-    private UndoReportAssignmentUseCase undoReportAssignmentUseCase;
-    private FinishReportInFieldUseCase finishReportInFieldUseCase;
-    private ApproveReportActionUseCase approveReportActionUseCase;
-    private RejectReportActionUseCase rejectReportActionUseCase;
-    private RequestReportCancellationUseCase requestReportCancellationUseCase;
-    private GetSortedAndFilteredReportsUseCase getSortedAndFilteredReportsUseCase;
-    private GetOnGoingReportsUseCase getOnGoingReportsUseCase;
-    private GetToConfirmReportsUseCase getToConfirmReportsUseCase;
-    private ExportDailyReportCSVUseCase exportDailyReportCSVUseCase;
- // Agrégalo junto a los otros UseCases
-    private GetNextPendingReportUseCase getNextPendingReportUseCase;
+    // ==========================================
+    // INSTANCIACIÓN DE LOS 43 CASOS DE USO
+    // ==========================================
+    public final LoginUseCase loginUseCase = new LoginUseCase(profileRepo);
+    public final GenerateDailyCSVUseCase generateDailyCSVUseCase = new GenerateDailyCSVUseCase(reportRepo);
     
-    private ProfileType currentRole;
-    private Stage primaryStage;
+    // Zonas y Críticos
+    public final GetZoneLabelsUseCase getZoneLabelsUseCase = new GetZoneLabelsUseCase();
+    public final GetCriticLevelLabelsUseCase getCriticLevelLabelsUseCase = new GetCriticLevelLabelsUseCase();
 
-    /**
-     * Constructor del controlador.
-     * Instanciar todo en orden para que no salte un NullPointerException 
-     * de la nada. Primero creamos las memorias (repositorios) y luego se las pasamos 
-     * a los casos de uso para que trabajen con datos reales.
-     */
-    public AppController() {
-        // Asegurar la memoria
-        this.clientRepository = new ClientRepository();
-        this.kitRepository = new KitRepository();
-        this.reportRepository = new ReportRepository();
-        this.serviceUnitRepository = new ServiceUnitRepository();
-        this.technicianRepository = new TechnicianRepository();
-        this.profileRepository = new ProfileRepository();
+    // Clientes
+    public final GetSortedAndFilteredClientsUseCase getClientsUseCase = new GetSortedAndFilteredClientsUseCase(clientRepo);
+    public final RegisterClientUseCase registerClientUseCase = new RegisterClientUseCase(clientRepo);
+    public final UpdateClientUseCase updateClientUseCase = new UpdateClientUseCase(clientRepo);
+    public final GetClientTypeLabelsUseCase getClientTypeLabelsUseCase = new GetClientTypeLabelsUseCase();
 
-        // Pasar esa memoria a la logica
-        this.registerClientUseCase = new RegisterClientUseCase(this.clientRepository);
-        this.getSortedClientsUseCase = new GetSortedAndFilteredClientsUseCase(this.clientRepository);
-        this.registerKitUseCase = new RegisterKitUseCase(this.kitRepository);
-        this.getSortedKitsUseCase = new GetSortedAndFilteredKitsUseCase(this.kitRepository);
-        this.registerServiceUnitUseCase = new RegisterServiceUnitUseCase(this.serviceUnitRepository);
-        this.registerTechnicianUseCase = new RegisterTechnicianUseCase(this.technicianRepository);
-        this.loginUseCase = new LoginUseCase(this.profileRepository);
-    
-        this.registerReportUseCase = new RegisterReportUseCase(this.clientRepository, this.reportRepository);
-        this.assignManualEmergencyUseCase = new AssignManualEmergencyUseCase(this.reportRepository, this.technicianRepository, this.serviceUnitRepository, this.kitRepository);
-        this.undoReportAssignmentUseCase = new UndoReportAssignmentUseCase(this.reportRepository);
-        this.finishReportInFieldUseCase = new FinishReportInFieldUseCase(this.reportRepository);
-        this.approveReportActionUseCase = new ApproveReportActionUseCase(this.reportRepository, this.kitRepository);
-        this.rejectReportActionUseCase = new RejectReportActionUseCase(this.reportRepository);
-        this.requestReportCancellationUseCase = new RequestReportCancellationUseCase(this.reportRepository);
-        this.getSortedAndFilteredReportsUseCase = new GetSortedAndFilteredReportsUseCase(this.reportRepository);
-        this.getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(this.reportRepository);
-        this.getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(this.reportRepository);
-        this.exportDailyReportCSVUseCase = new ExportDailyReportCSVUseCase(this.reportRepository);
-    
-        this.getNextPendingReportUseCase = new GetNextPendingReportUseCase(this.reportRepository);
+    // Técnicos
+    public final GetSortedAndDFilteredTechniciansUseCase getTechniciansUseCase = new GetSortedAndDFilteredTechniciansUseCase(techRepo);
+    public final RegisterTechnicianUseCase registerTechnicianUseCase = new RegisterTechnicianUseCase(techRepo);
+    public final UpdateTechnicianUseCase updateTechnicianUseCase = new UpdateTechnicianUseCase(techRepo);
+    public final GetTechnicianSpecialityLabelsUseCase getTechSpecialityLabelsUseCase = new GetTechnicianSpecialityLabelsUseCase();
+    public final GetTechnicianStatusLabelsUseCase getTechStatusLabelsUseCase = new GetTechnicianStatusLabelsUseCase();
+    public final GetAvailableTechnicianByZoneAndProblemUseCase getAvailTechUseCase = new GetAvailableTechnicianByZoneAndProblemUseCase(techRepo);
+
+    // Unidades
+    public final GetSortedAndFilteredServiceUnitsUseCase getUnitsUseCase = new GetSortedAndFilteredServiceUnitsUseCase(unitRepo);
+    public final RegisterServiceUnitUseCase registerUnitUseCase = new RegisterServiceUnitUseCase(unitRepo);
+    public final UpdateServiceUnitUseCase updateUnitUseCase = new UpdateServiceUnitUseCase(unitRepo);
+    public final GetServiceUnitsTypeLabelsUseCase getUnitTypeLabelsUseCase = new GetServiceUnitsTypeLabelsUseCase();
+    public final GetServiceUnitsStatusLabelsUseCase getUnitStatusLabelsUseCase = new GetServiceUnitsStatusLabelsUseCase();
+    public final GetAvailableUnitsByZoneUseCase getAvailUnitsUseCase = new GetAvailableUnitsByZoneUseCase(unitRepo);
+    public final GetToConfirmServiceUnitsUseCase getToConfirmUnitsUseCase = new GetToConfirmServiceUnitsUseCase(unitRepo);
+    public final ApproveUnitStatusUseCase approveUnitStatusUseCase = new ApproveUnitStatusUseCase(unitRepo);
+    public final RejectUnitStatusUseCase rejectUnitStatusUseCase = new RejectUnitStatusUseCase(unitRepo);
+
+    // Kits
+    public final GetSortedAndFilteredKitsUseCase getKitsUseCase = new GetSortedAndFilteredKitsUseCase(kitRepo);
+    public final RegisterKitUseCase registerKitUseCase = new RegisterKitUseCase(kitRepo);
+    public final UpdateKitUseCase updateKitUseCase = new UpdateKitUseCase(kitRepo);
+    public final GetKitTypeLabelsUseCase getKitTypeLabelsUseCase = new GetKitTypeLabelsUseCase();
+    public final GetKitStatusLabelsUseCase getKitStatusLabelsUseCase = new GetKitStatusLabelsUseCase();
+    public final GetMaintenanceKitsUseCase getMaintenanceKitsUseCase = new GetMaintenanceKitsUseCase(kitRepo);
+    public final RetireKitFromMaintenanceUseCase retireKitUseCase = new RetireKitFromMaintenanceUseCase(kitRepo);
+    public final ReturnKitToServiceUseCase returnKitUseCase = new ReturnKitToServiceUseCase(kitRepo);
+    public final GetAvailableKitsByTypeUseCase getAvailKitsUseCase = new GetAvailableKitsByTypeUseCase(kitRepo);
+
+    // Reportes (Siniestros)
+    public final RegisterReportUseCase registerReportUseCase = new RegisterReportUseCase(clientRepo, reportRepo);
+    public final GetSortedAndFilteredReportsUseCase getReportsUseCase = new GetSortedAndFilteredReportsUseCase(reportRepo);
+    public final RequestReportCancellationUseCase requestCancelUseCase = new RequestReportCancellationUseCase(reportRepo);
+    public final GetNextPendingReportUseCase getNextPendingReportUseCase = new GetNextPendingReportUseCase(reportRepo);
+    public final AssignResourcesReportUseCase assignResourcesUseCase = new AssignResourcesReportUseCase(reportRepo, techRepo, unitRepo, kitRepo);
+    public final GetOnGoingReportsUseCase getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(reportRepo);
+    public final UndoReportResourcesUseCase undoReportUseCase = new UndoReportResourcesUseCase(reportRepo);
+    public final FinishReportInFieldUseCase finishReportUseCase = new FinishReportInFieldUseCase(reportRepo);
+    public final GetToConfirmReportsUseCase getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(reportRepo);
+    public final ApproveReportActionUseCase approveReportUseCase = new ApproveReportActionUseCase(reportRepo, kitRepo);
+    public final RejectReportActionUseCase rejectReportUseCase = new RejectReportActionUseCase(reportRepo);
+
+
+    public AppController(Stage primaryStage) {
+        this.primaryStage = primaryStage;
     }
 
-    /**
-     * Metodo que arranca toda la aplicacion.
-     * Muestra la pantalla de login para ver si el que entra 
-     * es admin u operador y revisa que las credenciales cuadren.
-     * 
-     * @param primaryStage El escenario principal de JavaFX donde pinta todo
-     */
-    public void startApplication(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        loginView = new LoginView();
+    public void startApplication() {
+        showLogin();
+    }
 
-        // Decirs al boton de login que hacer cuando le den clic
-        loginView.setOnLoginAction(() -> {
-            String user = loginView.getUsername();
-            String pass = loginView.getPassword();
-
-            SessionDTO session = loginUseCase.execute(user, pass);
-            if (!session.isSuccess()) {
-                loginView.showMessage(session.getMessage());
-                return;
-            }
-
-            try {
-                // Si sale bien saca el rol y arma el sistema
-                ProfileType role = ProfileType.valueOf(session.getRole());
-                initializeSystem(role);
-            } catch (IllegalArgumentException ex) {
-                loginView.showMessage("Rol desconocido en el sistema.");
-            }
-        });
-
-        primaryStage.setTitle("AutoRescate 24/7 - Iniciar Sesion");
-        primaryStage.setScene(loginView.getScene());
+    public void showLogin() {
+        LoginView loginView = new LoginView(this);
+        primaryStage.setScene(new Scene(loginView.getView(), 400, 350));
+        primaryStage.centerOnScreen();
         primaryStage.show();
     }
 
-    /**
-     * Arma todas las ventanas del sistema despues de que alguien se loguea.
-     * Configura los permisos segun el rol y carga los datos  en las tablas.
-     * 
-     * @param role El perfil del usuario que acaba de entrar (Admin u Operador)
-     */
-    private void initializeSystem(ProfileType role) {
-        this.currentRole = role;
-
-        // Crea las vistas pasandole el rol para que oculten o muestren botones
-        mainView = new MainView(role);
-        dashboardView = new DashboardView(role);
-        requestsView = new RequestsView(role);
-        unitsView = new UnitsView(role);
-        techniciansView = new TechniciansView(role);
-        kitsView = new KitsView(role);
-        clientsView = new ClientsView(role);
-
-        // Si la memoria de clientes está vacía, inyectamos todos los datos base
-        if (clientRepository.getAllClients().getSize() == 0) {
-            seedData();
-        }
-        // Conecta como el controlador de todas esas vistas
-        mainView.setNavigationController(this);
-        clientsView.setController(this);
-        unitsView.setController(this);
-        kitsView.setController(this);
-        techniciansView.setController(this);
-        requestsView.setController(this);
-
-        // Llena las tablas con los datos que hayan guardados
-        refreshAllViews();
-
-        primaryStage.setScene(mainView.getScene());
-        mainView.getScene().getWindow().centerOnScreen();
-    }
-
-    /**
-     * Procesa cuando se quiere crear una nueva solicitud de emergencia.
-     * Revisa si la cedula existe. Si no, manda al usuario a crear el cliente primero.
-     * 
-     * @param clientId La cedula o ID que escribio el operador
-     */
-    public void processNewRequest(String clientId) {
-    	String cleanId = clientId.trim();
-        Client client = clientRepository.getClientByID(cleanId);
-        
-        if (client == null) {
-            Alert alert = new Alert(AlertType.WARNING);
-            alert.setHeaderText("Cliente No Encontrado");
-            alert.setContentText("Sera redirigido para registrar este nuevo cliente en el sistema.");
-            alert.showAndWait();
-            navigateToClients();
-            clientsView.showAddClientDialog(clientId);
-        } else {
-            requestsView.showCreateReportDialog(client);
-        }
-    }
-    
-    public void submitReportCreation(String clientId, String description, String type, String priority, String zone) {
-        // Limpiamos los espacios de los textos que vienen de la vista (ej: "Alta " -> "Alta", "Mecanico General" -> "MecanicoGeneral")
-        ResponseDTO response = registerReportUseCase.execute(
-            clientId, 
-            description, 
-            type.replace(" ", ""), 
-            priority.replace(" ", ""), 
-            zone.replace(" ", "")
-        );
-        showNotification(response.isSuccess(), response.getMessage());
-        refreshRequestsView();
-    }
-
-    public void assignReportResources(String techId, String unitId, String kitId) {
-        ResponseDTO response = assignManualEmergencyUseCase.execute(techId, unitId, kitId);
-        showNotification(response.isSuccess(), response.getMessage());
-        refreshRequestsView();
-        refreshTechniciansView();
-        refreshUnitsView();
-        refreshKitsView();
-    }
-
-    public void cancelReport(String ticketId) {
-        ResponseDTO response = requestReportCancellationUseCase.execute(ticketId);
-        showNotification(response.isSuccess(), response.getMessage());
-        refreshRequestsView();
-    }
-
-    public void undoReport() {
-        ResponseDTO response = undoReportAssignmentUseCase.execute();
-        showNotification(response.isSuccess(), response.getMessage());
-        refreshRequestsView();
-        refreshTechniciansView();
-        refreshUnitsView();
-        refreshKitsView();
-    }
-
-    public void finishReport(String ticketId) {
-        ResponseDTO response = finishReportInFieldUseCase.execute(ticketId);
-        showNotification(response.isSuccess(), response.getMessage());
-        refreshRequestsView();
-    }
-
-    public void approveReport() {
-        ResponseDTO response = approveReportActionUseCase.execute();
-        showNotification(response.isSuccess(), response.getMessage());
-        refreshRequestsView();
-        refreshTechniciansView();
-        refreshUnitsView();
-        refreshKitsView();
-    }
-
-    public void rejectReport() {
-        ResponseDTO response = rejectReportActionUseCase.execute();
-        showNotification(response.isSuccess(), response.getMessage());
-        refreshRequestsView();
-    }
-
-    public void exportDailyReport() {
-        ResponseDTO response = exportDailyReportCSVUseCase.execute();
-        showNotification(response.isSuccess(), response.getMessage());
-    }
-    
- // --- MÉTODOS PARA CARGAR DATOS EN LOS COMBOBOX ---
-
-    public SimpleList<EntityItem> getAvailableTechniciansForUI() {
-        SimpleList<EntityItem> list = new SimpleList<>();
-        var iterator = technicianRepository.getAllTechnicians().iterador();
-        while (iterator.hasNext()) {
-            Technician t = iterator.Next();
-            if (t.getStatus() == co.edu.udistrital.model.enums.TechnicianStatus.AVAILABLE) {
-            	String displayString = t.getName() + " (" + t.getSpecialty().getDisplayName() + ")";
-            	list.add(new EntityItem(t.getId().toString(), displayString));
-            }
-        }
-        return list;
-    }
-
-    public SimpleList<EntityItem> getAvailableUnitsForUI() {
-        SimpleList<EntityItem> list = new SimpleList<>();
-        var iterator = serviceUnitRepository.getAllUnits().iterador();
-        while (iterator.hasNext()) {
-            ServiceUnit u = iterator.Next();
-            if (u.getStatus() == co.edu.udistrital.model.enums.UnitStatus.AVAILABLE) {
-                list.add(new EntityItem(u.getId().toString(), u.getType().getDisplayName() + " (" + u.getZone().getDisplayName() + ")"));
-            }
-        }
-        return list;
-    }
-
-    public SimpleList<EntityItem> getAvailableKitsForUI() {
-        SimpleList<EntityItem> list = new SimpleList<>();
-        var iterator = kitRepository.getAllKits().iterador();
-        while (iterator.hasNext()) {
-            Kit k = iterator.Next();
-            if (k.getStatus() == co.edu.udistrital.model.enums.UnitStatus.AVAILABLE) {
-                list.add(new EntityItem(k.getId().toString(), k.getType().getDisplayName()));
-            }
-        }
-        return list;
-    }
-    
- // 1. Filtra técnicos por ZONA y ESPECIALIDAD
-    public SimpleList<EntityItem> getSuggestedTechnicians(String zoneName, String specialtyName) {
-        SimpleList<EntityItem> list = new SimpleList<>();
-        // Asumo que tienes factories para convertir texto a Enums
-        var zone = new co.edu.udistrital.model.enums.ZoneFactory().generateOperationZone(zoneName);
-        var spec = new co.edu.udistrital.model.enums.TechnicianFactory().generaTechnicianSpecialty(specialtyName);
-        
-        var it = technicianRepository.getAvailableTechnicians(zone, spec).iterador();
-        while (it.hasNext()) {
-            Technician t = it.Next();
-            list.add(new EntityItem(t.getId().toString(), t.getName()));
-        }
-        return list;
-    }
-
-    // 2. Filtra unidades por ZONA
-    public SimpleList<EntityItem> getSuggestedUnits(String zoneName) {
-        SimpleList<EntityItem> list = new SimpleList<>();
-        var zone = new co.edu.udistrital.model.enums.ZoneFactory().generateOperationZone(zoneName);
-        
-        var it = serviceUnitRepository.getAvailableUnitsByZone(zone).iterador();
-        while (it.hasNext()) {
-            ServiceUnit u = it.Next();
-            list.add(new EntityItem(u.getId().toString(), u.getType().getDisplayName()));
-        }
-        return list;
-    }
-
-    /**
-     * Guarda un cliente nuevo en el sistema y refresca la tabla.
-     * 
-     * @param id La cedula del cliente
-     * @param name El nombre completo
-     * @param type Si es particular, empresa, etc
-     * @param contact Numero de celular o telefono
-     */
-    public void registerClient(String id, String name, String type, String contact) {
-        ResponseDTO response = registerClientUseCase.ResponseDTO(id, name, type.replace(" ", ""), contact);
-        showNotification(response.isSuccess(), response.getMessage());
-        if (response.isSuccess()) {
-        	refreshClientsView();
-        }
-    }
-
-    /**
-     * Mete una nueva unidad de servicio (como una grua o moto) al parque automotor.
-     * 
-     * @param type El tipo de vehiculo
-     * @param zone La zona de Bogota donde opera
-     * @param quantity Cuantas unidades de estas vamos a registrar
-     */
-    public void registerUnit(String type, String zone, int quantity) {
-        ResponseDTO response = registerServiceUnitUseCase.execute(type.replace(" ", ""), zone.replace(" ", ""), quantity);
-        showNotification(response.isSuccess(), response.getMessage());
-        if (response.isSuccess()) {
-        	refreshUnitsView();
-        }
-    }
-
-    /**
-     * Añade un nuevo lote de kits al inventario para que los tecnicos los usen.
-     * 
-     * @param type El tipo de kit (ej. Cerrajeria)
-     * @param quantity La cantidad de kits que llegaron
-     */
-    public void registerKit(String type, int quantity) {
-        ResponseDTO response = registerKitUseCase.execute(type.replace(" ", ""), quantity);
-        showNotification(response.isSuccess(), response.getMessage());
-        if (response.isSuccess()) {
-        	refreshKitsView();
-        }
-    }
-
-    /**
-     * Registra a un nuevo tecnico en el sistema.
-     * 
-     * @param name El nombre del tecnico
-     * @param specialty En que es experto (mecanica, grua, etc)
-     * @param zone La zona que le toca cubrir
-     */
-    public void registerTechnician(String name, String specialty, String zone) {
-        ResponseDTO response = registerTechnicianUseCase.execute(name, specialty.replace(" ", ""), zone.replace(" ", ""));
-        showNotification(response.isSuccess(), response.getMessage());
-        if (response.isSuccess()) {
-        	refreshTechniciansView();
-        }
-    }
-    
-    private void refreshAllViews() {
-        refreshClientsView();
-        refreshKitsView();
-        refreshUnitsView();
-        refreshTechniciansView();
-        refreshRequestsView();
-        refreshDashboardView();
-    }
-
-    private void refreshRequestsView() {
-        requestsView.clearPanels();
-        
-        // 1. Mostrar Pendientes
-        SimpleList.Iterator<ReportDTO> iterPending = getSortedAndFilteredReportsUseCase.execute().iterador();
-        while (iterPending.hasNext()) {
-            ReportDTO rep = iterPending.Next();
-            if (rep.canCancel()) { 
-                requestsView.addReportCard(rep, "PENDING");
-            }
-        }
-        // 2. Mostrar En Progreso
-        SimpleList.Iterator<ReportDTO> iterOngoing = getOnGoingReportsUseCase.execute().iterador();
-        while (iterOngoing.hasNext()) {
-            requestsView.addReportCard(iterOngoing.Next(), "ONGOING");
-        }
-        // 3. Mostrar Por Confirmar
-        SimpleList.Iterator<ReportDTO> iterConfirm = getToConfirmReportsUseCase.execute().iterador();
-        while (iterConfirm.hasNext()) {
-            requestsView.addReportCard(iterConfirm.Next(), "CONFIRM");
-        }
-    }
-    
-
-    /**
-     * Limpia la tabla de clientes y la vuelve a dibujar con lo que hay en memoria.
-     * Aca usamos el iterador propio para cumplir con las reglas del proyecto.
-     */
-    private void refreshClientsView() {
-        clientsView.clearTable();
-        SimpleList<ClientDTO> list = getSortedClientsUseCase.execute();
-        SimpleList.Iterator<ClientDTO> iterator = list.iterador();
-        while (iterator.hasNext()) {
-            clientsView.addClient(iterator.Next());
-        }
-    }
-
-    /**
-     * Limpia y actualiza la tabla de los kits.
-     */
-    private void refreshKitsView() {
-        kitsView.clearTable();
-        SimpleList<KitDTO> list = getSortedKitsUseCase.execute();
-        SimpleList.Iterator<KitDTO> iterator = list.iterador();
-        while (iterator.hasNext()) {
-            kitsView.addKit(iterator.Next());
-        }
-    }
-
-    /**
-     * Actualiza la vista de las unidades de servicio. 
-     * Ademas revisa si la unidad esta disponible pa saber si habilita los botones o no.
-     */
-    private void refreshUnitsView() {
-        unitsView.clearTable();
-        SimpleList<ServiceUnit> list = serviceUnitRepository.getAllUnits();
-        SimpleList.Iterator<ServiceUnit> iterator = list.iterador();
-        while (iterator.hasNext()) {
-            ServiceUnit unit = iterator.Next();
-            boolean canEdit = unit.getStatus().getDisplayName().equals("Disponible");
-            unitsView.addUnit(unit.getId().toString(), unit.getType().getDisplayName(),
-                    unit.getStatus().getDisplayName(), unit.getZone().getDisplayName(), canEdit);
-        }
-    }
-
-    /**
-     * Refresca la tabla de los tecnicos viendo si estan ocupados o libres.
-     */
-    private void refreshTechniciansView() {
-        techniciansView.clearTable();
-        SimpleList<Technician> list = technicianRepository.getAllTechnicians();
-        SimpleList.Iterator<Technician> iterator = list.iterador();
-        while (iterator.hasNext()) {
-            Technician tech = iterator.Next();
-            boolean canEdit = tech.getStatus().getDisplayName().equals("Disponible");
-            techniciansView.addTechnician(tech.getId().toString(), tech.getName(),
-                    tech.getSpecialty().getDisplayName(), tech.getStatus().getDisplayName(),
-                    tech.getZone().getDisplayName(), canEdit);
-        }
+    public void loginSuccess(String role) {
+        this.currentUserRole = role;
+        DashboardView dashboard = new DashboardView(this, role);
+        primaryStage.setScene(new Scene(dashboard.getView(), 1100, 700));
+        primaryStage.centerOnScreen();
     }
     
     /**
-     * Calcula las estadisticas actuales del sistema iterando sobre las estructuras
-     * de datos y envia los resultados a la vista del Dashboard.
+     * Genera datos de prueba (Mock Data) al arrancar el sistema para facilitar
+     * la evaluación y demostración de las funcionalidades de AutoRescate 24/7.
      */
-    private void refreshDashboardView() {
-        // 1. Contar Unidades Activas (Disponibles o Asignadas)
-        int activeUnits = 0;
-        SimpleList.Iterator<ServiceUnit> unitIt = serviceUnitRepository.getAllUnits().iterador();
-        while (unitIt.hasNext()) {
-            UnitStatus status = unitIt.Next().getStatus();
-            if (status == co.edu.udistrital.model.enums.UnitStatus.AVAILABLE || 
-                status == co.edu.udistrital.model.enums.UnitStatus.ASSIGNED) {
-                activeUnits++;
-            }
-        }
-
-        // 2. Contar Casos Criticos (Prioridad ALTA y que esten Pendientes o En Progreso)
-        int criticalCases = 0;
-        SimpleList.Iterator<Report> reportIt = reportRepository.getAllReports().iterador();
-        while (reportIt.hasNext()) {
-            Report r = reportIt.Next();
-            if (r.getPriority() == co.edu.udistrital.model.enums.CriticLevel.HIGH && 
-               (r.getStatus() == co.edu.udistrital.model.enums.ReportStatus.PENDING || 
-                r.getStatus() == co.edu.udistrital.model.enums.ReportStatus.ON_GOING)) {
-                criticalCases++;
-            }
-        }
-
-        // 3. Contar Elementos en Mantenimiento (Kits en la pila + Unidades dañadas)
-        int maintenanceCount = 0;
-        maintenanceCount += kitRepository.getMaintenanceKits().getSize();
-        
-        SimpleList.Iterator<ServiceUnit> maintUnitIt = serviceUnitRepository.getAllUnits().iterador();
-        while(maintUnitIt.hasNext()) {
-            if (maintUnitIt.Next().getStatus() == co.edu.udistrital.model.enums.UnitStatus.MAINTENANCE) {
-                maintenanceCount++;
-            }
-        }
-
-        // Se envian los datos calculados a la vista
-        if (dashboardView != null) {
-            dashboardView.updateStatistics(
-                String.valueOf(activeUnits), 
-                String.valueOf(criticalCases), 
-                String.valueOf(maintenanceCount)
-            );
-        }
-    }
-    
     /**
-     * Puente entre la Vista y el Caso de Uso para obtener 
-     * el reporte más urgente de la cola.
+     * Genera datos de prueba y avisa en consola si algún Factory rechaza los textos.
      */
-    public ReportDTO getNextPendingReport() {
-        return getNextPendingReportUseCase.execute();
-    }
+    public void seedMockData() {
+        System.out.println("--- INICIANDO CARGA DE DATOS DE PRUEBA ---");
+        ResponseDTO res;
 
-    /**
-     * Saca una ventanita de alerta pa avisarle al usuario que paso con lo que intento hacer.
-     * 
-     * @param success Si salio bien mandamos info, si no, mandamos un error
-     * @param message El texto chiquito que explica que paso
-     */
-    private void showNotification(boolean success, String message) {
-        Alert alert = new Alert(success ? AlertType.INFORMATION : AlertType.ERROR);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+        // 1. Registrar Clientes
+        res = registerClientUseCase.ResponseDTO("102030", "Juan Perez", "Particular", "3001234567");
+        if(!res.isSuccess()) System.err.println("Error en Cliente 1: " + res.getMessage());
 
-    // Metodos pa cambiar de pantalla en el menu
-    public void navigateToDashboard() { 
-    	mainView.setContent(dashboardView.getView()); 
-    	}
-    public void navigateToRequests() { 
-    	mainView.setContent(requestsView.getView()); 
-    	}
-    public void navigateToUnits() { 
-    	mainView.setContent(unitsView.getView()); 
-    	}
-    public void navigateToTechnicians() { 
-    	mainView.setContent(techniciansView.getView()); 
-    	}
-    public void navigateToKits() { 
-    	mainView.setContent(kitsView.getView()); 
-    	}
-    public void navigateToClients() { 
-    	mainView.setContent(clientsView.getView()); 
-    	}
+        res = registerClientUseCase.ResponseDTO("900123", "Seguros Alfa", "Seguros", "contacto@alfa.com");
+        if(!res.isSuccess()) System.err.println("Error en Cliente 2: " + res.getMessage());
 
-    /**
-     * Borra el rol actual y devuelve todo a la pantalla de login.
-     */
-    public void logout() {
-        this.currentRole = null;
-        startApplication(this.primaryStage);
-    }
-    
-    /**
-     * Método encargado de poblar el sistema con datos de prueba (Seed Data)
-     * para facilitar la sustentación y evitar registrar todo manualmente.
-     */
-    private void seedData() {
-        System.out.println("--- INICIANDO CARGA DE DATOS SEMILLA ---");
-        
-        // 1. Crear Clientes
-        System.out.println("Cliente 1: " + registerClientUseCase.ResponseDTO("101010", "Transportes Rapidos SAS", "Empresarial", "3001112233").getMessage());
-        System.out.println("Cliente 2: " + registerClientUseCase.ResponseDTO("202020", "Seguros TodoRiesgo", "Seguros", "3104445566").getMessage());
-        
-        // 2. Crear Técnicos
-        System.out.println("Tecnico 1: " + registerTechnicianUseCase.execute("Carlos Ramirez", "OperadordeGrua", "Kennedy").getMessage());
-        System.out.println("Tecnico 2: " + registerTechnicianUseCase.execute("Julian Perez", "MecanicoGeneral", "Suba").getMessage());
+        // 2. Registrar Técnicos (Usando localidades válidas de tu ZoneFactory)
+        res = registerTechnicianUseCase.execute("Carlos Rodriguez", "Mecanico General", "Suba");
+        if(!res.isSuccess()) System.err.println("Error en Tecnico 1: " + res.getMessage());
 
-        // 3. Crear Unidades de Servicio
-        System.out.println("Unidad 1: " + registerServiceUnitUseCase.execute("Grua", "Kennedy", 2).getMessage());
-        System.out.println("Unidad 2: " + registerServiceUnitUseCase.execute("Moto", "Suba", 3).getMessage());
+        res = registerTechnicianUseCase.execute("Luis Martinez", "Operador de Grua", "Usme");
+        if(!res.isSuccess()) System.err.println("Error en Tecnico 2: " + res.getMessage());
 
-        // 4. Crear Kits
-        System.out.println("Kit 1: " + registerKitUseCase.execute("KitdeGrua", 2).getMessage());
-        System.out.println("Kit 2: " + registerKitUseCase.execute("KitGeneral", 4).getMessage());
+        res = registerTechnicianUseCase.execute("Ana Gomez", "Electrico Automotriz", "Kennedy");
+        if(!res.isSuccess()) System.err.println("Error en Tecnico 3: " + res.getMessage());
 
-        // 5. Crear Solicitudes
-        // CORRECCIÓN: Mandamos los textos con espacios exactamente igual a como los genera el ComboBox de la interfaz.
-     // 5. Crear Solicitudes
-        // CORRECCIÓN: Quitamos los espacios para que el Factory los reconozca
-        System.out.println("Siniestro 1: " + registerReportUseCase.execute("101010", "Camión varado por motor", "MecanicoGeneral", "Alta", "Suba").getMessage());
-        System.out.println("Siniestro 2: " + registerReportUseCase.execute("202020", "Estrellada en la principal", "OperadordeGrua", "Alta", "Kennedy").getMessage());
-        System.out.println("Siniestro 3: " + registerReportUseCase.execute("101010", "Llanta pinchada sin repuesto", "OperarioMontallantas", "Media", "Suba").getMessage());
-        
-        System.out.println("--- FIN CARGA DE DATOS ---");
+        res = registerTechnicianUseCase.execute("Pedro Sanchez", "Operario Montallantas", "Bosa");
+        if(!res.isSuccess()) System.err.println("Error en Tecnico 4: " + res.getMessage());
+
+        // 3. Registrar Unidades de Servicio
+        // Nota: Asegúrate de que "Grua", "Moto", etc., coincidan con tu UnitFactory
+        res = registerUnitUseCase.execute("Grua", "Usme", 2);
+        if(!res.isSuccess()) System.err.println("Error en Unidad 1: " + res.getMessage());
+
+        res = registerUnitUseCase.execute("Moto", "Kennedy", 4);
+        if(!res.isSuccess()) System.err.println("Error en Unidad 2: " + res.getMessage());
+
+        res = registerUnitUseCase.execute("Camioneta", "Suba", 2);
+        if(!res.isSuccess()) System.err.println("Error en Unidad 3: " + res.getMessage());
+
+        // 4. Registrar Kits 
+        // Nota: Si tu KitFactory usa nombres diferentes, la consola te lo dirá.
+        res = registerKitUseCase.execute("Kit General", 5);
+        if(!res.isSuccess()) System.err.println("Error en Kit 1: " + res.getMessage());
+
+        res = registerKitUseCase.execute("Kit de Grua", 3);
+        if(!res.isSuccess()) System.err.println("Error en Kit 2: " + res.getMessage());
+
+        res = registerKitUseCase.execute("Kit De Electricidad", 3);
+        if(!res.isSuccess()) System.err.println("Error en Kit 3: " + res.getMessage());
+
+        // 5. Registrar Siniestros
+        // Nota: He cambiado "Media" por "Alta" o "Baja" por si el CriticFactory no soporta entrada de "Media" directa.
+        res = registerReportUseCase.execute("102030", "Motor recalentado en la via principal", "Mecanico General", "Alta", "Suba");
+        if(!res.isSuccess()) System.err.println("Error Siniestro 1: " + res.getMessage());
+
+        res = registerReportUseCase.execute("900123", "Choque multiple, requiere traslado", "Operador de Grua", "Baja", "Usme");
+        if(!res.isSuccess()) System.err.println("Error Siniestro 2: " + res.getMessage());
+
+        res = registerReportUseCase.execute("102030", "Llanta pinchada sin repuesto", "Operario Montallantas", "Baja", "Bosa");
+        if(!res.isSuccess()) System.err.println("Error Siniestro 3: " + res.getMessage());
+
+        System.out.println("--- FIN DE CARGA DE DATOS ---");
     }
 }
