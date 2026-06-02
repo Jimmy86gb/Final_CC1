@@ -1,397 +1,508 @@
 package co.edu.udistrital.controller;
 
-import co.edu.udistrital.model.dtos.*;
-import co.edu.udistrital.model.entities.*;
-import co.edu.udistrital.model.repositories.*;
-import co.edu.udistrital.model.structures.SimpleList;
-import co.edu.udistrital.model.usecases.*;
-import co.edu.udistrital.view.*;
+import co.edu.udistrital.model.dtos.ClientDTO;
+import co.edu.udistrital.model.dtos.EntityItem;
+import co.edu.udistrital.model.dtos.KitDTO;
+import co.edu.udistrital.model.dtos.ReportDTO;
+import co.edu.udistrital.model.dtos.ResponseDTO;
+import co.edu.udistrital.model.dtos.ServiceUnitDTO;
+import co.edu.udistrital.model.dtos.SessionDTO;
+import co.edu.udistrital.model.dtos.TechnicianDTO;
+import co.edu.udistrital.model.entities.Client;
+import co.edu.udistrital.model.entities.Report;
+import co.edu.udistrital.model.entities.ServiceUnit;
+import co.edu.udistrital.model.entities.Technician;
 import co.edu.udistrital.model.enums.ProfileType;
+import co.edu.udistrital.model.repositories.ClientRepository;
+import co.edu.udistrital.model.repositories.KitRepository;
+import co.edu.udistrital.model.repositories.ProfileRepository;
+import co.edu.udistrital.model.repositories.ReportRepository;
+import co.edu.udistrital.model.repositories.ServiceUnitRepository;
+import co.edu.udistrital.model.repositories.TechnicianRepository;
+import co.edu.udistrital.model.structures.SimpleList;
+import co.edu.udistrital.model.usecases.ApproveReportActionUseCase;
+import co.edu.udistrital.model.usecases.AssignResourcesReportUseCase;
+import co.edu.udistrital.model.usecases.FinishReportInFieldUseCase;
+import co.edu.udistrital.model.usecases.GenerateDailyCSVUseCase;
+import co.edu.udistrital.model.usecases.GetAvailableKitsByTypeUseCase;
+import co.edu.udistrital.model.usecases.GetAvailableTechnicianByZoneAndProblemUseCase;
+import co.edu.udistrital.model.usecases.GetAvailableUnitsByZoneUseCase;
+import co.edu.udistrital.model.usecases.GetKitTypeLabelsUseCase;
+import co.edu.udistrital.model.usecases.GetNextPendingReportUseCase;
+import co.edu.udistrital.model.usecases.GetOnGoingReportsUseCase;
+import co.edu.udistrital.model.usecases.GetSortedAndFilteredClientsUseCase;
+import co.edu.udistrital.model.usecases.GetSortedAndFilteredKitsUseCase;
+import co.edu.udistrital.model.usecases.GetSortedAndFilteredReportsUseCase;
+import co.edu.udistrital.model.usecases.GetToConfirmReportsUseCase;
+import co.edu.udistrital.model.usecases.LoginUseCase;
+import co.edu.udistrital.model.usecases.RegisterClientUseCase;
+import co.edu.udistrital.model.usecases.RegisterKitUseCase;
+import co.edu.udistrital.model.usecases.RegisterReportUseCase;
+import co.edu.udistrital.model.usecases.RegisterServiceUnitUseCase;
+import co.edu.udistrital.model.usecases.RegisterTechnicianUseCase;
+import co.edu.udistrital.model.usecases.RejectReportActionUseCase;
+import co.edu.udistrital.model.usecases.RequestReportCancellationUseCase;
+import co.edu.udistrital.model.usecases.RetireKitFromMaintenanceUseCase;
+import co.edu.udistrital.model.usecases.ReturnKitToServiceUseCase;
+import co.edu.udistrital.model.usecases.UndoReportResourcesUseCase;
+import co.edu.udistrital.model.usecases.UpdateKitUseCase;
+import co.edu.udistrital.view.ClientsView;
+import co.edu.udistrital.view.DashboardView;
+import co.edu.udistrital.view.KitsView;
+import co.edu.udistrital.view.LoginView;
+import co.edu.udistrital.view.MainView;
+import co.edu.udistrital.view.RequestsView;
+import co.edu.udistrital.view.TechniciansView;
+import co.edu.udistrital.view.UnitsView;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 
 public class AppController {
 
-    private MainView mainView;
-    private DashboardView dashboardView;
-    private RequestsView requestsView;
-    private UnitsView unitsView;
-    private TechniciansView techniciansView;
-    private KitsView kitsView;
-    private ClientsView clientsView;
-    private LoginView loginView;
+	private MainView mainView;
+	private DashboardView dashboardView;
+	private RequestsView requestsView;
+	private UnitsView unitsView;
+	private TechniciansView techniciansView;
+	private KitsView kitsView;
+	private ClientsView clientsView;
+	private LoginView loginView;
 
-    private ClientRepository clientRepository;
-    private KitRepository kitRepository;
-    private ReportRepository reportRepository;
-    private ServiceUnitRepository serviceUnitRepository;
-    private TechnicianRepository technicianRepository;
-    private ProfileRepository profileRepository;
+	private ClientRepository clientRepository;
+	private KitRepository kitRepository;
+	private ReportRepository reportRepository;
+	private ServiceUnitRepository serviceUnitRepository;
+	private TechnicianRepository technicianRepository;
+	private ProfileRepository profileRepository;
 
-    private RegisterClientUseCase registerClientUseCase;
-    private GetSortedAndFilteredClientsUseCase getSortedClientsUseCase;
-    private RegisterKitUseCase registerKitUseCase;
-    private UpdateKitUseCase updateKitUseCase;
-    private GetSortedAndFilteredKitsUseCase getSortedKitsUseCase;
-    private RetireKitFromMaintenanceUseCase retireKitFromMaintenanceUseCase;
-    private ReturnKitToServiceUseCase returnKitToServiceUseCase;
-    private GetKitTypeLabelsUseCase getKitTypeLabelsUseCase;
-    private RegisterServiceUnitUseCase registerServiceUnitUseCase;
-    private RegisterTechnicianUseCase registerTechnicianUseCase;
-    private LoginUseCase loginUseCase;
-    
-    private RegisterReportUseCase registerReportUseCase;
-    private AssignResourcesReportUseCase assignResourcesReportUseCase;
-    private UndoReportResourcesUseCase undoReportResourcesUseCase;
-    private FinishReportInFieldUseCase finishReportInFieldUseCase;
-    private ApproveReportActionUseCase approveReportActionUseCase;
-    private RejectReportActionUseCase rejectReportActionUseCase;
-    private RequestReportCancellationUseCase requestReportCancellationUseCase;
-    private GetSortedAndFilteredReportsUseCase getSortedAndFilteredReportsUseCase;
-    private GetOnGoingReportsUseCase getOnGoingReportsUseCase;
-    private GetToConfirmReportsUseCase getToConfirmReportsUseCase;
-    private GetNextPendingReportUseCase getNextPendingReportUseCase;
-    private GenerateDailyCSVUseCase generateDailyCSVUseCase;
+	private RegisterClientUseCase registerClientUseCase;
+	private GetSortedAndFilteredClientsUseCase getSortedClientsUseCase;
+	private RegisterKitUseCase registerKitUseCase;
+	private UpdateKitUseCase updateKitUseCase;
+	private GetSortedAndFilteredKitsUseCase getSortedKitsUseCase;
+	private RetireKitFromMaintenanceUseCase retireKitFromMaintenanceUseCase;
+	private ReturnKitToServiceUseCase returnKitToServiceUseCase;
+	private GetKitTypeLabelsUseCase getKitTypeLabelsUseCase;
+	private RegisterServiceUnitUseCase registerServiceUnitUseCase;
+	private RegisterTechnicianUseCase registerTechnicianUseCase;
+	private LoginUseCase loginUseCase;
 
-    private ProfileType currentRole;
-    private Stage primaryStage;
+	private RegisterReportUseCase registerReportUseCase;
+	private AssignResourcesReportUseCase assignResourcesReportUseCase;
+	private UndoReportResourcesUseCase undoReportResourcesUseCase;
+	private FinishReportInFieldUseCase finishReportInFieldUseCase;
+	private ApproveReportActionUseCase approveReportActionUseCase;
+	private RejectReportActionUseCase rejectReportActionUseCase;
+	private RequestReportCancellationUseCase requestReportCancellationUseCase;
+	private GetSortedAndFilteredReportsUseCase getSortedAndFilteredReportsUseCase;
+	private GetOnGoingReportsUseCase getOnGoingReportsUseCase;
+	private GetToConfirmReportsUseCase getToConfirmReportsUseCase;
+	private GetNextPendingReportUseCase getNextPendingReportUseCase;
+	private GenerateDailyCSVUseCase generateDailyCSVUseCase;
 
-    public AppController() {
-        this.clientRepository = new ClientRepository();
-        this.kitRepository = new KitRepository();
-        this.reportRepository = new ReportRepository();
-        this.serviceUnitRepository = new ServiceUnitRepository();
-        this.technicianRepository = new TechnicianRepository();
-        this.profileRepository = new ProfileRepository();
+	private GetAvailableKitsByTypeUseCase getAvailableKitsByTypeUseCase;
+	private GetAvailableTechnicianByZoneAndProblemUseCase getAvailableTechnicianByZoneAndProblemUseCase;
+	private GetAvailableUnitsByZoneUseCase getAvailableUnitsByZoneUseCase;
 
-        this.registerClientUseCase = new RegisterClientUseCase(clientRepository);
-        this.getSortedClientsUseCase = new GetSortedAndFilteredClientsUseCase(clientRepository);
-        this.registerKitUseCase = new RegisterKitUseCase(kitRepository);
-        this.updateKitUseCase = new UpdateKitUseCase(kitRepository);
-        this.getSortedKitsUseCase = new GetSortedAndFilteredKitsUseCase(kitRepository);
-        this.retireKitFromMaintenanceUseCase = new RetireKitFromMaintenanceUseCase(kitRepository);
-        this.returnKitToServiceUseCase = new ReturnKitToServiceUseCase(kitRepository);
-        this.getKitTypeLabelsUseCase = new GetKitTypeLabelsUseCase();
+	private ProfileType currentRole;
+	private Stage primaryStage;
 
-        this.registerServiceUnitUseCase = new RegisterServiceUnitUseCase(serviceUnitRepository);
-        this.registerTechnicianUseCase = new RegisterTechnicianUseCase(technicianRepository);
-        this.loginUseCase = new LoginUseCase(profileRepository);
+	public AppController() {
+		this.clientRepository = new ClientRepository();
+		this.kitRepository = new KitRepository();
+		this.reportRepository = new ReportRepository();
+		this.serviceUnitRepository = new ServiceUnitRepository();
+		this.technicianRepository = new TechnicianRepository();
+		this.profileRepository = new ProfileRepository();
 
-        this.registerReportUseCase = new RegisterReportUseCase(clientRepository, reportRepository);
-        this.assignResourcesReportUseCase = new AssignResourcesReportUseCase(reportRepository, technicianRepository, serviceUnitRepository, kitRepository);
-        this.undoReportResourcesUseCase = new UndoReportResourcesUseCase(reportRepository);
-        this.finishReportInFieldUseCase = new FinishReportInFieldUseCase(reportRepository);
-        this.approveReportActionUseCase = new ApproveReportActionUseCase(reportRepository, kitRepository);
-        this.rejectReportActionUseCase = new RejectReportActionUseCase(reportRepository);
-        this.requestReportCancellationUseCase = new RequestReportCancellationUseCase(reportRepository);
-        this.getSortedAndFilteredReportsUseCase = new GetSortedAndFilteredReportsUseCase(reportRepository);
-        this.getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(reportRepository);
-        this.getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(reportRepository);
-        this.getNextPendingReportUseCase = new GetNextPendingReportUseCase(reportRepository);
-        this.generateDailyCSVUseCase = new GenerateDailyCSVUseCase(reportRepository);
-    }
+		this.registerClientUseCase = new RegisterClientUseCase(clientRepository);
+		this.getSortedClientsUseCase = new GetSortedAndFilteredClientsUseCase(clientRepository);
+		this.registerKitUseCase = new RegisterKitUseCase(kitRepository);
+		this.updateKitUseCase = new UpdateKitUseCase(kitRepository);
+		this.getSortedKitsUseCase = new GetSortedAndFilteredKitsUseCase(kitRepository);
+		this.retireKitFromMaintenanceUseCase = new RetireKitFromMaintenanceUseCase(kitRepository);
+		this.returnKitToServiceUseCase = new ReturnKitToServiceUseCase(kitRepository);
+		this.getKitTypeLabelsUseCase = new GetKitTypeLabelsUseCase();
 
-    public void startApplication(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        loginView = new LoginView();
-        loginView.setOnLoginAction(() -> {
-            SessionDTO session = loginUseCase.execute(loginView.getUsername(), loginView.getPassword());
-            if (session.isSuccess()) initializeSystem(ProfileType.valueOf(session.getRole()));
-            else loginView.showMessage(session.getMessage());
-        });
-        primaryStage.setScene(loginView.getScene());
-        primaryStage.show();
-    }
+		this.registerServiceUnitUseCase = new RegisterServiceUnitUseCase(serviceUnitRepository);
+		this.registerTechnicianUseCase = new RegisterTechnicianUseCase(technicianRepository);
+		this.loginUseCase = new LoginUseCase(profileRepository);
 
-    private void initializeSystem(ProfileType role) {
-        this.currentRole = role;
-        mainView = new MainView(role);
-        dashboardView = new DashboardView(role);
-        requestsView = new RequestsView(role);
-        unitsView = new UnitsView(role);
-        techniciansView = new TechniciansView(role);
-        kitsView = new KitsView(role);
-        clientsView = new ClientsView(role);
+		this.registerReportUseCase = new RegisterReportUseCase(clientRepository, reportRepository);
+		this.assignResourcesReportUseCase = new AssignResourcesReportUseCase(reportRepository, technicianRepository,
+				serviceUnitRepository, kitRepository);
+		this.undoReportResourcesUseCase = new UndoReportResourcesUseCase(reportRepository);
+		this.finishReportInFieldUseCase = new FinishReportInFieldUseCase(reportRepository);
+		this.approveReportActionUseCase = new ApproveReportActionUseCase(reportRepository, kitRepository);
+		this.rejectReportActionUseCase = new RejectReportActionUseCase(reportRepository);
+		this.requestReportCancellationUseCase = new RequestReportCancellationUseCase(reportRepository);
+		this.getSortedAndFilteredReportsUseCase = new GetSortedAndFilteredReportsUseCase(reportRepository);
+		this.getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(reportRepository);
+		this.getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(reportRepository);
+		this.getNextPendingReportUseCase = new GetNextPendingReportUseCase(reportRepository);
+		this.generateDailyCSVUseCase = new GenerateDailyCSVUseCase(reportRepository);
 
-        if (clientRepository.getAllClients().getSize() == 0) seedData();
+		this.getAvailableKitsByTypeUseCase = new GetAvailableKitsByTypeUseCase(kitRepository);
+		this.getAvailableTechnicianByZoneAndProblemUseCase = new GetAvailableTechnicianByZoneAndProblemUseCase(
+				technicianRepository);
+		this.getAvailableUnitsByZoneUseCase = new GetAvailableUnitsByZoneUseCase(serviceUnitRepository);
 
-        mainView.setNavigationController(this);
-        clientsView.setController(this);
-        unitsView.setController(this);
-        kitsView.setController(this);
-        techniciansView.setController(this);
-        requestsView.setController(this);
-        dashboardView.setController(this);
+	}
 
-        refreshAllViews();
-        primaryStage.setScene(mainView.getScene());
-        primaryStage.centerOnScreen();
-    }
+	public void startApplication(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+		loginView = new LoginView();
+		loginView.setOnLoginAction(() -> {
+			SessionDTO session = loginUseCase.execute(loginView.getUsername(), loginView.getPassword());
+			if (session.isSuccess()) {
+				initializeSystem(ProfileType.valueOf(session.getRole()));
+			} else {
+				loginView.showMessage(session.getMessage());
+			}
+		});
+		primaryStage.setScene(loginView.getScene());
+		primaryStage.show();
+	}
 
-    // --- FLUJO DE EMERGENCIAS ---
+	private void initializeSystem(ProfileType role) {
+		this.currentRole = role;
+		mainView = new MainView(role);
+		dashboardView = new DashboardView(role);
+		requestsView = new RequestsView(role);
+		unitsView = new UnitsView(role);
+		techniciansView = new TechniciansView(role);
+		kitsView = new KitsView(role);
+		clientsView = new ClientsView(role);
 
-    public void processNewRequest(String clientId) {
-        Client client = clientRepository.getClientByID(clientId.trim());
-        if (client == null) {
-            navigateToClients();
-            clientsView.showAddClientDialog(clientId);
-        } else {
-            requestsView.showCreateReportDialog(client);
-        }
-    }
+		if (clientRepository.getAllClients().getSize() == 0) {
+			seedData();
+		}
 
-    public void submitReportCreation(String clientId, String description, String type, String priority, String zone) {
-        handleResponse(registerReportUseCase.execute(clientId, description, type.replace(" ", ""), priority.replace(" ", ""), zone.replace(" ", "")), this::refreshAllViews);
-    }
+		mainView.setNavigationController(this);
+		clientsView.setController(this);
+		unitsView.setController(this);
+		kitsView.setController(this);
+		techniciansView.setController(this);
+		requestsView.setController(this);
+		dashboardView.setController(this);
 
-    public ReportDTO getNextPendingReport() {
-        return getNextPendingReportUseCase.execute();
-    }
+		refreshAllViews();
+		primaryStage.setScene(mainView.getScene());
+		primaryStage.centerOnScreen();
+	}
 
- // Ejemplo en AppController.java
-    public void assignReportResources(String techId, String unitId, String kitId) {
-        ResponseDTO res = assignResourcesReportUseCase.execute(techId, unitId, kitId);
-        if(res.isSuccess()) {
-            dashboardView.updateLog("Asignación realizada: Tech " + techId + " a Unidad " + unitId);
-        }
-        handleResponse(res, this::refreshAllViews);
-    }
+	// --- FLUJO DE EMERGENCIAS ---
 
-    public void undoReport() {
-        handleResponse(undoReportResourcesUseCase.execute(), this::refreshAllViews);
-    }
+	public void processNewRequest(String clientId) {
+		Client client = clientRepository.getClientByID(clientId.trim());
+		if (client == null) {
+			navigateToClients();
+			clientsView.showAddClientDialog(clientId);
+		} else {
+			requestsView.showCreateReportDialog(client);
+		}
+	}
 
-    public void finishReport(String ticketId) {
-        handleResponse(finishReportInFieldUseCase.execute(ticketId), this::refreshAllViews);
-    }
+	public void submitReportCreation(String clientId, String description, String type, String priority, String zone) {
+		handleResponse(registerReportUseCase.execute(clientId, description, type.replace(" ", ""),
+				priority.replace(" ", ""), zone.replace(" ", "")), this::refreshAllViews);
+	}
 
-    public void approveReport() {
-        handleResponse(approveReportActionUseCase.execute(), this::refreshAllViews);
-    }
+	public ReportDTO getNextPendingReport() {
+		return getNextPendingReportUseCase.execute();
+	}
 
-    public void rejectReport() {
-        handleResponse(rejectReportActionUseCase.execute(), this::refreshAllViews);
-    }
+	// Ejemplo en AppController.java
+	public void assignReportResources(String techId, String unitId, String kitId) {
+		ResponseDTO res = assignResourcesReportUseCase.execute(techId, unitId, kitId);
+		if (res.isSuccess()) {
+			dashboardView.updateLog("Asignación realizada: Tech " + techId + " a Unidad " + unitId);
+		}
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void cancelReport(String ticketId) {
-        handleResponse(requestReportCancellationUseCase.execute(ticketId), this::refreshAllViews);
-    }
+	public void undoReport() {
+		handleResponse(undoReportResourcesUseCase.execute(), this::refreshAllViews);
+	}
 
-    public void exportDailyReport() {
-        handleResponse(generateDailyCSVUseCase.execute(""), null);
-    }
+	public void finishReport(String ticketId) {
+		handleResponse(finishReportInFieldUseCase.execute(ticketId), this::refreshAllViews);
+	}
 
-    // --- FLUJO KITS (MANTENIMIENTO EN PILA) ---
+	public void approveReport() {
+		handleResponse(approveReportActionUseCase.execute(), this::refreshAllViews);
+	}
 
-    public void updateKitToMaintenance(String id, String type) {
-        handleResponse(updateKitUseCase.execute(id, type.replace(" ", ""), "Mantenimiento"), this::refreshAllViews);
-    }
+	public void rejectReport() {
+		handleResponse(rejectReportActionUseCase.execute(), this::refreshAllViews);
+	}
 
-    public void returnKitToService() {
-        handleResponse(returnKitToServiceUseCase.execute(), this::refreshAllViews);
-    }
+	public void cancelReport(String ticketId) {
+		handleResponse(requestReportCancellationUseCase.execute(ticketId), this::refreshAllViews);
+	}
 
-    public void retireKitFromMaintenance() {
-        handleResponse(retireKitFromMaintenanceUseCase.execute(), this::refreshAllViews);
-    }
+	public void exportDailyReport() {
+		handleResponse(generateDailyCSVUseCase.execute(""), null);
+	}
 
-    // --- REGISTRO DE ENTIDADES ---
+	// --- FLUJO KITS (MANTENIMIENTO EN PILA) ---
 
-    public void registerClient(String id, String name, String type, String contact) {
-        handleResponse(registerClientUseCase.ResponseDTO(id, name, type.replace(" ", ""), contact), this::refreshAllViews);
-    }
+	public void updateKitToMaintenance(String id, String type) {
+		handleResponse(updateKitUseCase.execute(id, type.replace(" ", ""), "Mantenimiento"), this::refreshAllViews);
+	}
 
-    public void registerTechnician(String name, String specialty, String zone) {
-        handleResponse(registerTechnicianUseCase.execute(name, specialty.replace(" ", ""), zone.replace(" ", "")), this::refreshAllViews);
-    }
+	public void returnKitToService() {
+		handleResponse(returnKitToServiceUseCase.execute(), this::refreshAllViews);
+	}
 
-    public void registerUnit(String type, String zone, int quantity) {
-        handleResponse(registerServiceUnitUseCase.execute(type.replace(" ", ""), zone.replace(" ", ""), quantity), this::refreshAllViews);
-    }
+	public void retireKitFromMaintenance() {
+		handleResponse(retireKitFromMaintenanceUseCase.execute(), this::refreshAllViews);
+	}
 
-    public void registerKit(String type, int quantity) {
-        handleResponse(registerKitUseCase.execute(type.replace(" ", ""), quantity), this::refreshAllViews);
-    }
+	// --- REGISTRO DE ENTIDADES ---
 
-    // --- FILTRADO INTELIGENTE PARA LA VISTA ---
+	public void registerClient(String id, String name, String type, String contact) {
+		handleResponse(registerClientUseCase.ResponseDTO(id, name, type.replace(" ", ""), contact),
+				this::refreshAllViews);
+	}
 
-    public SimpleList<String> getKitTypes() { 
-        return getKitTypeLabelsUseCase.execute(); 
-    }
+	public void registerTechnician(String name, String specialty, String zone) {
+		handleResponse(registerTechnicianUseCase.execute(name, specialty.replace(" ", ""), zone.replace(" ", "")),
+				this::refreshAllViews);
+	}
 
-    public SimpleList<EntityItem> getSuggestedTechnicians(String zoneName, String specialtyName) {
-        SimpleList<EntityItem> list = new SimpleList<>();
-        SimpleList.Iterator<Technician> it = technicianRepository.getAllTechnicians().iterador();
-        
-        String cleanZone = zoneName.replace(" ", "").toLowerCase();
-        String cleanSpec = specialtyName.replace(" ", "").toLowerCase();
+	public void registerUnit(String type, String zone, int quantity) {
+		handleResponse(registerServiceUnitUseCase.execute(type.replace(" ", ""), zone.replace(" ", ""), quantity),
+				this::refreshAllViews);
+	}
 
-        while (it.hasNext()) {
-            Technician t = it.Next();
-            if (t.getStatus() == co.edu.udistrital.model.enums.TechnicianStatus.AVAILABLE &&
-                t.getZone().getDisplayName().replace(" ", "").toLowerCase().equals(cleanZone) &&
-                t.getSpecialty().getDisplayName().replace(" ", "").toLowerCase().equals(cleanSpec)) {
-                
-                list.add(new EntityItem(t.getId().toString(), t.getName() + " (" + t.getSpecialty().getDisplayName() + ")"));
-            }
-        }
-        return list;
-    }
+	public void registerKit(String type, int quantity) {
+		handleResponse(registerKitUseCase.execute(type.replace(" ", ""), quantity), this::refreshAllViews);
+	}
 
-    public SimpleList<EntityItem> getSuggestedUnits(String zoneName) {
-        SimpleList<EntityItem> list = new SimpleList<>();
-        SimpleList.Iterator<ServiceUnit> it = serviceUnitRepository.getAllUnits().iterador();
-        String cleanZone = zoneName.replace(" ", "").toLowerCase();
+	// --- FILTRADO INTELIGENTE PARA LA VISTA ---
 
-        while (it.hasNext()) {
-            ServiceUnit u = it.Next();
-            if (u.getStatus() == co.edu.udistrital.model.enums.UnitStatus.AVAILABLE &&
-                u.getZone().getDisplayName().replace(" ", "").toLowerCase().equals(cleanZone)) {
-                list.add(new EntityItem(u.getId().toString(), u.getType().getDisplayName()));
-            }
-        }
-        return list;
-    }
+	public SimpleList<String> getKitTypes() {
+		return getKitTypeLabelsUseCase.execute();
+	}
 
-    public SimpleList<EntityItem> getAvailableKitsForUI() {
-        SimpleList<EntityItem> list = new SimpleList<>();
-        SimpleList.Iterator<Kit> it = kitRepository.getAllKits().iterador();
-        while (it.hasNext()) {
-            Kit k = it.Next();
-            if (k.getStatus() == co.edu.udistrital.model.enums.UnitStatus.AVAILABLE) {
-                list.add(new EntityItem(k.getId().toString(), k.getType().getDisplayName()));
-            }
-        }
-        return list;
-    }
+	// IMPORTANTE: Asegúrense de inyectar estos 3 Casos de Uso en el constructor del
+	// AppController
+	// private GetAvailableTechnicianByZoneAndProblemUseCase
+	// getSuggestedTechniciansUseCase;
+	// private GetAvailableUnitsByZoneUseCase getSuggestedUnitsUseCase;
+	// private GetAvailableKitsByTypeUseCase getSuggestedKitsUseCase;
 
-    // --- REFRESHERS CON ITERADORES NATIVOS ---
+	public SimpleList<EntityItem> getSuggestedTechnicians(String zoneName, String specialtyName) {
+		SimpleList<EntityItem> list = new SimpleList<>();
 
-    public void refreshAllViews() {
-        refreshClientsView(); 
-        refreshKitsView(); 
-        refreshUnitsView();
-        refreshTechniciansView(); 
-        refreshRequestsView(); 
-        refreshDashboardView();
-    }
+		// El controlador ya no itera el repositorio. Le pide la lista procesada al Caso
+		// de Uso.
+		SimpleList<TechnicianDTO> dtos = getAvailableTechnicianByZoneAndProblemUseCase.execute(zoneName, specialtyName);
 
-    private void refreshRequestsView() {
-        requestsView.clearPanels();
-        
-        SimpleList.Iterator<ReportDTO> pendIt = getSortedAndFilteredReportsUseCase.execute().iterador();
-        while(pendIt.hasNext()) requestsView.addReportCard(pendIt.Next(), "PENDING");
-        
-        SimpleList.Iterator<ReportDTO> ongoIt = getOnGoingReportsUseCase.execute().iterador();
-        while(ongoIt.hasNext()) requestsView.addReportCard(ongoIt.Next(), "ONGOING");
-        
-        SimpleList.Iterator<ReportDTO> confIt = getToConfirmReportsUseCase.execute().iterador();
-        while(confIt.hasNext()) requestsView.addReportCard(confIt.Next(), "CONFIRM");
-    }
+		SimpleList.Iterator<TechnicianDTO> it = dtos.iterador();
+		while (it.hasNext()) {
+			TechnicianDTO t = it.Next();
 
-    private void refreshClientsView() {
-        clientsView.clearTable();
-        SimpleList.Iterator<ClientDTO> cIt = getSortedClientsUseCase.execute().iterador();
-        while(cIt.hasNext()) clientsView.addClient(cIt.Next());
-    }
-    
-    private void refreshKitsView() {
-        kitsView.clearTable();
-        SimpleList.Iterator<KitDTO> kIt = getSortedKitsUseCase.execute().iterador();
-        while(kIt.hasNext()) kitsView.addKit(kIt.Next());
-    }
+			list.add(new EntityItem(t.getId(), t.getName() + " (" + t.getSpecialty() + ")"));
+		}
+		return list;
+	}
 
-    private void refreshUnitsView() {
-        unitsView.clearTable();
-        SimpleList.Iterator<ServiceUnit> uIt = serviceUnitRepository.getAllUnits().iterador();
-        while(uIt.hasNext()) {
-            ServiceUnit u = uIt.Next();
-            unitsView.addUnit(u.getId().toString(), u.getType().getDisplayName(), u.getStatus().getDisplayName(), u.getZone().getDisplayName(), u.getStatus().getDisplayName().equals("Disponible"));
-        }
-    }
+	public SimpleList<EntityItem> getSuggestedUnits(String zoneName) {
+		SimpleList<EntityItem> list = new SimpleList<>();
 
-    private void refreshTechniciansView() {
-        techniciansView.clearTable();
-        SimpleList.Iterator<Technician> tIt = technicianRepository.getAllTechnicians().iterador();
-        while(tIt.hasNext()) {
-            Technician t = tIt.Next();
-            techniciansView.addTechnician(t.getId().toString(), t.getName(), t.getSpecialty().getDisplayName(), t.getStatus().getDisplayName(), t.getZone().getDisplayName(), t.getStatus().getDisplayName().equals("Disponible"));
-        }
-    }
+		// Delegación absoluta al Caso de Uso
+		SimpleList<ServiceUnitDTO> dtos = getAvailableUnitsByZoneUseCase.execute(zoneName);
 
-    private void refreshDashboardView() {
-        if (dashboardView != null) {
-            int activeUnits = 0, critical = 0, maint = 0, total = 0;
-            
-            SimpleList.Iterator<ServiceUnit> uit = serviceUnitRepository.getAllUnits().iterador();
-            while(uit.hasNext()) { 
-                if(uit.Next().getStatus() != co.edu.udistrital.model.enums.UnitStatus.MAINTENANCE) activeUnits++; 
-            }
-            
-            maint = kitRepository.getMaintenanceKits().getSize();
-            
-            SimpleList.Iterator<Report> rit = reportRepository.getAllReports().iterador();
-            while(rit.hasNext()) { 
-                Report r = rit.Next(); 
-                total++;
-                if(r.getPriority() == co.edu.udistrital.model.enums.CriticLevel.HIGH) critical++;
-            }
-            dashboardView.updateStatistics(String.valueOf(activeUnits), String.valueOf(critical), String.valueOf(maint), String.valueOf(total));
-        }
-    }
+		SimpleList.Iterator<ServiceUnitDTO> it = dtos.iterador();
+		while (it.hasNext()) {
+			ServiceUnitDTO u = it.Next();
+			list.add(new EntityItem(u.getId(), u.getType()));
+		}
+		return list;
+	}
 
-    private void handleResponse(ResponseDTO response, Runnable onSuccess) {
-        showNotification(response.isSuccess(), response.getMessage());
-        if (response.isSuccess() && onSuccess != null) onSuccess.run();
-    }
+	// NOTA PARA JIMMY: Este método cambió de nombre y ahora exige el 'problemType'
+	public SimpleList<EntityItem> getSuggestedKits(String specialtyName) {
+		SimpleList<EntityItem> list = new SimpleList<>();
 
-    private void showNotification(boolean success, String message) {
-        Alert alert = new Alert(success ? AlertType.INFORMATION : AlertType.ERROR);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-    
-    /**
-     * Permite al supervisor revertir la última operación realizada en el sistema.
-     * Esto cumple con el requerimiento de restaurar consistencia ante errores de despacho.
-     */
-    public void performUndo() {
-        if (currentRole != ProfileType.ADMIN) {
-            showNotification(false, "Acceso denegado: Solo supervisores pueden revertir operaciones.");
-            return;
-        }
-        
-        // Llamamos al caso de uso de deshacer
-        ResponseDTO response = undoReportResourcesUseCase.execute();
-        
-        showNotification(response.isSuccess(), response.getMessage());
-        refreshAllViews(); // Refrescamos todo para ver el estado restaurado
-    }
+		// Utilizamos tu factory interno del caso de uso para traer el Kit correcto
+		SimpleList<KitDTO> dtos = getAvailableKitsByTypeUseCase.execute(specialtyName);
 
-    // --- NAVEGACIÓN ---
-    public void navigateToDashboard() { mainView.setContent(dashboardView.getView()); }
-    public void navigateToRequests() { mainView.setContent(requestsView.getView()); }
-    public void navigateToUnits() { mainView.setContent(unitsView.getView()); }
-    public void navigateToTechnicians() { mainView.setContent(techniciansView.getView()); }
-    public void navigateToKits() { mainView.setContent(kitsView.getView()); }
-    public void navigateToClients() { mainView.setContent(clientsView.getView()); }
+		SimpleList.Iterator<KitDTO> it = dtos.iterador();
+		while (it.hasNext()) {
+			KitDTO k = it.Next();
+			list.add(new EntityItem(k.getId(), k.getType()));
+		}
+		return list;
+	}
 
-    public void logout() {
-        this.currentRole = null;
-        startApplication(this.primaryStage);
-    }
+	// --- REFRESHERS CON ITERADORES NATIVOS ---
 
-    private void seedData() {
-        registerClientUseCase.ResponseDTO("101010", "Transportes Rapidos SAS", "Empresarial", "3001112233");
-        registerTechnicianUseCase.execute("Carlos Ramirez", "MecanicoGeneral", "Kennedy");
-        registerTechnicianUseCase.execute("Julian Perez", "OperadordeGrua", "Suba");
-        registerServiceUnitUseCase.execute("Grua", "Suba", 2);
-        registerServiceUnitUseCase.execute("Moto", "Kennedy", 2);
-        registerKitUseCase.execute("KitGeneral", 2);
-        registerKitUseCase.execute("KitdeGrua", 2);
-        registerReportUseCase.execute("101010", "Camión varado por motor", "MecanicoGeneral", "Alta", "Kennedy");
-        registerReportUseCase.execute("101010", "Estrellada fuerte", "OperadordeGrua", "Alta", "Suba");
-    }
+	public void refreshAllViews() {
+		refreshClientsView();
+		refreshKitsView();
+		refreshUnitsView();
+		refreshTechniciansView();
+		refreshRequestsView();
+		refreshDashboardView();
+	}
+
+	private void refreshRequestsView() {
+		requestsView.clearPanels();
+
+		SimpleList.Iterator<ReportDTO> pendIt = getSortedAndFilteredReportsUseCase.execute().iterador();
+		while (pendIt.hasNext()) {
+			requestsView.addReportCard(pendIt.Next(), "PENDING");
+		}
+
+		SimpleList.Iterator<ReportDTO> ongoIt = getOnGoingReportsUseCase.execute().iterador();
+		while (ongoIt.hasNext()) {
+			requestsView.addReportCard(ongoIt.Next(), "ONGOING");
+		}
+
+		SimpleList.Iterator<ReportDTO> confIt = getToConfirmReportsUseCase.execute().iterador();
+		while (confIt.hasNext()) {
+			requestsView.addReportCard(confIt.Next(), "CONFIRM");
+		}
+	}
+
+	private void refreshClientsView() {
+		clientsView.clearTable();
+		SimpleList.Iterator<ClientDTO> cIt = getSortedClientsUseCase.execute().iterador();
+		while (cIt.hasNext()) {
+			clientsView.addClient(cIt.Next());
+		}
+	}
+
+	private void refreshKitsView() {
+		kitsView.clearTable();
+		SimpleList.Iterator<KitDTO> kIt = getSortedKitsUseCase.execute().iterador();
+		while (kIt.hasNext()) {
+			kitsView.addKit(kIt.Next());
+		}
+	}
+
+	private void refreshUnitsView() {
+		unitsView.clearTable();
+		SimpleList.Iterator<ServiceUnit> uIt = serviceUnitRepository.getAllUnits().iterador();
+		while (uIt.hasNext()) {
+			ServiceUnit u = uIt.Next();
+			unitsView.addUnit(u.getId().toString(), u.getType().getDisplayName(), u.getStatus().getDisplayName(),
+					u.getZone().getDisplayName(), u.getStatus().getDisplayName().equals("Disponible"));
+		}
+	}
+
+	private void refreshTechniciansView() {
+		techniciansView.clearTable();
+		SimpleList.Iterator<Technician> tIt = technicianRepository.getAllTechnicians().iterador();
+		while (tIt.hasNext()) {
+			Technician t = tIt.Next();
+			techniciansView.addTechnician(t.getId().toString(), t.getName(), t.getSpecialty().getDisplayName(),
+					t.getStatus().getDisplayName(), t.getZone().getDisplayName(),
+					t.getStatus().getDisplayName().equals("Disponible"));
+		}
+	}
+
+	private void refreshDashboardView() {
+		if (dashboardView != null) {
+			int activeUnits = 0, critical = 0, maint = 0, total = 0;
+
+			SimpleList.Iterator<ServiceUnit> uit = serviceUnitRepository.getAllUnits().iterador();
+			while (uit.hasNext()) {
+				if (uit.Next().getStatus() != co.edu.udistrital.model.enums.UnitStatus.MAINTENANCE) {
+					activeUnits++;
+				}
+			}
+
+			maint = kitRepository.getMaintenanceKits().getSize();
+
+			SimpleList.Iterator<Report> rit = reportRepository.getAllReports().iterador();
+			while (rit.hasNext()) {
+				Report r = rit.Next();
+				total++;
+				if (r.getPriority() == co.edu.udistrital.model.enums.CriticLevel.HIGH) {
+					critical++;
+				}
+			}
+			dashboardView.updateStatistics(String.valueOf(activeUnits), String.valueOf(critical), String.valueOf(maint),
+					String.valueOf(total));
+		}
+	}
+
+	private void handleResponse(ResponseDTO response, Runnable onSuccess) {
+		showNotification(response.isSuccess(), response.getMessage());
+		if (response.isSuccess() && onSuccess != null) {
+			onSuccess.run();
+		}
+	}
+
+	private void showNotification(boolean success, String message) {
+		Alert alert = new Alert(success ? AlertType.INFORMATION : AlertType.ERROR);
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+		alert.showAndWait();
+	}
+
+	/**
+	 * Permite al supervisor revertir la última operación realizada en el sistema.
+	 * Esto cumple con el requerimiento de restaurar consistencia ante errores de
+	 * despacho.
+	 */
+	public void performUndo() {
+		if (currentRole != ProfileType.ADMIN) {
+			showNotification(false, "Acceso denegado: Solo supervisores pueden revertir operaciones.");
+			return;
+		}
+
+		// Llamamos al caso de uso de deshacer
+		ResponseDTO response = undoReportResourcesUseCase.execute();
+
+		showNotification(response.isSuccess(), response.getMessage());
+		refreshAllViews(); // Refrescamos todo para ver el estado restaurado
+	}
+
+	// --- NAVEGACIÓN ---
+	public void navigateToDashboard() {
+		mainView.setContent(dashboardView.getView());
+	}
+
+	public void navigateToRequests() {
+		mainView.setContent(requestsView.getView());
+	}
+
+	public void navigateToUnits() {
+		mainView.setContent(unitsView.getView());
+	}
+
+	public void navigateToTechnicians() {
+		mainView.setContent(techniciansView.getView());
+	}
+
+	public void navigateToKits() {
+		mainView.setContent(kitsView.getView());
+	}
+
+	public void navigateToClients() {
+		mainView.setContent(clientsView.getView());
+	}
+
+	public void logout() {
+		this.currentRole = null;
+		startApplication(this.primaryStage);
+	}
+
+	private void seedData() {
+		registerClientUseCase.ResponseDTO("101010", "Transportes Rapidos SAS", "Empresarial", "3001112233");
+		registerTechnicianUseCase.execute("Carlos Ramirez", "MecanicoGeneral", "Kennedy");
+		registerTechnicianUseCase.execute("Julian Perez", "OperadordeGrua", "Suba");
+		registerServiceUnitUseCase.execute("Grua", "Suba", 2);
+		registerServiceUnitUseCase.execute("Moto", "Kennedy", 2);
+		registerKitUseCase.execute("KitGeneral", 2);
+		registerKitUseCase.execute("KitdeGrua", 2);
+		registerReportUseCase.execute("101010", "Camión varado por motor", "MecanicoGeneral", "Alta", "Kennedy");
+		registerReportUseCase.execute("101010", "Estrellada fuerte", "OperadordeGrua", "Alta", "Suba");
+	}
 }
