@@ -149,8 +149,13 @@ public class AppController {
         return getNextPendingReportUseCase.execute();
     }
 
+ // Ejemplo en AppController.java
     public void assignReportResources(String techId, String unitId, String kitId) {
-        handleResponse(assignResourcesReportUseCase.execute(techId, unitId, kitId), this::refreshAllViews);
+        ResponseDTO res = assignResourcesReportUseCase.execute(techId, unitId, kitId);
+        if(res.isSuccess()) {
+            dashboardView.updateLog("Asignación realizada: Tech " + techId + " a Unidad " + unitId);
+        }
+        handleResponse(res, this::refreshAllViews);
     }
 
     public void undoReport() {
@@ -346,6 +351,23 @@ public class AppController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    
+    /**
+     * Permite al supervisor revertir la última operación realizada en el sistema.
+     * Esto cumple con el requerimiento de restaurar consistencia ante errores de despacho.
+     */
+    public void performUndo() {
+        if (currentRole != ProfileType.ADMIN) {
+            showNotification(false, "Acceso denegado: Solo supervisores pueden revertir operaciones.");
+            return;
+        }
+        
+        // Llamamos al caso de uso de deshacer
+        ResponseDTO response = undoReportResourcesUseCase.execute();
+        
+        showNotification(response.isSuccess(), response.getMessage());
+        refreshAllViews(); // Refrescamos todo para ver el estado restaurado
     }
 
     // --- NAVEGACIÓN ---
