@@ -3,22 +3,14 @@ package co.edu.udistrital.view;
 import co.edu.udistrital.controller.AppController;
 import co.edu.udistrital.model.dtos.KitDTO;
 import co.edu.udistrital.model.enums.ProfileType;
+import co.edu.udistrital.model.structures.SimpleList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import java.util.Optional;
 
-/**
- * Clase que define la vista para la gestion del inventario de kits y herramientas.
- * Se encarga de la visualizacion del inventario actual y provee la interfaz 
- * necesaria para la adicion de nuevos lotes de kits al sistema.
- * * @author Jimmy86gb
- */
 public class KitsView {
     private VBox rootContainer;
     private GridPane dataGrid;
@@ -29,44 +21,63 @@ public class KitsView {
     public KitsView(ProfileType role) {
         this.role = role;
         rootContainer = new VBox(25);
+        rootContainer.setPadding(new Insets(30));
         
         HBox headerBox = new HBox();
         headerBox.setAlignment(Pos.CENTER_LEFT);
         
-        Label lblTitle = new Label("Inventario de Kits y Herramientas");
+        Label lblTitle = new Label("Inventario y Taller de Kits");
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
-        lblTitle.setStyle("-fx-text-fill: #111827;");
         
-        Button btnNewKit = new Button("+ Anadir Kit");
-        btnNewKit.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
-        btnNewKit.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-padding: 8 16 8 16; -fx-background-radius: 6; -fx-cursor: hand;");
+        Button btnNewKit = new Button("+ Añadir Lote de Kits");
+        btnNewKit.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 6; -fx-cursor: hand;");
         btnNewKit.setOnAction(e -> showAddKitDialog());
-        
-        if (role == ProfileType.ADMIN) {
-            btnNewKit.setVisible(false);
-            btnNewKit.setManaged(false);
-        }
+        if (role != ProfileType.ADMIN) btnNewKit.setDisable(true);
         
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         headerBox.getChildren().addAll(lblTitle, spacer, btnNewKit);
 
+        // PANEL DE MANTENIMIENTO (Lógica LIFO - Sin seleccionar IDs)
+        HBox maintPanel = new HBox(15);
+        maintPanel.setAlignment(Pos.CENTER_LEFT);
+        maintPanel.setPadding(new Insets(15));
+        maintPanel.setStyle("-fx-background-color: #FEF3C7; -fx-border-color: #F59E0B; -fx-border-radius: 8; -fx-background-radius: 8;");
+        
+        Label lblMaintTitle = new Label("🛠 Pila de Mantenimiento (LIFO):");
+        lblMaintTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
+        
+        Button btnReturnKit = new Button("Retornar Tope al Servicio");
+        btnReturnKit.setStyle("-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-cursor: hand;");
+        btnReturnKit.setOnAction(e -> appController.returnKitToService());
+        
+        Button btnRetireKit = new Button("Dar de Baja Tope");
+        btnRetireKit.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-cursor: hand;");
+        btnRetireKit.setOnAction(e -> appController.retireKitFromMaintenance());
+        
+        if (role != ProfileType.ADMIN) {
+            btnReturnKit.setDisable(true);
+            btnRetireKit.setDisable(true);
+        }
+        
+        maintPanel.getChildren().addAll(lblMaintTitle, btnReturnKit, btnRetireKit);
+
+        // Tabla General
         VBox tableContainer = new VBox();
-        tableContainer.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 4);");
-        tableContainer.setPadding(new Insets(10, 20, 20, 20));
+        tableContainer.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 4);");
+        tableContainer.setPadding(new Insets(20));
 
         dataGrid = new GridPane();
-        dataGrid.setHgap(40);
+        dataGrid.setHgap(30);
         dataGrid.setVgap(15);
-        dataGrid.setPadding(new Insets(15, 0, 0, 0));
-
+        
         addHeaderCell("ID Serial", 0);
         addHeaderCell("Tipo de Kit", 1);
-        addHeaderCell("Estado del Inventario", 2);
+        addHeaderCell("Estado", 2);
         addHeaderCell("Acciones", 3);
 
         tableContainer.getChildren().add(dataGrid);
-        rootContainer.getChildren().addAll(headerBox, tableContainer);
+        rootContainer.getChildren().addAll(headerBox, maintPanel, tableContainer);
     }
 
     public void setController(AppController controller) { this.appController = controller; }
@@ -86,82 +97,55 @@ public class KitsView {
 
     public void addKit(KitDTO kit) {
         String fullId = kit.getId().toString();
-        String shortId = fullId.substring(0, 8);
         
-        Label lblId = createDataCell(shortId);
-        Label lblType = createDataCell(kit.getType());
+        dataGrid.add(new Label(fullId.substring(0, 8)), 0, currentRow);
+        dataGrid.add(new Label(kit.getType()), 1, currentRow);
         
-        Label lblStatus = new Label(kit.getStatus());
-        lblStatus.setFont(Font.font("Segoe UI", FontWeight.BOLD, 12));
-        lblStatus.setPadding(new Insets(4, 8, 4, 8));
+        Label statusLbl = new Label(kit.getStatus());
+        statusLbl.setStyle(kit.getStatus().equalsIgnoreCase("Disponible") ? "-fx-text-fill: #065F46; -fx-font-weight: bold;" : "-fx-text-fill: #991B1B; -fx-font-weight: bold;");
+        dataGrid.add(statusLbl, 2, currentRow);
+
+        HBox actions = new HBox(10);
         
-        if (kit.getStatus().equals("Disponible") || kit.getStatus().equals("AVAILABLE")) {
-            lblStatus.setStyle("-fx-background-color: #D1FAE5; -fx-text-fill: #065F46; -fx-background-radius: 12;");
-        } else {
-            lblStatus.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-background-radius: 12;");
+        if (kit.getStatus().equalsIgnoreCase("Disponible") && role == ProfileType.ADMIN) {
+            Button btnMaint = new Button("Enviar a Mantenimiento");
+            btnMaint.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand;");
+            btnMaint.setOnAction(e -> appController.updateKitToMaintenance(fullId, kit.getType()));
+            actions.getChildren().add(btnMaint);
+        } else if (kit.getStatus().equalsIgnoreCase("Mantenimiento")) {
+            Label lblPila = new Label("(En Pila LIFO de Reparación)");
+            lblPila.setStyle("-fx-text-fill: #F59E0B; -fx-font-style: italic;");
+            actions.getChildren().add(lblPila);
         }
 
-        Button btnAction = new Button("Copiar ID");
-        btnAction.setStyle("-fx-background-color: white; -fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-cursor: hand;");
-        btnAction.setDisable(!kit.isEditable());
-
-        // ACCION: Copia el UUID completo al portapapeles del sistema
-        btnAction.setOnAction(e -> {
-            Clipboard clipboard = Clipboard.getSystemClipboard();
-            ClipboardContent content = new ClipboardContent();
-            content.putString(fullId);
-            clipboard.setContent(content);
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText(null);
-            alert.setContentText("¡ID del Kit copiado al portapapeles!\nYa puedes hacer Ctrl+V.");
-            alert.showAndWait();
-        });
-
-        dataGrid.add(lblId, 0, currentRow);
-        dataGrid.add(lblType, 1, currentRow);
-        dataGrid.add(lblStatus, 2, currentRow);
-        dataGrid.add(btnAction, 3, currentRow);
+        dataGrid.add(actions, 3, currentRow);
         currentRow++;
-    }
-
-    private Label createDataCell(String text) {
-        Label lbl = new Label(text);
-        lbl.setFont(Font.font("Segoe UI", 14));
-        lbl.setStyle("-fx-text-fill: #111827;");
-        return lbl;
     }
 
     private void showAddKitDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Anadir Lote de Kits");
-        dialog.setHeaderText("Ingrese los datos del nuevo kit");
-
+        dialog.setTitle("Nuevo Lote de Kits");
+        
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-
+        
         ComboBox<String> typeBox = new ComboBox<>();
-        typeBox.getItems().addAll("Kit de Grua", "Kit de Electricidad", "Kit General", "Kit de Cerrajeria", "Kit de Montallantas");
+        // ITERACIÓN CORREGIDA
+        SimpleList.Iterator<String> tIt = appController.getKitTypes().iterador();
+        while(tIt.hasNext()) typeBox.getItems().add(tIt.Next());
         typeBox.getSelectionModel().selectFirst();
         
         TextField qtyField = new TextField("1");
-
-        grid.add(new Label("Tipo de Kit:"), 0, 0); grid.add(typeBox, 1, 0);
-        grid.add(new Label("Cantidad:"), 0, 1);    grid.add(qtyField, 1, 1);
-
+        
+        grid.add(new Label("Tipo:"), 0, 0); grid.add(typeBox, 1, 0);
+        grid.add(new Label("Cantidad:"), 0, 1); grid.add(qtyField, 1, 1);
+        
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        Optional<ButtonType> result = dialog.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                int qty = Integer.parseInt(qtyField.getText());
-                appController.registerKit(typeBox.getValue(), qty);
-            } catch(NumberFormatException ex) {
-                // Se omite el manejo de excepcion por simplicidad
-            }
-        }
+        dialog.showAndWait().ifPresent(res -> {
+            if(res == ButtonType.OK) appController.registerKit(typeBox.getValue(), Integer.parseInt(qtyField.getText()));
+        });
     }
 
     public VBox getView() { return rootContainer; }

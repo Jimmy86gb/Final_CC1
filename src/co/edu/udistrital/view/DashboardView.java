@@ -19,6 +19,7 @@ public class DashboardView {
     private Label lblActiveUnits;
     private Label lblCriticalCases;
     private Label lblMaintenance;
+    private Label lblTotalRequests; // <- Nueva etiqueta para el total
 
     public DashboardView(ProfileType role) {
         this.role = role;
@@ -34,12 +35,14 @@ public class DashboardView {
         lblActiveUnits = new Label("0");
         lblCriticalCases = new Label("0");
         lblMaintenance = new Label("0");
+        lblTotalRequests = new Label("0"); // <- Inicialización
         
         VBox card1 = createCard("Unidades Activas", lblActiveUnits, "#10B981");
         VBox card2 = createCard("Casos Criticos", lblCriticalCases, "#EF4444");
         VBox card3 = createCard("En Mantenimiento", lblMaintenance, "#F59E0B");
+        VBox card4 = createCard("Total Solicitudes", lblTotalRequests, "#3B82F6"); // <- Nueva tarjeta azul
         
-        cardsContainer.getChildren().addAll(card1, card2, card3);
+        cardsContainer.getChildren().addAll(card1, card2, card3, card4);
         rootContainer.getChildren().addAll(lblTitle, cardsContainer);
 
         if (role == ProfileType.ADMIN) {
@@ -58,7 +61,7 @@ public class DashboardView {
 
     /**
      * Se asigna el controlador encargado de gestionar la logica de la vista.
-     * * @param controller Instancia del controlador principal.
+     * @param controller Instancia del controlador principal.
      */
     public void setController(AppController controller) {
         this.appController = controller;
@@ -66,19 +69,21 @@ public class DashboardView {
 
     /**
      * Se actualizan los valores estadisticos mostrados en el dashboard.
-     * * @param active Cantidad de unidades activas en formato de texto.
+     * @param active Cantidad de unidades activas en formato de texto.
      * @param critical Cantidad de casos criticos en formato de texto.
      * @param maint Cantidad de recursos en mantenimiento en formato de texto.
+     * @param total Cantidad total de solicitudes en el sistema.
      */
-    public void updateStatistics(String active, String critical, String maint) {
+    public void updateStatistics(String active, String critical, String maint, String total) {
         lblActiveUnits.setText(active);
         lblCriticalCases.setText(critical);
         lblMaintenance.setText(maint);
+        lblTotalRequests.setText(total); // <- Se actualiza el cuarto valor
     }
 
     /**
      * Se crea un contenedor visual (tarjeta) para presentar una metrica especifica.
-     * * @param title Titulo de la metrica.
+     * @param title Titulo de la metrica.
      * @param lblValue Componente Label que contiene el valor numerico.
      * @param hexColor Codigo de color hexadecimal para resaltar el valor.
      * @return Contenedor VBox configurado.
@@ -103,7 +108,7 @@ public class DashboardView {
 
     /**
      * Retorna el contenedor principal de la vista.
-     * * @return Contenedor VBox de la vista.
+     * @return Contenedor VBox de la vista.
      */
     public VBox getView() { return rootContainer; }
 }
