@@ -1,16 +1,7 @@
 package co.edu.udistrital.view;
 
 import co.edu.udistrital.controller.AppController;
-import co.edu.udistrital.model.dtos.ReportDTO;
-import co.edu.udistrital.model.entities.Client;
-import co.edu.udistrital.model.enums.ProfileType;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import java.util.Optional;
+import co.edu.udistrital.model.dtos.EntityItem;
 import co.edu.udistrital.model.dtos.ReportDTO;
 import co.edu.udistrital.model.entities.Client;
 import co.edu.udistrital.model.enums.ProfileType;
@@ -49,7 +40,16 @@ public class RequestsView {
      // Botón de asignación manual de recursos
         Button btnAssignManual = new Button("Asignar Siguiente Siniestro");
         btnAssignManual.setStyle("-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-padding: 8 16; -fx-background-radius: 6; -fx-cursor: hand;");
-        btnAssignManual.setOnAction(e -> showAssignManualDialog());
+        btnAssignManual.setOnAction(e -> {
+            // Obtenemos el reporte urgente
+            ReportDTO nextReport = appController.getNextPendingReport(); 
+            if (nextReport != null) {
+                showAssignManualDialog(nextReport);
+            } else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "No hay siniestros pendientes para asignar.");
+                alert.showAndWait();
+            }
+        });
         
         if (role == ProfileType.ADMIN) {
             btnNewRequest.setVisible(false);
@@ -145,32 +145,44 @@ public class RequestsView {
         }
     }
     
-    private void showAssignManualDialog() {
+ // Modifica el método para que reciba el ReportDTO que se va a atender
+    private void showAssignManualDialog(ReportDTO report) {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Despachar Recursos");
-        dialog.setHeaderText("Atendiendo la emergencia más prioritaria de la cola");
+        dialog.setTitle("Asignación Sugerida");
+        dialog.setHeaderText("Recursos sugeridos para: " + report.getProblemDescription());
         
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
         grid.setPadding(new Insets(20, 10, 10, 10));
 
-        TextField techIdField = new TextField();
-        techIdField.setPromptText("UUID Técnico Libre");
-        TextField unitIdField = new TextField();
-        unitIdField.setPromptText("UUID Unidad Libre");
-        TextField kitIdField = new TextField();
-        kitIdField.setPromptText("UUID Kit Libre");
+        ComboBox<EntityItem> techBox = new ComboBox<>();
+        ComboBox<EntityItem> unitBox = new ComboBox<>();
+        ComboBox<EntityItem> kitBox = new ComboBox<>();
 
-        grid.add(new Label("Técnico Asignado:"), 0, 0); grid.add(techIdField, 1, 0);
-        grid.add(new Label("Unidad Asignada:"), 0, 1); grid.add(unitIdField, 1, 1);
-        grid.add(new Label("Kit Asignado:"), 0, 2); grid.add(kitIdField, 1, 2);
+        // AQUÍ ESTÁ LA LÓGICA: Pasamos los criterios del reporte
+        var techs = appController.getSuggestedTechnicians(report.getReportZone(), report.getProblemType());
+        var tIt = techs.iterador();
+        while(tIt.hasNext()) techBox.getItems().add(tIt.Next());
+
+        var units = appController.getSuggestedUnits(report.getReportZone());
+        var uIt = units.iterador();
+        while(uIt.hasNext()) unitBox.getItems().add(uIt.Next());
+
+        // Para kits, asumimos todos los disponibles por ahora (o puedes crear un filtro similar)
+        var kits = appController.getAvailableKitsForUI();
+        var kIt = kits.iterador();
+        while(kIt.hasNext()) kitBox.getItems().add(kIt.Next());
+
+        grid.add(new Label("Técnico (Filtro por Zona/Espec):"), 0, 0); grid.add(techBox, 1, 0);
+        grid.add(new Label("Unidad (Filtro por Zona):"), 0, 1); grid.add(unitBox, 1, 1);
+        grid.add(new Label("Kit:"), 0, 2); grid.add(kitBox, 1, 2);
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         Optional<ButtonType> result = dialog.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            appController.assignReportResources(techIdField.getText().trim(), unitIdField.getText().trim(), kitIdField.getText().trim());
+            appController.assignReportResources(techBox.getValue().getId(), unitBox.getValue().getId(), kitBox.getValue().getId());
         }
     }
 

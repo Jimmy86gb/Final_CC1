@@ -56,6 +56,8 @@ public class AppController {
     private GetOnGoingReportsUseCase getOnGoingReportsUseCase;
     private GetToConfirmReportsUseCase getToConfirmReportsUseCase;
     private ExportDailyReportCSVUseCase exportDailyReportCSVUseCase;
+ // Agrégalo junto a los otros UseCases
+    private GetNextPendingReportUseCase getNextPendingReportUseCase;
     
     private ProfileType currentRole;
     private Stage primaryStage;
@@ -95,6 +97,8 @@ public class AppController {
         this.getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(this.reportRepository);
         this.getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(this.reportRepository);
         this.exportDailyReportCSVUseCase = new ExportDailyReportCSVUseCase(this.reportRepository);
+    
+        this.getNextPendingReportUseCase = new GetNextPendingReportUseCase(this.reportRepository);
     }
 
     /**
@@ -253,6 +257,73 @@ public class AppController {
     public void exportDailyReport() {
         ResponseDTO response = exportDailyReportCSVUseCase.execute();
         showNotification(response.isSuccess(), response.getMessage());
+    }
+    
+ // --- MÉTODOS PARA CARGAR DATOS EN LOS COMBOBOX ---
+
+    public SimpleList<EntityItem> getAvailableTechniciansForUI() {
+        SimpleList<EntityItem> list = new SimpleList<>();
+        var iterator = technicianRepository.getAllTechnicians().iterador();
+        while (iterator.hasNext()) {
+            Technician t = iterator.Next();
+            if (t.getStatus() == co.edu.udistrital.model.enums.TechnicianStatus.AVAILABLE) {
+            	String displayString = t.getName() + " (" + t.getSpecialty().getDisplayName() + ")";
+            	list.add(new EntityItem(t.getId().toString(), displayString));
+            }
+        }
+        return list;
+    }
+
+    public SimpleList<EntityItem> getAvailableUnitsForUI() {
+        SimpleList<EntityItem> list = new SimpleList<>();
+        var iterator = serviceUnitRepository.getAllUnits().iterador();
+        while (iterator.hasNext()) {
+            ServiceUnit u = iterator.Next();
+            if (u.getStatus() == co.edu.udistrital.model.enums.UnitStatus.AVAILABLE) {
+                list.add(new EntityItem(u.getId().toString(), u.getType().getDisplayName() + " (" + u.getZone().getDisplayName() + ")"));
+            }
+        }
+        return list;
+    }
+
+    public SimpleList<EntityItem> getAvailableKitsForUI() {
+        SimpleList<EntityItem> list = new SimpleList<>();
+        var iterator = kitRepository.getAllKits().iterador();
+        while (iterator.hasNext()) {
+            Kit k = iterator.Next();
+            if (k.getStatus() == co.edu.udistrital.model.enums.UnitStatus.AVAILABLE) {
+                list.add(new EntityItem(k.getId().toString(), k.getType().getDisplayName()));
+            }
+        }
+        return list;
+    }
+    
+ // 1. Filtra técnicos por ZONA y ESPECIALIDAD
+    public SimpleList<EntityItem> getSuggestedTechnicians(String zoneName, String specialtyName) {
+        SimpleList<EntityItem> list = new SimpleList<>();
+        // Asumo que tienes factories para convertir texto a Enums
+        var zone = new co.edu.udistrital.model.enums.ZoneFactory().generateOperationZone(zoneName);
+        var spec = new co.edu.udistrital.model.enums.TechnicianFactory().generaTechnicianSpecialty(specialtyName);
+        
+        var it = technicianRepository.getAvailableTechnicians(zone, spec).iterador();
+        while (it.hasNext()) {
+            Technician t = it.Next();
+            list.add(new EntityItem(t.getId().toString(), t.getName()));
+        }
+        return list;
+    }
+
+    // 2. Filtra unidades por ZONA
+    public SimpleList<EntityItem> getSuggestedUnits(String zoneName) {
+        SimpleList<EntityItem> list = new SimpleList<>();
+        var zone = new co.edu.udistrital.model.enums.ZoneFactory().generateOperationZone(zoneName);
+        
+        var it = serviceUnitRepository.getAvailableUnitsByZone(zone).iterador();
+        while (it.hasNext()) {
+            ServiceUnit u = it.Next();
+            list.add(new EntityItem(u.getId().toString(), u.getType().getDisplayName()));
+        }
+        return list;
     }
 
     /**
@@ -452,6 +523,14 @@ public class AppController {
                 String.valueOf(maintenanceCount)
             );
         }
+    }
+    
+    /**
+     * Puente entre la Vista y el Caso de Uso para obtener 
+     * el reporte más urgente de la cola.
+     */
+    public ReportDTO getNextPendingReport() {
+        return getNextPendingReportUseCase.execute();
     }
 
     /**
