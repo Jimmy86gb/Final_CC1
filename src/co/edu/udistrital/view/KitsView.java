@@ -131,7 +131,7 @@ public class KitsView {
         
         ComboBox<String> typeBox = new ComboBox<>();
         // ITERACIÓN CORREGIDA
-        SimpleList.Iterator<String> tIt = appController.getKitTypes().iterador();
+        SimpleList.Iterator<String> tIt = appController.getKitTypeLabels().iterador();
         while(tIt.hasNext()) typeBox.getItems().add(tIt.Next());
         typeBox.getSelectionModel().selectFirst();
         

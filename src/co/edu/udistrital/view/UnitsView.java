@@ -2,6 +2,7 @@ package co.edu.udistrital.view;
 
 import co.edu.udistrital.controller.AppController;
 import co.edu.udistrital.model.enums.ProfileType;
+import co.edu.udistrital.model.structures.SimpleList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -12,12 +13,6 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import java.util.Optional;
 
-/**
- * Clase que define la vista para la gestion de unidades de servicio.
- * Se encarga de la visualizacion del parque automotor y gestiona los componentes 
- * necesarios para el registro de nuevos recursos en el sistema.
- * * @author Jimmy86gb
- */
 public class UnitsView {
     private VBox rootContainer;
     private GridPane dataGrid;
@@ -34,30 +29,44 @@ public class UnitsView {
         
         Label lblTitle = new Label("Unidades de Servicio");
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
-        lblTitle.setStyle("-fx-text-fill: #111827;");
         
         Button btnNewUnit = new Button("+ Registrar Unidad");
-        btnNewUnit.setFont(Font.font("Segoe UI", FontWeight.BOLD, 13));
-        btnNewUnit.setStyle("-fx-background-color: #2563EB; -fx-text-fill: white; -fx-padding: 8 16 8 16; -fx-background-radius: 6; -fx-cursor: hand;");
+        btnNewUnit.setStyle("-fx-background-color: #2563EB; -fx-text-fill: white; -fx-padding: 8 16; -fx-cursor: hand;");
         btnNewUnit.setOnAction(e -> showAddUnitDialog());
-        
-        if (role == ProfileType.ADMIN) {
-            btnNewUnit.setVisible(false);
-            btnNewUnit.setManaged(false);
-        }
+        if (role == ProfileType.ADMIN) btnNewUnit.setDisable(true);
 
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
         headerBox.getChildren().addAll(lblTitle, spacer, btnNewUnit);
 
+        // Panel de Aprobación de Unidades para ADMIN
+        HBox confirmPanel = new HBox(15);
+        if (role == ProfileType.ADMIN) {
+            confirmPanel.setAlignment(Pos.CENTER_LEFT);
+            confirmPanel.setPadding(new Insets(15));
+            confirmPanel.setStyle("-fx-background-color: #E0E7FF; -fx-border-color: #3730A3; -fx-border-radius: 8;");
+            
+            Label lblConfTitle = new Label("🛡 Confirmar Unidades (Pila):");
+            lblConfTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
+            
+            Button btnApprove = new Button("Aprobar Tope");
+            btnApprove.setStyle("-fx-background-color: #10B981; -fx-text-fill: white;");
+            btnApprove.setOnAction(e -> appController.approveUnitStatus());
+            
+            Button btnReject = new Button("Rechazar Tope");
+            btnReject.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white;");
+            btnReject.setOnAction(e -> appController.rejectUnitStatus());
+            
+            confirmPanel.getChildren().addAll(lblConfTitle, btnApprove, btnReject);
+        }
+
         VBox tableContainer = new VBox();
         tableContainer.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 4);");
-        tableContainer.setPadding(new Insets(10, 20, 20, 20));
+        tableContainer.setPadding(new Insets(20));
 
         dataGrid = new GridPane();
         dataGrid.setHgap(30);
         dataGrid.setVgap(15);
-        dataGrid.setPadding(new Insets(15, 0, 0, 0));
 
         addHeaderCell("ID (UUID)", 0);
         addHeaderCell("Tipo", 1);
@@ -66,18 +75,17 @@ public class UnitsView {
         addHeaderCell("Acciones", 4);
 
         tableContainer.getChildren().add(dataGrid);
-        rootContainer.getChildren().addAll(headerBox, tableContainer);
+        
+        if (role == ProfileType.ADMIN) rootContainer.getChildren().addAll(headerBox, confirmPanel, tableContainer);
+        else rootContainer.getChildren().addAll(headerBox, tableContainer);
     }
 
-    public void setController(AppController controller) { 
-        this.appController = controller; 
-    }
+    public void setController(AppController controller) { this.appController = controller; }
 
     private void addHeaderCell(String text, int col) {
         Label lbl = new Label(text);
         lbl.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
-        lbl.setStyle("-fx-text-fill: #6B7280; -fx-border-color: transparent transparent #E5E7EB transparent; -fx-border-width: 0 0 2 0; -fx-padding: 0 0 10 0;");
-        lbl.setMaxWidth(Double.MAX_VALUE);
+        lbl.setStyle("-fx-border-color: transparent transparent #E5E7EB transparent; -fx-border-width: 0 0 2 0; -fx-padding: 0 0 10 0;");
         dataGrid.add(lbl, col, 0);
     }
 
@@ -87,69 +95,36 @@ public class UnitsView {
     }
 
     public void addUnit(String id, String type, String status, String zone, boolean isEditable) {
-        Label lblId = createDataCell(id.substring(0, 8));
-        Label lblType = createDataCell(type);
-        Label lblZone = createDataCell(zone);
-        
-        Label lblStatus = new Label(status);
-        lblStatus.setFont(Font.font("Segoe UI", FontWeight.BOLD, 12));
-        lblStatus.setPadding(new Insets(4, 8, 4, 8));
-        
-        if (status.equals("Disponible")) {
-            lblStatus.setStyle("-fx-background-color: #D1FAE5; -fx-text-fill: #065F46; -fx-background-radius: 12;");
-        } else if (status.equals("Asignada")) {
-            lblStatus.setStyle("-fx-background-color: #DBEAFE; -fx-text-fill: #1E40AF; -fx-background-radius: 12;");
-        } else {
-            lblStatus.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-background-radius: 12;");
-        }
+        dataGrid.add(new Label(id.substring(0, 8)), 0, currentRow);
+        dataGrid.add(new Label(type), 1, currentRow);
+        dataGrid.add(new Label(status), 2, currentRow);
+        dataGrid.add(new Label(zone), 3, currentRow);
 
         Button btnAction = new Button("Copiar ID");
-        btnAction.setStyle("-fx-background-color: white; -fx-border-color: #D1D5DB; -fx-border-radius: 4; -fx-cursor: hand;");
-        btnAction.setDisable(!isEditable);
-        
-        // ACCION: Copia el UUID completo al portapapeles del sistema
+        btnAction.setStyle("-fx-background-color: white; -fx-border-color: #D1D5DB; -fx-cursor: hand;");
         btnAction.setOnAction(e -> {
-            Clipboard clipboard = Clipboard.getSystemClipboard();
-            ClipboardContent content = new ClipboardContent();
-            content.putString(id);
-            clipboard.setContent(content);
-
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText(null);
-            alert.setContentText("¡ID de la Unidad copiado al portapapeles!\nYa puedes hacer Ctrl+V.");
-            alert.showAndWait();
+            Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(id); }});
         });
-
-        dataGrid.add(lblId, 0, currentRow);
-        dataGrid.add(lblType, 1, currentRow);
-        dataGrid.add(lblStatus, 2, currentRow);
-        dataGrid.add(lblZone, 3, currentRow);
+        
         dataGrid.add(btnAction, 4, currentRow);
         currentRow++;
-    }
-
-    private Label createDataCell(String text) {
-        Label lbl = new Label(text);
-        lbl.setFont(Font.font("Segoe UI", 14));
-        lbl.setStyle("-fx-text-fill: #111827;");
-        return lbl;
     }
 
     private void showAddUnitDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Registrar Unidad");
-        dialog.setHeaderText("Ingrese los datos de la nueva unidad");
-
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
+        grid.setPadding(new Insets(20));
 
         ComboBox<String> typeBox = new ComboBox<>();
-        typeBox.getItems().addAll("Grua", "Moto", "Camioneta", "Carro");
+        SimpleList.Iterator<String> tIt = appController.getUnitTypeLabels().iterador();
+        while(tIt.hasNext()) typeBox.getItems().add(tIt.Next());
         typeBox.getSelectionModel().selectFirst();
         
         ComboBox<String> zoneBox = new ComboBox<>();
-        zoneBox.getItems().addAll("Usaquen", "Chapinero", "Santa Fe", "Suba", "Kennedy", "Fontibon", "Bosa");
+        SimpleList.Iterator<String> zIt = appController.getZoneLabels().iterador();
+        while(zIt.hasNext()) zoneBox.getItems().add(zIt.Next());
         zoneBox.getSelectionModel().selectFirst();
 
         TextField qtyField = new TextField("1");
@@ -161,15 +136,12 @@ public class UnitsView {
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        Optional<ButtonType> result = dialog.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                int qty = Integer.parseInt(qtyField.getText());
-                appController.registerUnit(typeBox.getValue(), zoneBox.getValue(), qty);
-            } catch(NumberFormatException ex) {
-                // Se omite por brevedad
+        dialog.showAndWait().ifPresent(res -> {
+            if (res == ButtonType.OK) {
+                try { appController.registerUnit(typeBox.getValue(), zoneBox.getValue(), Integer.parseInt(qtyField.getText())); } 
+                catch(NumberFormatException ex) {}
             }
-        }
+        });
     }
 
     public VBox getView() { return rootContainer; }

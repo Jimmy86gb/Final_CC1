@@ -174,7 +174,7 @@ public class RequestsView {
             if (report.canUndo()) {
                 Button btnUndo = new Button("Deshacer ↩");
                 btnUndo.setStyle("-fx-background-color: #FEF3C7; -fx-text-fill: #B45309; -fx-cursor: hand;");
-                btnUndo.setOnAction(e -> appController.undoReport());
+                btnUndo.setOnAction(e -> appController.rejectReport());
                 actions.getChildren().add(btnUndo);
             }
             if (report.canFinish()) {
@@ -224,7 +224,7 @@ public class RequestsView {
         unitBox.getSelectionModel().selectFirst();
 
         ComboBox<EntityItem> kitBox = new ComboBox<>();
-        SimpleList.Iterator<EntityItem> kIt = appController.getAvailableKitsForUI().iterador();
+        SimpleList.Iterator<EntityItem> kIt = appController.getAvailableKitsForUI(null).iterador();
         while(kIt.hasNext()) kitBox.getItems().add(kIt.Next());
         kitBox.getSelectionModel().selectFirst();
 

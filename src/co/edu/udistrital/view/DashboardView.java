@@ -18,18 +18,17 @@ public class DashboardView {
     private Label lblCriticalCases;
     private Label lblMaintenance;
     private Label lblTotalRequests;
-    private TextArea consoleLog; // <- El área de registro
+    private TextArea consoleLog;
 
-    public DashboardView(ProfileType role) {
+    public DashboardView(ProfileType role, AppController controller) {
         this.role = role;
+        this.appController = controller;
         rootContainer = new VBox(20);
         rootContainer.setPadding(new Insets(20));
         
         Label lblTitle = new Label("Resumen General");
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
-        lblTitle.setStyle("-fx-text-fill: #111827;");
 
-        // Tarjetas de KPIs
         HBox cardsContainer = new HBox(20);
         lblActiveUnits = new Label("0");
         lblCriticalCases = new Label("0");
@@ -43,18 +42,19 @@ public class DashboardView {
             createCard("Total Solicitudes", lblTotalRequests, "#3B82F6")
         );
 
-        // --- APARTADO DE CONSOLA / REGISTRO ---
         Label lblLog = new Label("Historial de Operaciones (Últimas acciones):");
         lblLog.setFont(Font.font("Segoe UI", FontWeight.SEMI_BOLD, 14));
         
         consoleLog = new TextArea();
         consoleLog.setEditable(false);
         consoleLog.setPrefHeight(150);
-        consoleLog.setFont(Font.font("Consolas", 12)); // Fuente tipo consola
+        consoleLog.setFont(Font.font("Consolas", 12));
         consoleLog.setStyle("-fx-control-inner-background: #1E293B; -fx-text-fill: #34D399; -fx-border-radius: 5;");
-        consoleLog.setText("Sistema iniciado...\n");
+        
+        if (appController != null) {
+            consoleLog.setText(appController.getConsoleHistory());
+        }
 
-        // --- BOTONES DE ACCIÓN ---
         HBox actionsContainer = new HBox(15);
         actionsContainer.setAlignment(Pos.CENTER_LEFT);
 
@@ -62,9 +62,7 @@ public class DashboardView {
         btnUndoGlobal.setStyle("-fx-background-color: #7C3AED; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
         btnUndoGlobal.setOnAction(e -> {
             Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "¿Está seguro de revertir la última operación registrada?");
-            if (confirm.showAndWait().get() == ButtonType.OK) {
-                appController.performUndo();
-            }
+            if (confirm.showAndWait().get() == ButtonType.OK) appController.performUndo();
         });
 
         actionsContainer.getChildren().add(btnUndoGlobal);
@@ -77,22 +75,10 @@ public class DashboardView {
         }
 
         rootContainer.getChildren().addAll(lblTitle, cardsContainer, lblLog, consoleLog, actionsContainer);
-    
-        if (appController != null) {
-            consoleLog.setText(appController.getConsoleHistory());
-        }
     }
 
-    /**
-     * Agrega una nueva línea al log del dashboard.
-     * @param message El mensaje de la operación realizada.
-     */
     public void updateLog(String message) {
         consoleLog.appendText("> " + message + "\n");
-    }
-
-    public void setController(AppController controller) {
-        this.appController = controller;
     }
 
     public void updateStatistics(String active, String critical, String maint, String total) {
@@ -106,13 +92,10 @@ public class DashboardView {
         VBox card = new VBox(10);
         card.setPadding(new Insets(20));
         card.setPrefSize(250, 120);
-        card.setAlignment(Pos.CENTER_LEFT);
         card.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);");
 
         Label lblTitle = new Label(title);
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.SEMI_BOLD, 14));
-        lblTitle.setStyle("-fx-text-fill: #6B7280;");
-
         lblValue.setFont(Font.font("Segoe UI", FontWeight.BOLD, 36));
         lblValue.setStyle("-fx-text-fill: " + hexColor + ";");
 
