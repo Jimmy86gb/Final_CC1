@@ -22,7 +22,7 @@ import co.edu.udistrital.model.repositories.TechnicianRepository;
  *
  * @author Juan David Diaz Perez
  */
-public class AssignManualEmergencyUseCase {
+public class AssignResourcesReportUseCase {
 
 	/**
 	 * Instancia privada del repositorio de memoria de reportes
@@ -53,7 +53,7 @@ public class AssignManualEmergencyUseCase {
 	 * @param serviceUnitRepository Repositorio de unidades de servicio
 	 * @param kitRepository         Repositorio de kits
 	 */
-	public AssignManualEmergencyUseCase(ReportRepository reportRepository, TechnicianRepository technicianRepository,
+	public AssignResourcesReportUseCase(ReportRepository reportRepository, TechnicianRepository technicianRepository,
 			ServiceUnitRepository serviceUnitRepository, KitRepository kitRepository) {
 		this.reportRepository = reportRepository;
 		this.technicianRepository = technicianRepository;
