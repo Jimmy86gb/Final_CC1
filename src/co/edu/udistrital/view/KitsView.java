@@ -100,8 +100,11 @@ public class KitsView {
         btnCopy.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(kit.getId().toString()); }}));
         actions.getChildren().add(btnCopy);
 
+        // CORRECCIÓN 1: Unificamos la validación del estado para evitar discrepancias de texto
+        boolean isMaintenance = kit.getStatus().equalsIgnoreCase("En mantenimiento") || kit.getStatus().equalsIgnoreCase("Mantenimiento");
+
         // 1. LÓGICA DE MANTENIMIENTO (PILA LIFO)
-        if (kit.getStatus().equalsIgnoreCase("Mantenimiento")) {
+        if (isMaintenance) {
             if (role.equals("ADMIN")) {
                 Button btnReturn = new Button("Retornar (Pila)");
                 btnReturn.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-cursor: hand;");
@@ -110,6 +113,12 @@ public class KitsView {
                 Button btnRetire = new Button("Baja (Pila)");
                 btnRetire.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-cursor: hand;");
                 btnRetire.setOnAction(e -> appController.retireKitFromMaintenance());
+                
+                // CORRECCIÓN 2: Aplicamos la regla LIFO. Si no es el tope, se bloquean los botones.
+                if (!kit.isEditable()) {
+                    btnReturn.setDisable(true);
+                    btnRetire.setDisable(true);
+                }
                 
                 actions.getChildren().addAll(btnReturn, btnRetire);
             }
@@ -140,7 +149,8 @@ public class KitsView {
 
         card.getChildren().addAll(lblId, lblType, lblStatus, actions);
 
-        if (kit.getStatus().equalsIgnoreCase("Mantenimiento")) {
+        // CORRECCIÓN 3: Reasignamos el contenedor usando la validación segura
+        if (isMaintenance) {
             maintenanceContainer.getChildren().add(card);
         } else {
             availableContainer.getChildren().add(card);
@@ -161,6 +171,7 @@ public class KitsView {
 
         TextField qtyField = new TextField("1");
 
+        // CORRECCIÓN: Se agrega la fila del Tipo de Kit al GridPane (columna 0 y 1, fila 0)
         grid.add(new Label("Tipo de Kit:"), 0, 0); grid.add(typeBox, 1, 0);
         grid.add(new Label("Cantidad:"), 0, 1);    grid.add(qtyField, 1, 1);
 
@@ -169,8 +180,11 @@ public class KitsView {
 
         dialog.showAndWait().ifPresent(res -> {
             if (res == ButtonType.OK) {
-                try { appController.registerKit(typeBox.getValue(), Integer.parseInt(qtyField.getText())); }
-                catch (NumberFormatException e) { new Alert(Alert.AlertType.ERROR, "Cantidad inválida").show(); }
+                try { 
+                    appController.registerKit(typeBox.getValue(), Integer.parseInt(qtyField.getText())); 
+                } catch (NumberFormatException e) { 
+                    new Alert(Alert.AlertType.ERROR, "Cantidad inválida").show(); 
+                }
             }
         });
     }

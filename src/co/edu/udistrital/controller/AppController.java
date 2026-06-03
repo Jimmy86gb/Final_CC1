@@ -117,7 +117,7 @@ public class AppController {
 
 	private final RegisterKitUseCase registerKitUseCase;
 	private final UpdateKitUseCase updateKitUseCase;
-	private final GetSortedAndFilteredKitsUseCase getSortedAndFilteredKitsUseCase;
+	private final GetSortedAndFilteredKitsUseCase getSortedKitsUseCase;
 	private final RetireKitFromMaintenanceUseCase retireKitFromMaintenanceUseCase;
 	private final ReturnKitToServiceUseCase returnKitToServiceUseCase;
 	private final GetKitTypeLabelsUseCase getKitTypeLabelsUseCase;
@@ -181,7 +181,7 @@ public class AppController {
 
 		registerKitUseCase = new RegisterKitUseCase(kitRepository);
 		updateKitUseCase = new UpdateKitUseCase(kitRepository);
-		getSortedAndFilteredKitsUseCase = new GetSortedAndFilteredKitsUseCase(kitRepository);
+		getSortedKitsUseCase = new GetSortedAndFilteredKitsUseCase(kitRepository);
 		retireKitFromMaintenanceUseCase = new RetireKitFromMaintenanceUseCase(kitRepository);
 		returnKitToServiceUseCase = new ReturnKitToServiceUseCase(kitRepository);
 		getKitTypeLabelsUseCase = new GetKitTypeLabelsUseCase();
@@ -505,6 +505,10 @@ public class AppController {
 	 * Actualiza la vista de solicitudes clasificando los tiquetes en sus 
 	 * tres contenedores visuales correspondientes, respetando el flujo de colas y pilas.
 	 */
+	/**
+	 * Actualiza la vista de solicitudes clasificando los tiquetes en sus 
+	 * tres contenedores correspondientes de JavaFX, consumiendo las colas FIFO y las pilas.
+	 */
 	private void refreshRequestsView() {
 		requestsView.clearPanels();
 
@@ -526,7 +530,7 @@ public class AppController {
 			}
 		}
 
-		// 3. Cargar solicitudes POR CONFIRMAR (CONFIRM) desde la pila LIFO de auditoría
+		// 3. Cargar solicitudes POR CONFIRMAR (CONFIRM) desde la pila LIFO de auditoría del administrador
 		SimpleList.Iterator<ReportDTO> confIt = getToConfirmReportsUseCase.execute().iterador();
 		while (confIt.hasNext()) {
 			ReportDTO r = confIt.Next();
@@ -539,6 +543,10 @@ public class AppController {
 	/**
 	 * Actualiza la vista de control de unidades de servicio evitando duplicidades visuales
 	 * cuando un recurso se encuentra en proceso de cambio de estado.
+	 */
+	/**
+	 * Actualiza la vista de control de unidades de servicio evitando duplicidades visuales
+	 * cuando una grúa, moto o camioneta está esperando la confirmación de cambios del admin.
 	 */
 	private void refreshUnitsView() {
 		unitsView.clearTable();
@@ -561,14 +569,14 @@ public class AppController {
 			}
             
 			if (!isPending) {
-				unitsView.addUnit(activeUnit, false); // Añade al contenedor de activas
+				unitsView.addUnit(activeUnit, false); // Añade al contenedor de activas/inactivas normales
 			}
 		}
         
-		// Renderizar las unidades que están esperando la confirmación del administrador
+		// Renderizar las unidades que están esperando la aprobación en la pila de auditoría
 		SimpleList.Iterator<ServiceUnitDTO> pIt = pendingUnits.iterador();
 		while (pIt.hasNext()) {
-			unitsView.addUnit(pIt.Next(), true); // Añade al contenedor de pendientes
+			unitsView.addUnit(pIt.Next(), true); // Añade al contenedor de pendientes de confirmación
 		}
 	}
 
@@ -584,23 +592,23 @@ public class AppController {
 
 	/**
 	 * Actualiza el inventario de herramientas combinando los listados generales
-	 * con la pila LIFO de mantenimiento para validar la regla de negocio del tope.
+	 * con la pila LIFO de mantenimiento, aislando los elementos para evitar duplicidad.
 	 */
 	private void refreshKitsView() {
 		kitsView.clearTable();
         
-		// 1. Cargar los kits en mantenimiento directamente desde la pila LIFO (asigna correctamente la editabilidad del tope)
+		// 1. Cargar primero los kits en mantenimiento directo desde la pila LIFO activa (asigna el tope LIFO)
 		SimpleList.Iterator<KitDTO> mIt = getMaintenanceKitsUseCase.execute().iterador();
 		while (mIt.hasNext()) {
 			kitsView.addKit(mIt.Next());
 		}
         
-		// 2. Cargar los kits disponibles y asignados desde la lista maestra ordenada
-		SimpleList.Iterator<KitDTO> kIt = getSortedAndFilteredKitsUseCase.execute().iterador();
+		// 2. Cargar los kits disponibles, asignados e inactivos desde la lista maestra ordenada
+		SimpleList.Iterator<KitDTO> kIt = getSortedKitsUseCase.execute().iterador();
 		while (kIt.hasNext()) {
 			KitDTO kit = kIt.Next();
-			// Evita duplicar el kit en la interfaz si este ya fue pintado por la subestructura de mantenimiento
-			if (!kit.getStatus().equalsIgnoreCase("En mantenimiento")) {
+			// CORRECCIÓN: Filtrar para que no se vuelvan a pintar en la sección de disponibles
+			if (!kit.getStatus().equalsIgnoreCase("En mantenimiento") && !kit.getStatus().equalsIgnoreCase("Mantenimiento")) {
 				kitsView.addKit(kit);
 			}
 		}
