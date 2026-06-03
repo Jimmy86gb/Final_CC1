@@ -1,6 +1,7 @@
 package co.edu.udistrital.controller;
 
 import co.edu.udistrital.model.dtos.ClientDTO;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.ClientRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.usecases.*;
@@ -31,13 +32,14 @@ public class ClientsController {
 	 * @param role Rol del usuario actual para definir los permisos visuales en la interfaz.
 	 * @param clientRepo Repositorio en memoria que contiene los datos de los clientes.
 	 */
-	public ClientsController(AppController appController, String role, ClientRepository clientRepo) {
+	public ClientsController(AppController appController, String role, ClientRepository clientRepo,
+		ActionLogRepository actionLogRepository) {
 		this.appController = appController;
 		this.view = new ClientsView(role);
 		this.view.setController(this);
 
 		this.registerClientUseCase = new RegisterClientUseCase(clientRepo);
-		this.updateClientUseCase = new UpdateClientUseCase(clientRepo);
+		this.updateClientUseCase = new UpdateClientUseCase(clientRepo, actionLogRepository);
 		this.getSortedClientsUseCase = new GetSortedAndFilteredClientsUseCase(clientRepo);
 		this.getClientTypeLabelsUseCase = new GetClientTypeLabelsUseCase();
 	}

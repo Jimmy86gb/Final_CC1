@@ -1,6 +1,7 @@
 package co.edu.udistrital.controller;
 
 import co.edu.udistrital.model.dtos.TechnicianDTO;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.TechnicianRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.usecases.*;
@@ -33,13 +34,14 @@ public class TechniciansController {
 	 * @param role Rol del usuario actual para ajustar los permisos de edicion en la interfaz.
 	 * @param techRepo Repositorio en memoria que contiene los registros del personal tecnico.
 	 */
-	public TechniciansController(AppController appController, String role, TechnicianRepository techRepo) {
+	public TechniciansController(AppController appController, String role, TechnicianRepository techRepo,
+		ActionLogRepository actionLogRepository) {
 		this.appController = appController;
 		this.view = new TechniciansView(role);
 		this.view.setController(this);
 
 		this.registerTechnicianUseCase = new RegisterTechnicianUseCase(techRepo);
-		this.updateTechnicianUseCase = new UpdateTechnicianUseCase(techRepo);
+		this.updateTechnicianUseCase = new UpdateTechnicianUseCase(techRepo, actionLogRepository);
 		this.getSortedAndDFilteredTechniciansUseCase = new GetSortedAndDFilteredTechniciansUseCase(techRepo);
 		this.getTechnicianStatusLabelsUseCase = new GetTechnicianStatusLabelsUseCase();
 		this.getTechnicianSpecialityLabelsUseCase = new GetTechnicianSpecialityLabelsUseCase();

@@ -1,6 +1,7 @@
 package co.edu.udistrital.controller;
 
 import co.edu.udistrital.model.dtos.ReportDTO;
+import co.edu.udistrital.model.dtos.ResponseDTO;
 import co.edu.udistrital.model.dtos.ServiceUnitDTO;
 import co.edu.udistrital.model.repositories.*;
 import co.edu.udistrital.model.structures.SimpleList;
@@ -19,6 +20,8 @@ public class DashboardController {
 
 	private final AppController appController;
 	private final DashboardView view;
+	private final ActionLogRepository actionLogRepository;
+	private final UndoGlobalActionUseCase undoGlobalActionUseCase;
 
 	private final GetSortedAndFilteredServiceUnitsUseCase getSortedAndFilteredServiceUnitsUseCase;
 	private final GetMaintenanceKitsUseCase getMaintenanceKitsUseCase;
@@ -36,8 +39,12 @@ public class DashboardController {
 	 * @param kitRepo Repositorio de kits para consultar elementos en reparacion.
 	 * @param reportRepo Repositorio de siniestros para calcular el volumen de operaciones.
 	 */
-	public DashboardController(AppController appController, String role, ServiceUnitRepository serviceUnitRepo, KitRepository kitRepo, ReportRepository reportRepo) {
+	public DashboardController(AppController appController, String role, ServiceUnitRepository serviceUnitRepo,
+		KitRepository kitRepo, ReportRepository reportRepo, ActionLogRepository actionLogRepository,
+		UndoGlobalActionUseCase undoGlobalActionUseCase) {
 		this.appController = appController;
+		this.actionLogRepository = actionLogRepository;
+		this.undoGlobalActionUseCase = undoGlobalActionUseCase;
 		this.view = new DashboardView(role, this); // Asumiendo que espera un DashboardController, actualiza la vista
 
 		this.getSortedAndFilteredServiceUnitsUseCase = new GetSortedAndFilteredServiceUnitsUseCase(serviceUnitRepo);
@@ -80,6 +87,7 @@ public class DashboardController {
 		}
 		
 		view.updateStatistics(String.valueOf(activeUnits), String.valueOf(critical), String.valueOf(maint), String.valueOf(total));
+		view.updateLogPanel(actionLogRepository.getLogDescriptions());
 	}
 
 	/**
@@ -91,5 +99,18 @@ public class DashboardController {
 		String defaultPath = System.getProperty("user.dir");
 	    
 	    appController.handleResponse(generateDailyCSVUseCase.execute(defaultPath), () -> {});
+	}
+
+	/**
+	 * Ejecuta la operacion de deshacer la ultima accion global registrada.
+	 * El metodo delega el resultado al controlador principal y, en caso de exito,
+	 * refresca todas las vistas y el panel de log del dashboard.
+	 */
+	public void undoLastGlobalAction() {
+		ResponseDTO response = undoGlobalActionUseCase.execute();
+		appController.handleResponse(response, () -> {
+			appController.refreshAllViews();
+			this.refreshView();
+		});
 	}
 }

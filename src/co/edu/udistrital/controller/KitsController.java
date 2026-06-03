@@ -1,6 +1,7 @@
 package co.edu.udistrital.controller;
 
 import co.edu.udistrital.model.dtos.KitDTO;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.KitRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.usecases.*;
@@ -35,13 +36,14 @@ public class KitsController {
 	 * @param role Rol del usuario actual para definir permisos visuales sobre el inventario.
 	 * @param kitRepo Repositorio en memoria que almacena y gestiona los objetos Kit.
 	 */
-	public KitsController(AppController appController, String role, KitRepository kitRepo) {
+	public KitsController(AppController appController, String role, KitRepository kitRepo,
+		ActionLogRepository actionLogRepository) {
 		this.appController = appController;
 		this.view = new KitsView(role);
 		this.view.setController(this);
 
 		this.registerKitUseCase = new RegisterKitUseCase(kitRepo);
-		this.updateKitUseCase = new UpdateKitUseCase(kitRepo);
+		this.updateKitUseCase = new UpdateKitUseCase(kitRepo, actionLogRepository);
 		this.getSortedKitsUseCase = new GetSortedAndFilteredKitsUseCase(kitRepo);
 		this.retireKitFromMaintenanceUseCase = new RetireKitFromMaintenanceUseCase(kitRepo);
 		this.returnKitToServiceUseCase = new ReturnKitToServiceUseCase(kitRepo);

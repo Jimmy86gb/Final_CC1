@@ -1,10 +1,12 @@
 package co.edu.udistrital.view;
 
 import co.edu.udistrital.controller.DashboardController;
+import co.edu.udistrital.model.structures.SimpleList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -26,6 +28,8 @@ public class DashboardView {
 	private Label lblCriticalCases;
 	private Label lblMaintenance;
 	private Label lblTotalRequests;
+	private ListView<String> logListView;
+	private Button btnGlobalUndo;
 
 	/**
 	 * Constructor de la vista del Dashboard.
@@ -71,7 +75,26 @@ public class DashboardView {
 			actionsContainer.getChildren().add(btnCSV);
 		}
 
-		rootContainer.getChildren().addAll(lblTitle, cardsContainer, actionsContainer);
+		btnGlobalUndo = new Button("↩ Deshacer Última Acción");
+		btnGlobalUndo.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand;");
+		btnGlobalUndo.setOnAction(e -> {
+			if (controller != null) {
+				controller.undoLastGlobalAction();
+			}
+		});
+
+		logListView = new ListView<>();
+		logListView.setPrefHeight(220);
+		logListView.setMaxWidth(Double.MAX_VALUE);
+
+		VBox logPanel = new VBox(12);
+		logPanel.setPadding(new Insets(20));
+		logPanel.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 5);");
+		Label lblLogTitle = new Label("Historial de acciones");
+		lblLogTitle.setFont(Font.font("Segoe UI", FontWeight.SEMI_BOLD, 16));
+		logPanel.getChildren().addAll(lblLogTitle, logListView, btnGlobalUndo);
+
+		rootContainer.getChildren().addAll(lblTitle, cardsContainer, actionsContainer, logPanel);
 	}
 
 	/**
@@ -88,6 +111,22 @@ public class DashboardView {
 		lblCriticalCases.setText(critical);
 		lblMaintenance.setText(maint);
 		lblTotalRequests.setText(total);
+	}
+
+	/**
+	 * Actualiza el ListView del historial de acciones con los registros recientes.
+	 * Recorre la estructura SimpleList usando su iterador y agrega cada descripcion.
+	 * @param logs Estructura SimpleList con las descripciones de las acciones.
+	 */
+	public void updateLogPanel(SimpleList<String> logs) {
+		logListView.getItems().clear();
+		if (logs == null) {
+			return;
+		}
+		SimpleList.Iterator<String> logIterator = logs.iterador();
+		while (logIterator.hasNext()) {
+			logListView.getItems().add(logIterator.Next());
+		}
 	}
 
 	/**

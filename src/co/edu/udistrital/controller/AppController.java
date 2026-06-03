@@ -27,10 +27,12 @@ public class AppController {
 	private final ServiceUnitRepository serviceUnitRepository;
 	private final TechnicianRepository technicianRepository;
 	private final ProfileRepository profileRepository;
+	private final ActionLogRepository actionLogRepository;
 
 	// Casos de uso globales (Persistencia)
 	private final SaveSystemDataUseCase saveSystemDataUseCase;
 	private final LoadSystemDataUseCase loadSystemDataUseCase;
+	private final UndoGlobalActionUseCase undoGlobalActionUseCase;
 
 	// Sub-controladores modulares
 	private LoginController loginController;
@@ -53,9 +55,11 @@ public class AppController {
 		this.serviceUnitRepository = new ServiceUnitRepository();
 		this.technicianRepository = new TechnicianRepository();
 		this.profileRepository = new ProfileRepository();
+		this.actionLogRepository = new ActionLogRepository();
 
 		this.saveSystemDataUseCase = new SaveSystemDataUseCase(profileRepository, clientRepository, technicianRepository, serviceUnitRepository, kitRepository, reportRepository);
 		this.loadSystemDataUseCase = new LoadSystemDataUseCase(profileRepository, clientRepository, technicianRepository, serviceUnitRepository, kitRepository, reportRepository);
+		this.undoGlobalActionUseCase = new UndoGlobalActionUseCase(actionLogRepository, technicianRepository, serviceUnitRepository, kitRepository, clientRepository, new UndoReportResourcesUseCase(reportRepository));
 	}
 
 	/**
@@ -102,12 +106,12 @@ public class AppController {
 		mainView = new MainView(role);
 		
 		// Inyeccion de dependencias a los sub-controladores
-		dashboardController = new DashboardController(this, role, serviceUnitRepository, kitRepository, reportRepository);
-		clientsController = new ClientsController(this, role, clientRepository);
-		techniciansController = new TechniciansController(this, role, technicianRepository);
-		unitsController = new UnitsController(this, role, serviceUnitRepository);
-		kitsController = new KitsController(this, role, kitRepository);
-		requestsController = new RequestsController(this, role, reportRepository, clientRepository, technicianRepository, serviceUnitRepository, kitRepository);
+		dashboardController = new DashboardController(this, role, serviceUnitRepository, kitRepository, reportRepository, actionLogRepository, undoGlobalActionUseCase);
+		clientsController = new ClientsController(this, role, clientRepository, actionLogRepository);
+		techniciansController = new TechniciansController(this, role, technicianRepository, actionLogRepository);
+		unitsController = new UnitsController(this, role, serviceUnitRepository, actionLogRepository);
+		kitsController = new KitsController(this, role, kitRepository, actionLogRepository);
+		requestsController = new RequestsController(this, role, reportRepository, clientRepository, technicianRepository, serviceUnitRepository, kitRepository, actionLogRepository);
 
 		mainView.setNavigationController(this);
 

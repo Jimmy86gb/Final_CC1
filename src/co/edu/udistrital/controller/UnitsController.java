@@ -1,6 +1,7 @@
 package co.edu.udistrital.controller;
 
 import co.edu.udistrital.model.dtos.ServiceUnitDTO;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.ServiceUnitRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.usecases.*;
@@ -38,13 +39,14 @@ public class UnitsController {
 	 * @param role Rol del usuario actual para ajustar los permisos de aprobacion o edicion en la interfaz.
 	 * @param unitRepo Repositorio en memoria que gestiona la persistencia de las unidades de servicio.
 	 */
-	public UnitsController(AppController appController, String role, ServiceUnitRepository unitRepo) {
+	public UnitsController(AppController appController, String role, ServiceUnitRepository unitRepo,
+		ActionLogRepository actionLogRepository) {
 		this.appController = appController;
 		this.view = new UnitsView(role);
 		this.view.setController(this);
 
 		this.registerServiceUnitUseCase = new RegisterServiceUnitUseCase(unitRepo);
-		this.updateServiceUnitUseCase = new UpdateServiceUnitUseCase(unitRepo);
+		this.updateServiceUnitUseCase = new UpdateServiceUnitUseCase(unitRepo, actionLogRepository);
 		this.approveUnitStatusUseCase = new ApproveUnitStatusUseCase(unitRepo);
 		this.rejectUnitStatusUseCase = new RejectUnitStatusUseCase(unitRepo);
 		this.getToConfirmServiceUnitsUseCase = new GetToConfirmServiceUnitsUseCase(unitRepo);

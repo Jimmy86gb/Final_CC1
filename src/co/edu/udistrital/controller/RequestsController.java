@@ -6,6 +6,7 @@ import co.edu.udistrital.model.dtos.KitDTO;
 import co.edu.udistrital.model.dtos.ReportDTO;
 import co.edu.udistrital.model.dtos.ServiceUnitDTO;
 import co.edu.udistrital.model.dtos.TechnicianDTO;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.ClientRepository;
 import co.edu.udistrital.model.repositories.KitRepository;
 import co.edu.udistrital.model.repositories.ReportRepository;
@@ -83,15 +84,16 @@ public class RequestsController {
 	 */
 	public RequestsController(AppController appController, String role, ReportRepository reportRepo,
 			ClientRepository clientRepo, TechnicianRepository techRepo, ServiceUnitRepository unitRepo,
-			KitRepository kitRepo) {
+			KitRepository kitRepo, ActionLogRepository actionLogRepository) {
 		this.appController = appController;
 		this.view = new RequestsView(role);
 		this.view.setController(this);
 
 		this.registerReportUseCase = new RegisterReportUseCase(clientRepo, reportRepo);
-		this.assignResourcesReportUseCase = new AssignResourcesReportUseCase(reportRepo, techRepo, unitRepo, kitRepo);
-		this.finishReportInFieldUseCase = new FinishReportInFieldUseCase(reportRepo);
-		this.approveReportActionUseCase = new ApproveReportActionUseCase(reportRepo, kitRepo);
+		this.assignResourcesReportUseCase = new AssignResourcesReportUseCase(reportRepo, techRepo, unitRepo, kitRepo,
+				actionLogRepository);
+		this.finishReportInFieldUseCase = null;
+		this.approveReportActionUseCase = null;
 		this.rejectReportActionUseCase = new RejectReportActionUseCase(reportRepo);
 		this.requestReportCancellationUseCase = new RequestReportCancellationUseCase(reportRepo);
 		this.getSortedAndFilteredReportsUseCase = new GetSortedAndFilteredReportsUseCase(reportRepo);
