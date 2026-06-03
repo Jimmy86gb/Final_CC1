@@ -32,6 +32,7 @@ public class DatabaseSnapshot implements Serializable {
 	private SimpleList<ServiceUnit> unitList;
 	private Stack<ServiceUnit> toConfirmUnitStack;
 	private SimpleList<Kit> kitList;
+	private SimpleList<Report> allHistoricalReports;
 	private Stack<Kit> maintenanceKitStack;
 	private Queue<Report> undoQueue;
 	private Queue<Report> highPriorityQueue;
@@ -227,5 +228,13 @@ public class DatabaseSnapshot implements Serializable {
 	 */
 	public void setToConfirmReportStack(Stack<Report> toConfirmReportStack) {
 		this.toConfirmReportStack = toConfirmReportStack;
+	}
+	
+	public SimpleList<Report> getAllHistoricalReports() {
+		return allHistoricalReports;
+	}
+
+	public void setAllHistoricalReports(SimpleList<Report> allHistoricalReports) {
+		this.allHistoricalReports = allHistoricalReports;
 	}
 }

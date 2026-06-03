@@ -33,6 +33,7 @@ public class RequestsView {
 	private VBox pendingCasesContainer;
 	private VBox ongoingCasesContainer;
 	private VBox confirmCasesContainer;
+	private VBox summaryContainer;
 
 	public RequestsView(String role) {
 		this.role = role;
@@ -86,7 +87,35 @@ public class RequestsView {
 		HBox.setHgrow(ongoingPanel, Priority.ALWAYS);
 		HBox.setHgrow(confirmPanel, Priority.ALWAYS);
 
-		rootContainer.getChildren().addAll(headerBox, columnsContainer);
+		
+		// --- NUEVA SECCIÓN: Resumen Histórico Inferior ---
+		Label lblSummaryTitle = new Label("Resumen Histórico de Solicitudes");
+		lblSummaryTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 22));
+
+		summaryContainer = new VBox(5);
+		summaryContainer.setPadding(new Insets(10));
+		summaryContainer.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #E5E7EB; -fx-border-width: 1;");
+
+		// Cabecera "falsa" para simular una tabla limpia
+		HBox headerRow = new HBox(15);
+		headerRow.setPadding(new Insets(10));
+		headerRow.setStyle("-fx-background-color: #F3F4F6; -fx-font-weight: bold; -fx-background-radius: 5;");
+		Label hId = new Label("ID Tiquete"); hId.setPrefWidth(80);
+		Label hClient = new Label("Cliente"); hClient.setPrefWidth(150);
+		Label hType = new Label("Tipo Siniestro"); hType.setPrefWidth(150);
+		Label hStatus = new Label("Estado"); hStatus.setPrefWidth(100);
+		Label hDate = new Label("Fecha y Hora"); hDate.setPrefWidth(130);
+		headerRow.getChildren().addAll(hId, hClient, hType, hStatus, hDate);
+	        
+		VBox summaryWrapper = new VBox(headerRow, summaryContainer);
+		        
+		ScrollPane summaryScroll = new ScrollPane(summaryWrapper);
+		summaryScroll.setFitToWidth(true);
+		summaryScroll.setPrefHeight(250); // Altura fija para que no empuje las columnas superiores
+		summaryScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+		// Modifica la adición final para incluir el título y el scroll del resumen
+		rootContainer.getChildren().addAll(headerBox, columnsContainer, lblSummaryTitle, summaryScroll);
 	}
 
 	public void setController(AppController controller) {
@@ -121,8 +150,65 @@ public class RequestsView {
 		pendingCasesContainer.getChildren().clear();
 		ongoingCasesContainer.getChildren().clear();
 		confirmCasesContainer.getChildren().clear();
+		summaryContainer.getChildren().clear(); // NUEVO
 	}
+	
+	/**
+	 * Añade una fila al resumen histórico de solicitudes de forma segura,
+	 * forzando colores y anchos para evitar colapsos visuales.
+	 */
+	public void addReportToSummary(ReportDTO report) {
+		HBox row = new HBox(15);
+		row.setPadding(new Insets(10));
+		row.setStyle("-fx-border-color: #E5E7EB; -fx-border-width: 0 0 1 0;");
+		row.setAlignment(Pos.CENTER_LEFT);
 
+		// 1. Extracción segura de datos para evitar que la vista colapse por nulos o strings cortos
+		String rawId = report.getTicketID();
+		String safeId = (rawId != null && rawId.length() >= 8) ? rawId.substring(0, 8) : (rawId != null ? rawId : "---");
+		
+		String safeClient = (report.getClientName() != null && !report.getClientName().trim().isEmpty()) ? report.getClientName() : "---";
+		String safeType = (report.getProblemType() != null && !report.getProblemType().trim().isEmpty()) ? report.getProblemType() : "---";
+		String safeStatus = (report.getReportStatus() != null && !report.getReportStatus().trim().isEmpty()) ? report.getReportStatus() : "---";
+		String safeDate = (report.getReportTime() != null && !report.getReportTime().trim().isEmpty()) ? report.getReportTime() : "---";
+
+		// 2. Columna ID (Forzando color oscuro -fx-text-fill: #1F2937;)
+		Label lblId = new Label(safeId);
+		lblId.setPrefWidth(80); lblId.setMinWidth(80); lblId.setMaxWidth(80);
+		lblId.setStyle("-fx-text-fill: #1F2937;"); 
+		lblId.setFont(Font.font("Consolas", 12));
+
+		// 3. Columna Cliente
+		Label lblClient = new Label(safeClient);
+		lblClient.setPrefWidth(150); lblClient.setMinWidth(150); lblClient.setMaxWidth(150);
+		lblClient.setStyle("-fx-text-fill: #1F2937;");
+
+		// 4. Columna Tipo Siniestro
+		Label lblType = new Label(safeType);
+		lblType.setPrefWidth(150); lblType.setMinWidth(150); lblType.setMaxWidth(150);
+		lblType.setStyle("-fx-text-fill: #1F2937;");
+
+		// 5. Columna Estado (Color dinámico)
+		Label lblStatus = new Label(safeStatus);
+		lblStatus.setPrefWidth(100); lblStatus.setMinWidth(100); lblStatus.setMaxWidth(100);
+		lblStatus.setFont(Font.font("Segoe UI", FontWeight.BOLD, 12));
+		
+		String statusText = safeStatus.toLowerCase();
+		if (statusText.contains("pendiente")) lblStatus.setStyle("-fx-text-fill: #D97706;"); 
+		else if (statusText.contains("progreso")) lblStatus.setStyle("-fx-text-fill: #2563EB;"); 
+		else if (statusText.contains("atendida")) lblStatus.setStyle("-fx-text-fill: #10B981;"); 
+		else if (statusText.contains("cancelada")) lblStatus.setStyle("-fx-text-fill: #DC2626;"); 
+        else lblStatus.setStyle("-fx-text-fill: #1F2937;"); 
+
+		// 6. Columna Fecha
+		Label lblDate = new Label(safeDate);
+		lblDate.setPrefWidth(130); lblDate.setMinWidth(130); lblDate.setMaxWidth(130);
+		lblDate.setStyle("-fx-text-fill: #1F2937;");
+
+		row.getChildren().addAll(lblId, lblClient, lblType, lblStatus, lblDate);
+		summaryContainer.getChildren().add(row);
+	}
+	
 	public void addReportCard(ReportDTO report, String targetPanel) {
 		VBox card = new VBox(10);
 		card.setPadding(new Insets(15));

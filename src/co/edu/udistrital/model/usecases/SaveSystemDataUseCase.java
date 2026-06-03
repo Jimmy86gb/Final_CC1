@@ -80,7 +80,8 @@ public class SaveSystemDataUseCase {
 
 			snapshot.setOnGoingReportStack(reportRepo.getOnGoingReportStack());
 			snapshot.setToConfirmReportStack(reportRepo.getToConfirmStack());
-
+			snapshot.setAllHistoricalReports(reportRepo.getAllHistoricalReports());
+			
 			// 4. Delegar el guardado a la capa de infraestructura
 			boolean success = BinaryDatabaseManager.saveSnapshot(snapshot);
 

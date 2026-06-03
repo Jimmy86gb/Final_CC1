@@ -52,7 +52,7 @@ public class ReportRepository {
 	/**
 	 * Lista de todos los reportes sin importar su estado
 	 */
-	private final SimpleList<Report> allHistoricalReports = new SimpleList<Report>();
+	private SimpleList<Report> allHistoricalReports = new SimpleList<Report>();
 
 	/**
 	 * Metodo para guardar un nuevo reporte
@@ -496,5 +496,12 @@ public class ReportRepository {
 		appendQueueToListSafely(lowPriorityQueue, allPending);
 
 		return allPending;
+	}
+	
+	/**
+	 * @param allHistoricalReports la lista historica a restaurar desde la base de datos
+	 */
+	public void setAllHistoricalReports(SimpleList<Report> allHistoricalReports) {
+		this.allHistoricalReports = allHistoricalReports;
 	}
 }

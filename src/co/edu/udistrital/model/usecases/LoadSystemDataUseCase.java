@@ -114,7 +114,11 @@ public class LoadSystemDataUseCase {
 			if (snapshot.getToConfirmReportStack() != null) {
 				reportRepo.setToConfirmStack(snapshot.getToConfirmReportStack());
 			}
-
+			// Restaura el historial completo
+			if (snapshot.getAllHistoricalReports() != null) {
+				reportRepo.setAllHistoricalReports(snapshot.getAllHistoricalReports());
+			}
+			
 			return new ResponseDTO(true, "Estado del sistema restaurado exitosamente desde archivo binario.");
 
 		} catch (Exception e) {

@@ -2,37 +2,23 @@ package co.edu.udistrital.model.usecases;
 
 import co.edu.udistrital.model.dtos.ResponseDTO;
 import co.edu.udistrital.model.entities.Report;
+import co.edu.udistrital.model.enums.CriticLevel;
 import co.edu.udistrital.model.enums.ReportStatus;
 import co.edu.udistrital.model.repositories.ReportRepository;
 
 /**
- * Caso de uso para terminar deshacer un cambio de estado de reporte y hacerle
- * pop en la fila de confirmaciones
+ * Caso de uso para deshacer un cambio de estado de reporte y devolverlo a su flujo original
  *
  * @author Juan David Diaz Perez
  */
 public class RejectReportActionUseCase {
 
-	/**
-	 * Instancia privada del repositorio de memoria de reportes
-	 */
 	private final ReportRepository reportRepository;
 
-	/**
-	 * Constructor que inyecta dentro del caso de uso el repositorio de reportes
-	 * 
-	 * @param reportRepository Repositorio de reportes
-	 */
 	public RejectReportActionUseCase(ReportRepository reportRepository) {
 		this.reportRepository = reportRepository;
 	}
 
-	/**
-	 * Método que se encarga de deshacer estados de cambio en los reportes y los
-	 * devuleve a su sitio original
-	 * 
-	 * @return DTO de muestra en la vista con el resultado de la operación.
-	 */
 	public ResponseDTO execute() {
 		try {
 
@@ -45,17 +31,25 @@ public class RejectReportActionUseCase {
 			if (confirmReport.getStatus() == ReportStatus.DONE) {
 
 				confirmReport.setStatus(ReportStatus.ON_GOING);
-
 				reportRepository.pushToOnProgress(confirmReport);
 
 				return new ResponseDTO(true, "Finalizacion del reporte deshecha con exito.");
+				
 			} else if (confirmReport.getStatus() == ReportStatus.CANCELLED) {
 
+				// Restaurar estado
 				confirmReport.setStatus(ReportStatus.PENDING);
 
-				reportRepository.registerReport(confirmReport);
+				// CORRECCIÓN CRÍTICA: Reencolar según prioridad sin usar registerReport (que duplica en el historial)
+				if (confirmReport.getPriority() == CriticLevel.HIGH) {
+					reportRepository.getHighPriorityQueue().enqueue(confirmReport);
+				} else if (confirmReport.getPriority() == CriticLevel.MEDIUM) {
+					reportRepository.getMediumPriorityQueue().enqueue(confirmReport);
+				} else {
+					reportRepository.getLowPriorityQueue().enqueue(confirmReport);
+				}
 
-				return new ResponseDTO(true, "Solicitud de cancelamiento rechazada con exito.");
+				return new ResponseDTO(true, "Solicitud de cancelación rechazada. El siniestro ha vuelto a la cola de atención.");
 			}
 
 			return new ResponseDTO(false, "El reporte extraído tiene un estado no reconocible para esta acción.");

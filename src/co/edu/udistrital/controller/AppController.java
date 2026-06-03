@@ -538,6 +538,12 @@ public class AppController {
 				requestsView.addReportCard(r, "CONFIRM");
 			}
 		}
+		
+		// 4. NUEVO: Llenar el resumen histórico ordenado cruzando toda la memoria
+		SimpleList.Iterator<ReportDTO> histIt = getSortedAndFilteredReportsUseCase.execute().iterador();
+		while (histIt.hasNext()) {
+			requestsView.addReportToSummary(histIt.Next());
+		}
 	}
 
 	/**
