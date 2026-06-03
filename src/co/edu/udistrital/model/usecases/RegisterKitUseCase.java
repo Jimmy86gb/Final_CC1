@@ -7,40 +7,22 @@ import co.edu.udistrital.model.enums.KitType;
 import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.repositories.KitRepository;
 
-/**
- * Clase que representa el caso de uso de registrar un nuevo kit en el sistema.
- *
- * @author Juan David Diaz Perez
- */
+
 public class RegisterKitUseCase {
 
-	/**
-	 * Instancia del factory del tipo de kit
-	 */
+	
 	private final KitFactory kitFactory = new KitFactory();
 
-	/**
-	 * Instancia del repositorio que maneja la memoria de los kits
-	 */
+	
 	private final KitRepository kitRepository;
 
-	/**
-	 * Constructor que inyecta el repositorio de kits
-	 * 
-	 * @param kitRepository Repositorio de memoria de kits
-	 */
+	
 	public RegisterKitUseCase(KitRepository kitRepository) {
 		super();
 		this.kitRepository = kitRepository;
 	}
 
-	/**
-	 * Caso de uso que ejecuta el registro en bloque de kits
-	 * 
-	 * @param type     Tipo de kit a usar
-	 * @param quantity Cantidad de kits a registrar
-	 * @return La respuesta de la operacion al controller
-	 */
+	
 	public ResponseDTO execute(String type, int quantity) {
 
 		if (quantity <= 0) {

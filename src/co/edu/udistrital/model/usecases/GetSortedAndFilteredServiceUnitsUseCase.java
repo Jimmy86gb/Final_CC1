@@ -8,35 +8,18 @@ import co.edu.udistrital.model.repositories.ServiceUnitRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 
-/**
- * Clase encargada de ejecutar el caso de uso de devolucion de lista completa
- * ordenada con opciones de eliminar segun especificos de unidades de servicio
- *
- * @author Juan David Diaz Perez
- */
+
 public class GetSortedAndFilteredServiceUnitsUseCase {
 
-	/**
-	 * Instancia privada del reporitorio de memoria de unidades de servicio
-	 */
+	
 	private final ServiceUnitRepository serviceUnitRepository;
 
-	/**
-	 * Constructor que inyecta dentro del caso de uso el repositorio de unidades de
-	 * servicio
-	 * 
-	 * @param serviceUnitRepository Repositorio de unidades de servicio
-	 */
+	
 	public GetSortedAndFilteredServiceUnitsUseCase(ServiceUnitRepository serviceUnitRepository) {
 		this.serviceUnitRepository = serviceUnitRepository;
 	}
 
-	/**
-	 * Metodo de apoyo optimizado que genera la lista ordenada final con base en el
-	 * criterio del repositorio cruzando Tipo de Unidad y Estado.
-	 * 
-	 * @return Lista ordenada
-	 */
+	
 	private SimpleList<ServiceUnit> buildOrderedList() {
 		SimpleList<ServiceUnit> orderedList = new SimpleList<ServiceUnit>();
 
@@ -61,11 +44,7 @@ public class GetSortedAndFilteredServiceUnitsUseCase {
 		return orderedList;
 	}
 
-	/**
-	 * Metodo encargado de retornar la lista de DTO para la vista ya ordenada
-	 * 
-	 * @return Lista basada en kitDTO
-	 */
+	
 	public SimpleList<ServiceUnitDTO> execute() {
 
 		SimpleList<ServiceUnitDTO> resultList = new SimpleList<>();

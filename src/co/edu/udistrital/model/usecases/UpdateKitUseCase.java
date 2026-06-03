@@ -10,46 +10,24 @@ import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.enums.UnitStatusFactory;
 import co.edu.udistrital.model.repositories.KitRepository;
 
-/**
- * Clase de caso de uso que se encarga de actualizar la informacion de los kits
- * recibidas desde la vista
- *
- * @author Juan David Diaz Perez
- */
+
 public class UpdateKitUseCase {
 
-	/**
-	 * Instancia del factory del tipo de kit
-	 */
+	
 	private final KitFactory kitFactory = new KitFactory();
 
-	/**
-	 * Instancia privada del factory del status del kit
-	 */
+	
 	private final UnitStatusFactory unitStatusFactory = new UnitStatusFactory();
 
-	/**
-	 * Instancia del repositorio que maneja la memoria de los kits
-	 */
+	
 	private final KitRepository kitRepository;
 
-	/**
-	 * Constructor que inyecta el repositorio de kits
-	 * 
-	 * @param kitRepository Repositorio de memoria de kits
-	 */
+	
 	public UpdateKitUseCase(KitRepository kitRepository) {
 		this.kitRepository = kitRepository;
 	}
 
-	/**
-	 * Metodo del caso de uso que actualiza la informacion de los kits
-	 * 
-	 * @param idDkit ID de ambos kits
-	 * @param type   Tipo de ambos kits
-	 * @param status Status a actualizar
-	 * @return DTO de respuesta frente a la accion
-	 */
+	
 	public ResponseDTO execute(String idDkit, String type, String status) {
 		try {
 

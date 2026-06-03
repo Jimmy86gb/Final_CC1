@@ -9,35 +9,19 @@ import co.edu.udistrital.model.enums.UnitType;
 import co.edu.udistrital.model.enums.ZoneFactory;
 import co.edu.udistrital.model.repositories.ServiceUnitRepository;
 
-/**
- * Clase que representa el caso de uso de registrar una nueva unidad de servicio
- * en el sistema.
- *
- * @author Juan David Diaz Perez
- */
+
 public class RegisterServiceUnitUseCase {
 
-	/**
-	 * Instancia privada del factory del tipo de unidad
-	 */
+	
 	private final UnitFactory unitFactory = new UnitFactory();
 
-	/**
-	 * Instancia privada del factory de la zona de la unidad
-	 */
+	
 	private final ZoneFactory zoneFactory = new ZoneFactory();
 
-	/**
-	 * Instancia del repositorio que manneja la memoria de las unidades de servicio
-	 */
+	
 	private final ServiceUnitRepository serviceUnitRepository;
 
-	/**
-	 * Constructor del caso de uso que inyecta el repositorio de unidades de
-	 * servicio
-	 * 
-	 * @param serviceUnitRepository Repositorio de unidades de servicio
-	 */
+	
 	public RegisterServiceUnitUseCase(ServiceUnitRepository serviceUnitRepository) {
 		this.serviceUnitRepository = serviceUnitRepository;
 	}

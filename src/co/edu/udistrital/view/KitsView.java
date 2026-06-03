@@ -24,13 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-/**
- * Clase encargada de la representacion visual del inventario de Kits.
- * Implementa una interfaz dividida en paneles para distinguir entre la
- * disponibilidad operativa de los equipos y la pila de mantenimiento (LIFO).
- * Gestiona la interaccion del usuario para el registro, activacion y gestion de
- * recursos tecnicos. * @author Jimmy86gb
- */
+
 public class KitsView {
 	private VBox rootContainer;
 	private VBox availableContainer;
@@ -38,12 +32,7 @@ public class KitsView {
 	private KitsController controller;
 	private String role;
 
-	/**
-	 * Constructor de la vista de kits. Configura el diseño de columnas para separar
-	 * visualmente los kits operativos de aquellos que se encuentran en proceso de
-	 * reparacion o mantenimiento. * @param role Perfil de seguridad para habilitar
-	 * o restringir acciones administrativas.
-	 */
+	
 	public KitsView(String role) {
 		this.role = role;
 		rootContainer = new VBox(25);
@@ -81,16 +70,7 @@ public class KitsView {
 		rootContainer.getChildren().addAll(headerBox, columnsContainer);
 	}
 
-	/**
-	 * Metodo factoria para generar columnas de datos estandarizadas. Envuelve el
-	 * contenedor de datos en un ScrollPane para garantizar la navegabilidad cuando
-	 * el inventario supera el espacio vertical. * @param title Titulo de la
-	 * columna.
-	 * 
-	 * @param bgColor           Color de fondo en hexadecimal.
-	 * @param internalContainer Contenedor hijo donde se añadiran las tarjetas.
-	 * @return Contenedor VBox con la estructura completa de la columna.
-	 */
+	
 	private VBox createColumn(String title, String bgColor, VBox internalContainer) {
 		VBox col = new VBox(15);
 		col.setPadding(new Insets(15));
@@ -115,29 +95,18 @@ public class KitsView {
 		return col;
 	}
 
-	/**
-	 * Inyecta el controlador asociado a esta vista. * @param controller Instancia
-	 * de KitsController.
-	 */
+	
 	public void setController(KitsController controller) {
 		this.controller = controller;
 	}
 
-	/**
-	 * Limpia ambos contenedores de la vista para permitir una recarga limpia de los
-	 * datos provenientes del repositorio.
-	 */
+	
 	public void clearTable() {
 		availableContainer.getChildren().clear();
 		maintenanceContainer.getChildren().clear();
 	}
 
-	/**
-	 * Crea y renderiza una tarjeta informativa (card) para un Kit especifico.
-	 * Aplica logica de seguridad para habilitar botones de mantenimiento solo bajo
-	 * el patron LIFO y habilita controles de administracion segun el rol. * @param
-	 * kit Objeto DTO del kit a visualizar.
-	 */
+	
 	public void addKit(KitDTO kit) {
 		VBox card = new VBox(8);
 		card.setPadding(new Insets(15));
@@ -176,8 +145,8 @@ public class KitsView {
 				btnRetire.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-cursor: hand;");
 				btnRetire.setOnAction(e -> controller.retireKitFromMaintenance());
 
-				// Regla LIFO estricta: Solo el elemento tope (isEditable) puede salir de la
-				// pila
+				
+				
 				if (!kit.isEditable()) {
 					btnReturn.setDisable(true);
 					btnRetire.setDisable(true);
@@ -209,9 +178,7 @@ public class KitsView {
 		}
 	}
 
-	/**
-	 * Muestra el dialogo para el registro de nuevos lotes de kits en inventario.
-	 */
+	
 	private void showAddKitDialog() {
 		Dialog<ButtonType> dialog = new Dialog<>();
 		dialog.setTitle("Registrar Kit");
@@ -249,9 +216,7 @@ public class KitsView {
 		});
 	}
 
-	/**
-	 * Retorna el contenedor principal de la vista. * @return VBox contenedor.
-	 */
+	
 	public VBox getView() {
 		return rootContainer;
 	}

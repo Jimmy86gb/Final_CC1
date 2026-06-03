@@ -9,42 +9,22 @@ import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.repositories.KitRepository;
 import co.edu.udistrital.model.repositories.ReportRepository;
 
-/**
- * Caso de uso para terminar confirmar un cambio de estado de reporte y hacerle
- * pop en la fila de confirmaciones
- *
- * @author Juan David Diaz Perez
- */
+
 public class ApproveReportActionUseCase {
 
-	/**
-	 * Instancia privada del repositorio de memoria de reportes
-	 */
+	
 	private final ReportRepository reportRepository;
 
-	/**
-	 * Instancia privada del repositorio de memoria de kits;
-	 */
+	
 	private final KitRepository kitRepository;
 
-	/**
-	 * Constructor que inyecta al caso de uso todos los repositotios necesarios en
-	 * la logica
-	 * 
-	 * @param reportRepository Repositorio de reporte
-	 * @param kitRepository    Repositorio de kits
-	 */
+	
 	public ApproveReportActionUseCase(ReportRepository reportRepository, KitRepository kitRepository) {
 		this.reportRepository = reportRepository;
 		this.kitRepository = kitRepository;
 	}
 
-	/**
-	 * Método que se encarga de guardar estados definitivamente y liberar recursos
-	 * si es un reporte terminado
-	 * 
-	 * @return DTO de muestra en la vista con el resultado de la operación.
-	 */
+	
 	public ResponseDTO execute() {
 		try {
 

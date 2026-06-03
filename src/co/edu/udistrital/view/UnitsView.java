@@ -24,13 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-/**
- * Clase encargada de la representacion visual de las unidades de servicio.
- * Implementa una interfaz dividida en paneles para diferenciar las unidades
- * activas de aquellas que requieren aprobacion administrativa tras una
- * solicitud de cambio. Gestiona el registro de nuevas unidades y la interaccion
- * de roles (Operador/Admin). * @author Jimmy86gb
- */
+
 public class UnitsView {
 	private VBox rootContainer;
 	private VBox activeContainer;
@@ -38,12 +32,7 @@ public class UnitsView {
 	private UnitsController controller;
 	private String role;
 
-	/**
-	 * Constructor de la vista de unidades. Configura el layout principal,
-	 * inicializa los contenedores de scroll y añade el boton de registro de nuevas
-	 * unidades. * @param role Perfil de seguridad para habilitar o restringir
-	 * acciones administrativas.
-	 */
+	
 	public UnitsView(String role) {
 		this.role = role;
 		rootContainer = new VBox(25);
@@ -83,22 +72,12 @@ public class UnitsView {
 		VBox.setVgrow(columnsContainer, Priority.ALWAYS);
 	}
 
-	/**
-	 * Inyecta el controlador asociado a esta vista. * @param controller Instancia
-	 * de UnitsController.
-	 */
+	
 	public void setController(UnitsController controller) {
 		this.controller = controller;
 	}
 
-	/**
-	 * Metodo factoria para generar columnas de datos estandarizadas con scroll
-	 * interno. * @param title Titulo de la columna.
-	 * 
-	 * @param bgColor           Color de fondo en hexadecimal.
-	 * @param internalContainer Contenedor hijo donde se añadiran las tarjetas.
-	 * @return Contenedor VBox con la estructura completa.
-	 */
+	
 	private VBox createColumn(String title, String bgColor, VBox internalContainer) {
 		VBox col = new VBox(15);
 		col.setPadding(new Insets(15));
@@ -123,22 +102,13 @@ public class UnitsView {
 		return col;
 	}
 
-	/**
-	 * Limpia ambos contenedores (activos y pendientes) para recargar datos frescos.
-	 */
+	
 	public void clearTable() {
 		activeContainer.getChildren().clear();
 		pendingContainer.getChildren().clear();
 	}
 
-	/**
-	 * Renderiza una tarjeta informativa de la unidad de servicio. Aplica logica de
-	 * seguridad para mostrar botones de edicion solo al operador o botones de
-	 * aprobacion solo al administrador. * @param unit Objeto DTO con los datos de
-	 * la unidad.
-	 * 
-	 * @param isPending Indica si la unidad esta en la cola de aprobacion.
-	 */
+	
 	public void addUnit(ServiceUnitDTO unit, boolean isPending) {
 		VBox card = new VBox(8);
 		card.setPadding(new Insets(15));
@@ -194,9 +164,7 @@ public class UnitsView {
 		}
 	}
 
-	/**
-	 * Muestra el dialogo de registro para crear un nuevo grupo de unidades.
-	 */
+	
 	private void showAddUnitDialog() {
 		Dialog<ButtonType> dialog = new Dialog<>();
 		dialog.setTitle("Registrar Unidad");
@@ -238,14 +206,7 @@ public class UnitsView {
 		});
 	}
 
-	/**
-	 * Muestra el dialogo de edicion para solicitar cambios de estado o zona.
-	 * * @param id UUID de la unidad.
-	 * 
-	 * @param currentType   Tipo actual.
-	 * @param currentStatus Estado actual.
-	 * @param currentZone   Zona actual.
-	 */
+	
 	private void showEditUnitDialog(String id, String currentType, String currentStatus, String currentZone) {
 		Dialog<ButtonType> dialog = new Dialog<>();
 		dialog.setTitle("Solicitar Cambio: " + id.substring(0, 8));
@@ -284,9 +245,7 @@ public class UnitsView {
 		});
 	}
 
-	/**
-	 * Retorna el contenedor principal. * @return VBox contenedor.
-	 */
+	
 	public VBox getView() {
 		return rootContainer;
 	}

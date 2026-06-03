@@ -10,56 +10,32 @@ import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 import co.edu.udistrital.model.structures.Stack;
 
-// Terminar comentarios
-/**
- * Clase que representa la memoria y administracion referente a los reportes en
- * el sistema
- *
- * @author Juan David Diaz Perez
- */
+
+
 public class ReportRepository {
 
-	/**
-	 * Cola de la mas alta prioridad para los reportes sacados de la stack ongoing
-	 */
+	
 	private Queue<Report> undoQueue = new Queue<Report>();
 
-	/**
-	 * Cola de alta prioridad para alto impacto en transito o gravedad del accidente
-	 */
+	
 	private Queue<Report> highPriorityQueue = new Queue<Report>();
 
-	/**
-	 * Cola de prioridad media para clientes empresariales
-	 */
+	
 	private Queue<Report> mediumPriorityQueue = new Queue<Report>();
 
-	/**
-	 * Cola de baja prioridad para personas comunes
-	 */
+	
 	private Queue<Report> lowPriorityQueue = new Queue<Report>();
 
-	/**
-	 * Pila de reportes en proceso de ser completados
-	 */
+	
 	private Stack<Report> onGoingReportStack = new Stack<Report>();
 
-	/**
-	 * Pila de reportes para confirmar si se cerro un caso
-	 */
+	
 	private Stack<Report> toConfirmStack = new Stack<Report>();
 
-	/**
-	 * Lista de todos los reportes sin importar su estado
-	 */
+	
 	private SimpleList<Report> allHistoricalReports = new SimpleList<Report>();
 
-	/**
-	 * Metodo para guardar un nuevo reporte
-	 * 
-	 * @param report Objeto de reporte
-	 * @return Si la operacion fue exitosa
-	 */
+	
 	public boolean saveReport(Report report) {
 		if (allHistoricalReports.contains(report)) {
 			return false;
@@ -76,22 +52,12 @@ public class ReportRepository {
 		return true;
 	}
 
-	/**
-	 * Metodo para actualizar un reporte a lo largo del proceso
-	 * 
-	 * @param actualReport Objeto con la informacion actual de reporte
-	 * @param newReport    Objeto con la informacion nueca de reporte
-	 * @return Si la operacion fue exitosa
-	 */
+	
 	public boolean updateReport(Report actualReport, Report newReport) {
 		return allHistoricalReports.update(actualReport, newReport);
 	}
 
-	/**
-	 * Metodo que retorna todos los reportes registrados en el sistema
-	 * 
-	 * @return La lista de todos los reportes
-	 */
+	
 	public SimpleList<Report> getAllReports() {
 		SimpleList<Report> copyList = new SimpleList<>();
 		Iterator<Report> iterator = allHistoricalReports.iterador();
@@ -102,13 +68,7 @@ public class ReportRepository {
 		return copyList;
 	}
 
-	/**
-	 * Metodo que filtra todos los reportes por estado y nivel critico
-	 * 
-	 * @param criticLevel  EL nivel critico a filtrar
-	 * @param reportStatus El estado a filtrar
-	 * @return La lista filtrada
-	 */
+	
 	public SimpleList<Report> getReportsByCriticLevelAndStatus(CriticLevel criticLevel, ReportStatus reportStatus) {
 		SimpleList<Report> filteredList = new SimpleList<>();
 		Iterator<Report> iterator = allHistoricalReports.iterador();
@@ -123,29 +83,17 @@ public class ReportRepository {
 		return filteredList;
 	}
 
-	/**
-	 * Metodo que añade un nuevo reporte a los que estan en progresa
-	 * 
-	 * @param report Reporte a poner en progreso
-	 */
+	
 	public void pushToOnProgress(Report report) {
 		onGoingReportStack.push(report);
 	}
 
-	/**
-	 * Metodo que saca el ultimo reporte dentro de los que estan en progreso
-	 * 
-	 * @return Reporte fuera de la pila
-	 */
+	
 	public Report popOnProgress() {
 		return onGoingReportStack.pop();
 	}
 
-	/**
-	 * Metodo que muestra todos los reportes que estan siendo tratados en el momento
-	 * 
-	 * @return La lista de todos los reportes tratados en el momento
-	 */
+	
 	public SimpleList<Report> getOnGoingReports() {
 
 		SimpleList<Report> copyList = new SimpleList<>();
@@ -166,29 +114,17 @@ public class ReportRepository {
 		return copyList;
 	}
 
-	/**
-	 * Metodo que añade un nuevo reporte a los que se van a confirmar para cerrar
-	 * 
-	 * @param report Reporte a poner en progreso
-	 */
+	
 	public void pushToConfirm(Report report) {
 		toConfirmStack.push(report);
 	}
 
-	/**
-	 * Metodo que saca el ultimo reporte de la pila de confirmaciones de acciones
-	 * 
-	 * @return Reporte fuera de la pila
-	 */
+	
 	public Report popOnConfirm() {
 		return toConfirmStack.pop();
 	}
 
-	/**
-	 * Metodo que muestra todos los reportes a confirmar su cierre
-	 * 
-	 * @return La lista de todos los reportes tratados en el momento
-	 */
+	
 	public SimpleList<Report> getToConfirmReports() {
 
 		SimpleList<Report> copyList = new SimpleList<>();
@@ -209,21 +145,12 @@ public class ReportRepository {
 		return copyList;
 	}
 
-	/**
-	 * Metodo que añade a los pendientes los reportes desechos de la pila
-	 * 
-	 * @param report El reporte que salio de la pila
-	 */
+	
 	public void registerRevertedReport(Report report) {
 		undoQueue.enqueue(report);
 	}
 
-	/**
-	 * Metodo que añade a los pendientes los reportes cuyo cancelamiento no fue
-	 * aprobado
-	 * 
-	 * @param report El reporte que salio de la pila
-	 */
+	
 	public void registerReport(Report report) {
 		switch (report.getPriority()) {
 		case HIGH -> highPriorityQueue.enqueue(report);
@@ -232,12 +159,7 @@ public class ReportRepository {
 		}
 	}
 
-	/**
-	 * Metodo que retorna el siguiente reporte a procesar segun el orden de
-	 * prioridades, sin sacarlo de la cola.
-	 * 
-	 * @return El siguiente reporte o null si no hay ninguno.
-	 */
+	
 	public Report peekNextPendingReport() {
 
 		if (!undoQueue.isEmpty()) {
@@ -256,12 +178,7 @@ public class ReportRepository {
 		return null;
 	}
 
-	/**
-	 * Metodo que retorna el siguiente reporte a procesar segun el orden de
-	 * prioridades
-	 * 
-	 * @return El siguiente reporte
-	 */
+	
 	public Report getNextPendingReport() {
 		Report nextReport = undoQueue.dequeue();
 		if (nextReport != null) {
@@ -281,12 +198,7 @@ public class ReportRepository {
 		return lowPriorityQueue.dequeue();
 	}
 
-	/**
-	 * Metodo que remueve un reporte especifico de la pila de progreso cuando este
-	 * ha finalizado, sin alterar el orden del resto.
-	 * 
-	 * @param finishedReport El reporte que ya se completó
-	 */
+	
 	public Report removeFinishedReportFromStack(UUID id) {
 
 		Stack<Report> tempStack = new Stack<>();
@@ -310,29 +222,23 @@ public class ReportRepository {
 		return currentReport;
 	}
 
-	/**
-	 * Metodo que saca de la cola especificada un reporte segun si coincide su ID
-	 * 
-	 * @param originalQueue La cola original evaluada
-	 * @param targetID      El id del reporte a buscar
-	 * @return El elemento fuera de sus colas de prioridad
-	 */
+	
 	private Report extractFromQueue(Queue<Report> originalQueue, UUID targetID) {
 		Queue<Report> tempQueue = new Queue<>();
 		Report foundReport = null;
 
-		// 1. Vaciamos la cola original buscando el objetivo
+		
 		while (!originalQueue.isEmpty()) {
 			Report current = originalQueue.dequeue();
 
 			if (current.getTicketID().equals(targetID)) {
-				foundReport = current; // ¡Lo encontramos! No lo metemos en la temporal
+				foundReport = current; 
 			} else {
-				tempQueue.enqueue(current); // Los demás se guardan para no perderlos
+				tempQueue.enqueue(current); 
 			}
 		}
 
-		// 2. Devolvemos los elementos a la cola original manteniendo el orden
+		
 		while (!tempQueue.isEmpty()) {
 			originalQueue.enqueue(tempQueue.dequeue());
 		}
@@ -340,12 +246,7 @@ public class ReportRepository {
 		return foundReport;
 	}
 
-	/**
-	 * Busca un reporte específico en las colas de prioridad y lo extrae.
-	 * 
-	 * @param ticketID ID del reporte buscado.
-	 * @return El reporte si fue encontrado, o null si no estaba en ninguna cola.
-	 */
+	
 	public Report extractPendingReport(UUID ticketID) {
 		Report target = extractFromQueue(undoQueue, ticketID);
 		if (target != null) {
@@ -366,104 +267,72 @@ public class ReportRepository {
 		return target;
 	}
 
-	/**
-	 * @return La cola de deshacer de la ejecucion actual
-	 */
+	
 	public Queue<Report> getUndoQueue() {
 		return undoQueue;
 	}
 
-	/**
-	 * @param undoQueue La cola de deshacer de la base de datos
-	 */
+	
 	public void setUndoQueue(Queue<Report> undoQueue) {
 		this.undoQueue = undoQueue;
 	}
 
-	/**
-	 * @return the highPriorityQueue
-	 */
+	
 	public Queue<Report> getHighPriorityQueue() {
 		return highPriorityQueue;
 	}
 
-	/**
-	 * @param highPriorityQueue the highPriorityQueue to set
-	 */
+	
 	public void setHighPriorityQueue(Queue<Report> highPriorityQueue) {
 		this.highPriorityQueue = highPriorityQueue;
 	}
 
-	/**
-	 * @return the mediumPriorityQueue
-	 */
+	
 	public Queue<Report> getMediumPriorityQueue() {
 		return mediumPriorityQueue;
 	}
 
-	/**
-	 * @param mediumPriorityQueue the mediumPriorityQueue to set
-	 */
+	
 	public void setMediumPriorityQueue(Queue<Report> mediumPriorityQueue) {
 		this.mediumPriorityQueue = mediumPriorityQueue;
 	}
 
-	/**
-	 * @return the lowPriorityQueue
-	 */
+	
 	public Queue<Report> getLowPriorityQueue() {
 		return lowPriorityQueue;
 	}
 
-	/**
-	 * @param lowPriorityQueue the lowPriorityQueue to set
-	 */
+	
 	public void setLowPriorityQueue(Queue<Report> lowPriorityQueue) {
 		this.lowPriorityQueue = lowPriorityQueue;
 	}
 
-	/**
-	 * @return the onGoingReportStack
-	 */
+	
 	public Stack<Report> getOnGoingReportStack() {
 		return onGoingReportStack;
 	}
 
-	/**
-	 * @param onGoingReportStack the onGoingReportStack to set
-	 */
+	
 	public void setOnGoingReportStack(Stack<Report> onGoingReportStack) {
 		this.onGoingReportStack = onGoingReportStack;
 	}
 
-	/**
-	 * @return the toConfirmStack
-	 */
+	
 	public Stack<Report> getToConfirmStack() {
 		return toConfirmStack;
 	}
 
-	/**
-	 * @param toConfirmStack the toConfirmStack to set
-	 */
+	
 	public void setToConfirmStack(Stack<Report> toConfirmStack) {
 		this.toConfirmStack = toConfirmStack;
 	}
 
-	/**
-	 * @return the allHistoricalReports
-	 */
+	
 	public SimpleList<Report> getAllHistoricalReports() {
 		return allHistoricalReports;
 	}
 
-	/**
-	 * Metodo auxiliar que extrae los elementos de una cola, los añade a una lista y
-	 * los devuelve a la cola original manteniendo su orden exacto.
-	 * 
-	 * @param sourceQueue La cola de prioridad a leer
-	 * @param targetList  La lista donde se guardarán los resultados
-	 */
+	
 	private void appendQueueToListSafely(Queue<Report> sourceQueue, SimpleList<Report> targetList) {
 		Queue<Report> tempQueue = new Queue<>();
 
@@ -473,23 +342,17 @@ public class ReportRepository {
 			tempQueue.enqueue(current);
 		}
 
-		// 2. Restauramos la cola original
+		
 		while (!tempQueue.isEmpty()) {
 			sourceQueue.enqueue(tempQueue.dequeue());
 		}
 	}
 
-	/**
-	 * Obtiene TODOS los reportes pendientes ordenados estrictamente por su
-	 * jerarquía de negocio (Undo -> High -> Medium -> Low), sin sacarlos del
-	 * sistema.
-	 * 
-	 * @return Una lista enlazada con los reportes en espera.
-	 */
+	
 	public SimpleList<Report> getAllPendingReportsOrdered() {
 		SimpleList<Report> allPending = new SimpleList<>();
 
-		// El orden en que llamamos a este método garantiza la prioridad global
+		
 		appendQueueToListSafely(undoQueue, allPending);
 		appendQueueToListSafely(highPriorityQueue, allPending);
 		appendQueueToListSafely(mediumPriorityQueue, allPending);
@@ -498,9 +361,7 @@ public class ReportRepository {
 		return allPending;
 	}
 	
-	/**
-	 * @param allHistoricalReports la lista historica a restaurar desde la base de datos
-	 */
+	
 	public void setAllHistoricalReports(SimpleList<Report> allHistoricalReports) {
 		this.allHistoricalReports = allHistoricalReports;
 	}

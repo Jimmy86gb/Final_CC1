@@ -7,34 +7,18 @@ import co.edu.udistrital.model.repositories.ClientRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 
-/**
- * Clase encargada de ejecutar el caso de uso de devolucion de lista completa
- * ordenada con opciones de eliminar segun especificos de clientes
- *
- * @author Juan David Diaz Perez
- */
+
 public class GetSortedAndFilteredClientsUseCase {
 
-	/**
-	 * Instanciacion privada del repositorio de memoria de clientes
-	 */
+	
 	private final ClientRepository clientRepository;
 
-	/**
-	 * Constructor que inyecta el repositorio de clientes al caso de uso
-	 * 
-	 * @param clientRepository Respositorio de memoria de clientes
-	 */
+	
 	public GetSortedAndFilteredClientsUseCase(ClientRepository clientRepository) {
 		this.clientRepository = clientRepository;
 	}
 
-	/**
-	 * Metodo de apoyo optimizado que genera la lista ordenada final con base en el
-	 * criterio del repositorio para Clientes.
-	 * 
-	 * @return Lista ordenada
-	 */
+	
 	private SimpleList<Client> buildOrderedList() {
 
 		SimpleList<Client> orderedList = new SimpleList<Client>();
@@ -54,11 +38,7 @@ public class GetSortedAndFilteredClientsUseCase {
 		return orderedList;
 	}
 
-	/**
-	 * Metodo encargado de retornar la lista de DTO para la vista ya ordenada
-	 * 
-	 * @return Lista basada en kitDTO
-	 */
+	
 	public SimpleList<ClientDTO> execute() {
 
 		SimpleList<ClientDTO> resultList = new SimpleList<ClientDTO>();

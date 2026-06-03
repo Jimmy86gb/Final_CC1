@@ -12,35 +12,18 @@ import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 import co.edu.udistrital.model.utils.CSVReportExporter;
 
-/**
- * Caso de uso encargado de filtrar los casos exitosos del día actual,
- * estructurar la información (incluyendo tipos de cliente y unidad) y orquestar
- * la generación del reporte.
- *
- * @author Juan David Diaz Perez
- */
+
 public class GenerateDailyCSVUseCase {
 
-	/**
-	 * Instancia privada del repositorio de reportes en memoria
-	 */
+	
 	private final ReportRepository reportRepository;
 
-	/**
-	 * Constructor que inyecta el repositorio al caso de uso
-	 * 
-	 * @param reportRepository Repositorio de reportes
-	 */
+	
 	public GenerateDailyCSVUseCase(ReportRepository reportRepository) {
 		this.reportRepository = reportRepository;
 	}
 
-	/**
-	 * Caso de uso que da el texto en crudo a guardar en el archivo
-	 * 
-	 * @param directoryPath Direccion de guardado
-	 * @return Si la operacion es exitosa
-	 */
+	
 	public ResponseDTO execute(String directoryPath) {
 		try {
 			SimpleList<String[]> csvRows = new SimpleList<>();
@@ -57,17 +40,17 @@ public class GenerateDailyCSVUseCase {
 				while (iterator.hasNext()) {
 					Report report = iterator.Next();
 
-					// Filtro: Solo casos de HOY
+					
 					if (report.getReportTime().toLocalDate().equals(today)) {
 
-						// 1. Extracción Segura de Cliente (Ahora con Tipo)
+						
 						String clientName = report.getClient() != null ? report.getClient().getName() : "N/A";
 						String clientType = (report.getClient() != null && report.getClient().getType() != null)
 								? report.getClient().getType().toString()
 								: "N/A";
 						String clientContact = report.getClient() != null ? report.getClient().getContactInfo() : "N/A";
 
-						// 2. Extracción Segura de Recursos (Ahora con Tipo de Unidad)
+						
 						String techName = report.getAssignedTechnician() != null
 								? report.getAssignedTechnician().getName()
 								: "N/A";
@@ -78,12 +61,12 @@ public class GenerateDailyCSVUseCase {
 										? report.getAssignedUnit().getType().toString()
 										: "N/A";
 
-						// 3. Empaquetar la fila en un arreglo de Strings
+						
 						String[] row = { report.getTicketID().toString(), report.getReportTime().format(formatter),
-								clientName, clientType, // Novedad agregada
+								clientName, clientType, 
 								clientContact, report.getProblemDescription(), report.getProblemType().getDisplayName(),
 								report.getPriority().getDisplayName(), report.getReportZone().getDisplayName(),
-								techName, unitId, unitType, // Novedad agregada
+								techName, unitId, unitType, 
 								report.getStatus().getDisplayName() };
 
 						csvRows.add(row);

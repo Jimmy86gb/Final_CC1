@@ -14,13 +14,7 @@ public class GetAvailableKitsByTypeUseCase {
 		this.kitRepository = kitRepository;
 	}
 
-	/**
-	 * Metodo de apoyo factory para convertir la especialidad del tecnico en el tipo
-	 * de kit
-	 * 
-	 * @param technicianSpeciality Especialidad del tecnico en string
-	 * @return Enum del tipo del kit
-	 */
+	
 	private KitType getType(String technicianSpeciality) {
 		return switch (technicianSpeciality.replaceAll("\\s+", "").toLowerCase()) {
 		case "electricoautomotriz" -> KitType.ELECTRICITY_KIT;
@@ -32,11 +26,7 @@ public class GetAvailableKitsByTypeUseCase {
 		};
 	}
 
-	/**
-	 * Metodo encargado de retornar la lista de DTO para la seleccion de recursos
-	 * 
-	 * @return Lista basada en kitDTO
-	 */
+	
 	public SimpleList<KitDTO> execute(String speciality) {
 
 		KitType kitType = getType(speciality);

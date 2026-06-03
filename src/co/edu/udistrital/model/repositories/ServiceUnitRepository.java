@@ -10,30 +10,16 @@ import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 import co.edu.udistrital.model.structures.Stack;
 
-/**
- * Clase que representa la memoria y administracion referente a las unidades de
- * servicio en el sistema
- *
- * @author Juan David Diaz Perez
- */
+
 public class ServiceUnitRepository {
 
-	/**
-	 * Lista estatica de unidades de servicio que almacenara a todos en memoria
-	 */
+	
 	private SimpleList<ServiceUnit> unitList = new SimpleList<>();
 
-	/**
-	 * Pila estatica para confirmar cambios de estado de la unidad de servicio
-	 */
+	
 	private Stack<ServiceUnit> toConfirmStack = new Stack<ServiceUnit>();
 
-	/**
-	 * Metodo que guarda una nueva unidad de servicios en la lista de unidades
-	 * 
-	 * @param unit Objeto de la unidad
-	 * @return si la operacion fue un exito o no
-	 */
+	
 	public boolean saveUnit(ServiceUnit unit) {
 		if (unitList.contains(unit)) {
 			return false;
@@ -42,24 +28,12 @@ public class ServiceUnitRepository {
 		return true;
 	}
 
-	/**
-	 * Metodo que actualiza la informacion de una unidad de servicio selecionada
-	 * 
-	 * @param actualUnit Objeto unidad con la informacion actual
-	 * @param newUnit    Objeto unidad con la informacion nueva
-	 * @return Si la operacion fue exitosa
-	 */
+	
 	public boolean update(ServiceUnit actualUnit, ServiceUnit newUnit) {
 		return unitList.update(actualUnit, newUnit);
 	}
 
-	/**
-	 * Metodo que retorna si exite un elemento unidad de servicio de la lista segun
-	 * una busqueda por ID
-	 * 
-	 * @param id Id para buscar la lista
-	 * @return Elemento unidad de servicio con la id dada
-	 */
+	
 	public ServiceUnit getServiceUnitByID(UUID id) {
 		Iterator<ServiceUnit> iterator = this.unitList.iterador();
 
@@ -74,11 +48,7 @@ public class ServiceUnitRepository {
 		return null;
 	}
 
-	/**
-	 * Metodo que retorna toda la lista de unidades de servicio
-	 * 
-	 * @return La lista de unidades de servicio
-	 */
+	
 	public SimpleList<ServiceUnit> getAllUnits() {
 		SimpleList<ServiceUnit> copyList = new SimpleList<>();
 		Iterator<ServiceUnit> iterator = unitList.iterador();
@@ -89,12 +59,7 @@ public class ServiceUnitRepository {
 		return copyList;
 	}
 
-	/**
-	 * Metodo que retorna las unidades de servicio disponibles por zona
-	 * 
-	 * @param targetZone Zona de filtrado
-	 * @return La lista filtrada
-	 */
+	
 	public SimpleList<ServiceUnit> getAvailableUnitsByZone(OperationZone targetZone) {
 		SimpleList<ServiceUnit> filteredList = new SimpleList<>();
 		Iterator<ServiceUnit> iterator = unitList.iterador();
@@ -108,13 +73,7 @@ public class ServiceUnitRepository {
 		return filteredList;
 	}
 
-	/**
-	 * Metodo que retorna las unidades de servicio por status y tipo de unidad
-	 * 
-	 * @param unitStatus Estatus de unidad a filtrar
-	 * @param unitType   Tipo de unidad a filtrar
-	 * @return La lista filtrada
-	 */
+	
 	public SimpleList<ServiceUnit> getUnitsByStatusAndType(UnitStatus unitStatus, UnitType unitType) {
 		SimpleList<ServiceUnit> filteredList = new SimpleList<>();
 		Iterator<ServiceUnit> iterator = unitList.iterador();
@@ -128,31 +87,17 @@ public class ServiceUnitRepository {
 		return filteredList;
 	}
 
-	/**
-	 * Metodo que añade una nueva unidad de servicio a confirmar su cambio de estado
-	 * 
-	 * @param serviceUnit Unidad de servicio a cambiar el estado
-	 */
+	
 	public void pushToConfirm(ServiceUnit serviceUnit) {
 		toConfirmStack.push(serviceUnit);
 	}
 
-	/**
-	 * Metodo que saca la unidad de servicio que encontraba pendiente la
-	 * confirmacion de sus cambios
-	 * 
-	 * @return Unidad de servicio fuera de la fila
-	 */
+	
 	public ServiceUnit popOnConfirm() {
 		return toConfirmStack.pop();
 	}
 
-	/**
-	 * Metodo que muestra todas las unidades de servicio a confirmar su cambio de
-	 * estado
-	 * 
-	 * @return La lista de todos los reportes tratados en el momento
-	 */
+	
 	public SimpleList<ServiceUnit> getToConfirmUnits() {
 
 		SimpleList<ServiceUnit> copyList = new SimpleList<>();
@@ -173,30 +118,22 @@ public class ServiceUnitRepository {
 		return copyList;
 	}
 
-	/**
-	 * @return La lista de unidades de servicio de la ejecucion actual
-	 */
+	
 	public SimpleList<ServiceUnit> getUnitList() {
 		return unitList;
 	}
 
-	/**
-	 * @param unitList La lista de unidades de servicio de la base de datos
-	 */
+	
 	public void setUnitList(SimpleList<ServiceUnit> unitList) {
 		this.unitList = unitList;
 	}
 
-	/**
-	 * @return the toConfirmStack
-	 */
+	
 	public Stack<ServiceUnit> getToConfirmStack() {
 		return toConfirmStack;
 	}
 
-	/**
-	 * @param toConfirmStack the toConfirmStack to set
-	 */
+	
 	public void setToConfirmStack(Stack<ServiceUnit> toConfirmStack) {
 		this.toConfirmStack = toConfirmStack;
 	}

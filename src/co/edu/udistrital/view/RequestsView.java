@@ -25,13 +25,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-/**
- * Clase encargada de la renderizacion del tablero de despacho de emergencias.
- * Implementa un flujo de trabajo tipo Kanban, gestionando visualmente la cola
- * de espera, los casos en progreso y las confirmaciones finales. Incluye un
- * historial consolidado de solicitudes y herramientas de asignacion manual de
- * recursos. * @author Jimmy86gb
- */
+
 public class RequestsView {
 	private VBox rootContainer;
 	private String role;
@@ -42,12 +36,7 @@ public class RequestsView {
 	private VBox confirmCasesContainer;
 	private VBox summaryContainer;
 
-	/**
-	 * Constructor de la vista. Configura el layout principal con tres columnas para
-	 * el flujo de trabajo (Espera, Progreso, Confirmacion) y una seccion inferior
-	 * para el historial. * @param role Perfil del usuario para restringir acciones
-	 * sensibles.
-	 */
+	
 	public RequestsView(String role) {
 		this.role = role;
 		rootContainer = new VBox(25);
@@ -100,7 +89,7 @@ public class RequestsView {
 		HBox.setHgrow(ongoingPanel, Priority.ALWAYS);
 		HBox.setHgrow(confirmPanel, Priority.ALWAYS);
 
-		// --- Seccion de Resumen Historico ---
+		
 		Label lblSummaryTitle = new Label("Resumen Historico de Solicitudes");
 		lblSummaryTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 22));
 
@@ -146,16 +135,12 @@ public class RequestsView {
 		rootContainer.getChildren().addAll(headerBox, columnsContainer, lblSummaryTitle, summaryScroll);
 	}
 
-	/**
-	 * Inyecta el controlador. * @param controller Instancia de RequestsController.
-	 */
+	
 	public void setController(RequestsController controller) {
 		this.controller = controller;
 	}
 
-	/**
-	 * Crea una columna de tablero con scroll.
-	 */
+	
 	private VBox createColumn(String title, String bgColor, VBox internalContainer) {
 		VBox col = new VBox(15);
 		col.setPadding(new Insets(15));
@@ -180,9 +165,7 @@ public class RequestsView {
 		return col;
 	}
 
-	/**
-	 * Limpia los contenedores visuales para refrescar la interfaz.
-	 */
+	
 	public void clearPanels() {
 		pendingCasesContainer.getChildren().clear();
 		ongoingCasesContainer.getChildren().clear();
@@ -190,10 +173,7 @@ public class RequestsView {
 		summaryContainer.getChildren().clear();
 	}
 
-	/**
-	 * Añade una fila al resumen historico. Implementa validacion de nulos para
-	 * evitar errores visuales.
-	 */
+	
 	public void addReportToSummary(ReportDTO report) {
 		HBox row = new HBox(15);
 		row.setPadding(new Insets(10));
@@ -265,9 +245,7 @@ public class RequestsView {
 		summaryContainer.getChildren().add(row);
 	}
 
-	/**
-	 * Añade una tarjeta de siniestro (card) a la columna correspondiente.
-	 */
+	
 	public void addReportCard(ReportDTO report, String targetPanel) {
 		VBox card = new VBox(10);
 		card.setPadding(new Insets(15));
@@ -361,9 +339,7 @@ public class RequestsView {
 		}
 	}
 
-	/**
-	 * Muestra el dialogo de asignacion manual de recursos.
-	 */
+	
 	private void showAssignManualDialog(ReportDTO report) {
 		Dialog<ButtonType> dialog = new Dialog<>();
 		dialog.setTitle("Analisis de Asignacion");
@@ -426,9 +402,7 @@ public class RequestsView {
 		});
 	}
 
-	/**
-	 * Dialogo inicial de entrada de ID de cliente.
-	 */
+	
 	private void showInitRequestDialog() {
 		TextInputDialog dialog = new TextInputDialog();
 		dialog.setTitle("Nueva Solicitud");
@@ -437,9 +411,7 @@ public class RequestsView {
 		dialog.showAndWait().ifPresent(id -> controller.processNewRequest(id));
 	}
 
-	/**
-	 * Dialogo de creacion de reporte.
-	 */
+	
 	public void showCreateReportDialog(ClientDTO client) {
 		Dialog<ButtonType> dialog = new Dialog<>();
 		dialog.setTitle("Registrar Emergencia");

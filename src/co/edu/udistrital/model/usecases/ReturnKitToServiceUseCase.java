@@ -5,33 +5,18 @@ import co.edu.udistrital.model.entities.Kit;
 import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.repositories.KitRepository;
 
-/**
- * Caso de uso para finalizar el mantenimiento de un kit (en la cima de la pila
- * LIFO) y devolverlo al servicio como disponible.
- *
- * @author Juan David Diaz Perez
- */
+
 public class ReturnKitToServiceUseCase {
 
-	/**
-	 * Instancia del repositorio que maneja la memoria de los kits
-	 */
+	
 	private final KitRepository kitRepository;
 
-	/**
-	 * Constructor que inyecta el repositorio de kits
-	 * 
-	 * @param kitRepository Repositorio de memoria de kits
-	 */
+	
 	public ReturnKitToServiceUseCase(KitRepository kitRepository) {
 		this.kitRepository = kitRepository;
 	}
 
-	/**
-	 * Metodo que retorna a circulacion un kit que se encontraba en mantenimiento
-	 * 
-	 * @return DTO de respuesta para la vista
-	 */
+	
 	public ResponseDTO execute() {
 		try {
 

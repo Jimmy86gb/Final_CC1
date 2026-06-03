@@ -9,35 +9,18 @@ import co.edu.udistrital.model.repositories.ReportRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 
-/**
- * Clase encargada de ejecutar el caso de uso de devolucion de lista de reportes
- * que estan para confirmar con la opcion de solo confirmar el elemento de
- * encima
- *
- * @author Juan David Diaz Perez
- */
+
 public class GetToConfirmReportsUseCase {
 
-	/**
-	 * Instancia privada del repositorio de memoria de reportes
-	 */
+	
 	private final ReportRepository reportRepository;
 
-	/**
-	 * Constructor que inyecta dentro del caso de uso el repositorio de reportes
-	 * 
-	 * @param reportRepository Repositorio de reportes
-	 */
+	
 	public GetToConfirmReportsUseCase(ReportRepository reportRepository) {
 		this.reportRepository = reportRepository;
 	}
 
-	/**
-	 * Metodo encargado de retornar la lista de la pila a la vista. Solo el reporte
-	 * en el tope se podra confirmar
-	 * 
-	 * @return Lista basada en ReportDTO
-	 */
+	
 	public SimpleList<ReportDTO> execute() {
 
 		SimpleList<ReportDTO> resultList = new SimpleList<ReportDTO>();

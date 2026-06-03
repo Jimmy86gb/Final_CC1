@@ -1,13 +1,6 @@
 package co.edu.udistrital.model.enums;
 
-/**
- * Enum que representa las diferentes zonas de operación
- * disponibles dentro del sistema. Corresponden a las localidades
- * del Distrito Capital de Bogotá donde pueden prestarse servicios.
- * Cada zona posee un nombre descriptivo para su visualización.
- * 
- * @author ChrZ
- */
+
 public enum OperationZone {
 
 	USAQUEN("Usaquen"),
@@ -33,20 +26,12 @@ public enum OperationZone {
 
 	private final String displayName;
 
-	/**
-	 * Constructor del enum.
-	 *
-	 * @param displayName Nombre descriptivo asociado a la zona de operación.
-	 */
+	
 	private OperationZone(String displayName) {
 		this.displayName = displayName;
 	}
 
-	/**
-	 * Obtiene el nombre descriptivo de la zona de operación.
-	 *
-	 * @return El nombre para visualización de la zona.
-	 */
+	
 	public String getDisplayName() {
 		return displayName;
 	}
