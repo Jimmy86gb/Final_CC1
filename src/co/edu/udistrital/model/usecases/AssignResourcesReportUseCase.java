@@ -3,13 +3,16 @@ package co.edu.udistrital.model.usecases;
 import java.util.UUID;
 
 import co.edu.udistrital.model.dtos.ResponseDTO;
+import co.edu.udistrital.model.entities.ActionRecord;
 import co.edu.udistrital.model.entities.Kit;
 import co.edu.udistrital.model.entities.Report;
 import co.edu.udistrital.model.entities.ServiceUnit;
 import co.edu.udistrital.model.entities.Technician;
+import co.edu.udistrital.model.enums.ActionType;
 import co.edu.udistrital.model.enums.ReportStatus;
 import co.edu.udistrital.model.enums.TechnicianStatus;
 import co.edu.udistrital.model.enums.UnitStatus;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.KitRepository;
 import co.edu.udistrital.model.repositories.ReportRepository;
 import co.edu.udistrital.model.repositories.ServiceUnitRepository;
@@ -28,6 +31,7 @@ public class AssignResourcesReportUseCase {
 	 * Instancia privada del repositorio de memoria de reportes
 	 */
 	private final ReportRepository reportRepository;
+	private final ActionLogRepository logRepo;
 
 	/**
 	 * Instancia privada del repositorio de memoria de tecnicos
@@ -54,11 +58,12 @@ public class AssignResourcesReportUseCase {
 	 * @param kitRepository         Repositorio de kits
 	 */
 	public AssignResourcesReportUseCase(ReportRepository reportRepository, TechnicianRepository technicianRepository,
-			ServiceUnitRepository serviceUnitRepository, KitRepository kitRepository) {
+			ServiceUnitRepository serviceUnitRepository, KitRepository kitRepository, ActionLogRepository logRepo) {
 		this.reportRepository = reportRepository;
 		this.technicianRepository = technicianRepository;
 		this.serviceUnitRepository = serviceUnitRepository;
 		this.kitRepository = kitRepository;
+		this.logRepo = logRepo;
 	}
 
 	/**
@@ -109,9 +114,12 @@ public class AssignResourcesReportUseCase {
 			targetReport.setAssignedKit(selectedKit);
 			targetReport.setStatus(ReportStatus.ON_GOING);
 
-			reportRepository.pushToOnProgress(targetReport);
+		logRepo.logAction(new ActionRecord("Despacho de emergencia: " + targetReport.getTicketID(),
+				ActionType.DISPATCH_REPORT, targetReport.getTicketID().toString()));
 
-			return new ResponseDTO(true, "Siniestro asignado exitosamente. Los recursos han sido despachados.");
+		reportRepository.pushToOnProgress(targetReport);
+
+		return new ResponseDTO(true, "Siniestro asignado exitosamente. Los recursos han sido despachados.");
 
 		} catch (IllegalArgumentException e) {
 			return new ResponseDTO(false, "Uno o más identificadores seleccionados tienen un formato inválido.");

@@ -3,11 +3,14 @@ package co.edu.udistrital.model.usecases;
 import java.util.UUID;
 
 import co.edu.udistrital.model.dtos.ResponseDTO;
+import co.edu.udistrital.model.entities.ActionRecord;
 import co.edu.udistrital.model.entities.Kit;
+import co.edu.udistrital.model.enums.ActionType;
 import co.edu.udistrital.model.enums.KitFactory;
 import co.edu.udistrital.model.enums.KitType;
 import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.enums.UnitStatusFactory;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.KitRepository;
 
 /**
@@ -32,14 +35,16 @@ public class UpdateKitUseCase {
 	 * Instancia del repositorio que maneja la memoria de los kits
 	 */
 	private final KitRepository kitRepository;
+	private final ActionLogRepository logRepo;
 
 	/**
 	 * Constructor que inyecta el repositorio de kits
 	 * 
 	 * @param kitRepository Repositorio de memoria de kits
 	 */
-	public UpdateKitUseCase(KitRepository kitRepository) {
+	public UpdateKitUseCase(KitRepository kitRepository, ActionLogRepository logRepo) {
 		this.kitRepository = kitRepository;
+		this.logRepo = logRepo;
 	}
 
 	/**
@@ -64,6 +69,10 @@ public class UpdateKitUseCase {
 				return new ResponseDTO(false,
 						"El kit no se encontró en el sistema. Es posible que haya sido eliminado.");
 			}
+
+			logRepo.logAction(new ActionRecord("Actualización de Kit: " + actualKit.getId().toString().substring(0, 8),
+					ActionType.UPDATE_KIT, actualKit.getId().toString(), actualKit.getType().name(),
+					actualKit.getStatus().name()));
 
 			boolean goesToMaintenance = (actualKit.getStatus() == UnitStatus.AVAILABLE
 					&& requestedStatus == UnitStatus.MAINTENANCE);

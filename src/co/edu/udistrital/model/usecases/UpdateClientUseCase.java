@@ -1,9 +1,12 @@
 package co.edu.udistrital.model.usecases;
 
 import co.edu.udistrital.model.dtos.ResponseDTO;
+import co.edu.udistrital.model.entities.ActionRecord;
 import co.edu.udistrital.model.entities.Client;
+import co.edu.udistrital.model.enums.ActionType;
 import co.edu.udistrital.model.enums.ClientFactory;
 import co.edu.udistrital.model.enums.ClientType;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.ClientRepository;
 
 /**
@@ -25,12 +28,18 @@ public class UpdateClientUseCase {
 	private final ClientRepository clientRepository;
 
 	/**
+	 * Repositorio global de historial de acciones (Memento)
+	 */
+	private final ActionLogRepository logRepo;
+
+	/**
 	 * Constructor que inyecta el repositorio de clientes al caso de uso
 	 * 
 	 * @param clientRepository Repositorio de clientes
 	 */
-	public UpdateClientUseCase(ClientRepository clientRepository) {
+	public UpdateClientUseCase(ClientRepository clientRepository, ActionLogRepository logRepo) {
 		this.clientRepository = clientRepository;
+		this.logRepo = logRepo;
 	}
 
 	/**
@@ -53,6 +62,10 @@ public class UpdateClientUseCase {
 				return new ResponseDTO(false,
 						"El cliente no se encontró en el sistema. Es posible que haya sido eliminado.");
 			}
+
+			logRepo.logAction(new ActionRecord("Modificación de Cliente: " + actualClient.getName(),
+				ActionType.UPDATE_CLIENT, actualClient.getId(), actualClient.getName(),
+				actualClient.getType().name(), actualClient.getContactInfo()));
 
 			Client newClient = new Client(id, name, clientType, contact);
 

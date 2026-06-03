@@ -3,13 +3,16 @@ package co.edu.udistrital.model.usecases;
 import java.util.UUID;
 
 import co.edu.udistrital.model.dtos.ResponseDTO;
+import co.edu.udistrital.model.entities.ActionRecord;
 import co.edu.udistrital.model.entities.Technician;
+import co.edu.udistrital.model.enums.ActionType;
 import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.TechnicianFactory;
 import co.edu.udistrital.model.enums.TechnicianSpecialty;
 import co.edu.udistrital.model.enums.TechnicianStatus;
 import co.edu.udistrital.model.enums.TechnicianStatusFactory;
 import co.edu.udistrital.model.enums.ZoneFactory;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.TechnicianRepository;
 
 /**
@@ -41,12 +44,18 @@ public class UpdateTechnicianUseCase {
 	private final TechnicianRepository technicianRepository;
 
 	/**
+	 * Repositorio global de historial de acciones (Memento)
+	 */
+	private final ActionLogRepository logRepo;
+
+	/**
 	 * Constructor que inyecta el repositorio centralizado del sistema
 	 * 
 	 * @param technicianRepository El DAO de técnicos instanciado en el sistema
 	 */
-	public UpdateTechnicianUseCase(TechnicianRepository technicianRepository) {
+	public UpdateTechnicianUseCase(TechnicianRepository technicianRepository, ActionLogRepository logRepo) {
 		this.technicianRepository = technicianRepository;
+		this.logRepo = logRepo;
 	}
 
 	/**
@@ -74,6 +83,11 @@ public class UpdateTechnicianUseCase {
 				return new ResponseDTO(false,
 						"El tecnico no se encontró en el sistema. Es posible que haya sido eliminado.");
 			}
+
+			logRepo.logAction(new ActionRecord("Actualización de Técnico: " + actualTechnician.getName(),
+				ActionType.UPDATE_TECHNICIAN, actualTechnician.getId().toString(), actualTechnician.getName(),
+				actualTechnician.getSpecialty().name(), actualTechnician.getZone().name(),
+				actualTechnician.getStatus().name()));
 
 			Technician newTechnician = new Technician(name, technicianSpecialty, operationZone, technicianStatus);
 

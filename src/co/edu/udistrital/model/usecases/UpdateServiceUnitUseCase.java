@@ -2,13 +2,16 @@ package co.edu.udistrital.model.usecases;
 
 import java.util.UUID;
 import co.edu.udistrital.model.dtos.ResponseDTO;
+import co.edu.udistrital.model.entities.ActionRecord;
 import co.edu.udistrital.model.entities.ServiceUnit;
+import co.edu.udistrital.model.enums.ActionType;
 import co.edu.udistrital.model.enums.OperationZone;
 import co.edu.udistrital.model.enums.UnitFactory;
 import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.enums.UnitStatusFactory;
 import co.edu.udistrital.model.enums.UnitType;
 import co.edu.udistrital.model.enums.ZoneFactory;
+import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.ServiceUnitRepository;
 
 /**
@@ -21,9 +24,11 @@ public class UpdateServiceUnitUseCase {
 	private final ZoneFactory zoneFactory = new ZoneFactory();
 	private final UnitStatusFactory unitStatusFactory = new UnitStatusFactory();
 	private final ServiceUnitRepository serviceUnitRepository;
+	private final ActionLogRepository logRepo;
 
-	public UpdateServiceUnitUseCase(ServiceUnitRepository serviceUnitRepository) {
+	public UpdateServiceUnitUseCase(ServiceUnitRepository serviceUnitRepository, ActionLogRepository logRepo) {
 		this.serviceUnitRepository = serviceUnitRepository;
+		this.logRepo = logRepo;
 	}
 
 	public ResponseDTO execute(String id, String type, String status, String zone) {
@@ -38,6 +43,11 @@ public class UpdateServiceUnitUseCase {
 			if (actualServiceUnit == null) {
 				return new ResponseDTO(false, "La unidad de servicio no se encontró en el sistema.");
 			}
+
+			logRepo.logAction(new ActionRecord("Actualización de Unidad: "
+					+ actualServiceUnit.getId().toString().substring(0, 8), ActionType.UPDATE_UNIT,
+					actualServiceUnit.getId().toString(), actualServiceUnit.getType().name(),
+					actualServiceUnit.getStatus().name(), actualServiceUnit.getZone().name()));
 
 			// CORRECCIÓN CRÍTICA: Cualquier cambio de estado requiere confirmación del admin.
 			// Si el operador solo cambió la zona, se actualiza directamente.
