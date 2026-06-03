@@ -42,7 +42,7 @@ public class GetSortedAndFilteredServiceUnitsUseCase {
 
 		UnitType[] typeOrder = { UnitType.MOTORCYCLE, UnitType.CAR, UnitType.TRUCK, UnitType.CRANE };
 
-		UnitStatus[] statusOrder = { UnitStatus.AVAILABLE, UnitStatus.MAINTENANCE, UnitStatus.ASSIGNED };
+		UnitStatus[] statusOrder = { UnitStatus.AVAILABLE, UnitStatus.MAINTENANCE, UnitStatus.ASSIGNED, UnitStatus.INACTIVE };
 
 		for (int i = 0; i < typeOrder.length; i++) {
 			for (int j = 0; j < statusOrder.length; j++) {

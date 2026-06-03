@@ -1,7 +1,6 @@
 package co.edu.udistrital.model.usecases;
 
 import java.util.UUID;
-
 import co.edu.udistrital.model.dtos.ResponseDTO;
 import co.edu.udistrital.model.entities.ServiceUnit;
 import co.edu.udistrital.model.enums.OperationZone;
@@ -13,96 +12,57 @@ import co.edu.udistrital.model.enums.ZoneFactory;
 import co.edu.udistrital.model.repositories.ServiceUnitRepository;
 
 /**
- * Clase de caso de uso que se encarga de actualizar la informacion de las
- * unidades de servicio recibidas desde la vista
- *
- * @author Juan David Diaz Perez
+ * Caso de uso que actualiza la información de las unidades de servicio.
+ * Delega los cambios de estado a la pila de confirmación del administrador.
  */
 public class UpdateServiceUnitUseCase {
 
-	/**
-	 * Instancia privada del factory del tipo de unidad
-	 */
 	private final UnitFactory unitFactory = new UnitFactory();
-
-	/**
-	 * Instancia privada del factory de la zona de la unidad
-	 */
 	private final ZoneFactory zoneFactory = new ZoneFactory();
-
-	/**
-	 * Instancia privada del factory de el status de la unidad
-	 */
 	private final UnitStatusFactory unitStatusFactory = new UnitStatusFactory();
-
-	/**
-	 * Instancia del repositorio que manneja la memoria de las unidades de servicio
-	 */
 	private final ServiceUnitRepository serviceUnitRepository;
 
-	/**
-	 * Constructor del caso de uso que inyecta el repositorio de unidades de
-	 * servicio
-	 * 
-	 * @param serviceUnitRepository Repositorio de unidades de servicio
-	 */
 	public UpdateServiceUnitUseCase(ServiceUnitRepository serviceUnitRepository) {
 		this.serviceUnitRepository = serviceUnitRepository;
 	}
 
-	/**
-	 * Metodo que ejecuta el caso de uso de actualizacion de datos de la unidad de
-	 * servicio y almacena en stack de confirmacion si es un cambio de estados
-	 * manual
-	 * 
-	 * @param idServiceUnit ID de ambas unidades de servicio
-	 * @param type          Tipo de ambas unidades de servicio
-	 * @param status        Nuevo status de la unidad de servicio
-	 * @param zone          Nueva zona de la unidad de servicio
-	 * @return DTO con respuesta para implementar en la vista
-	 */
-	public ResponseDTO execute(String idServiceUnit, String type, String status, String zone) {
+	public ResponseDTO execute(String id, String type, String status, String zone) {
 		try {
-
-			UUID id = UUID.fromString(idServiceUnit);
-
+			UUID unitId = UUID.fromString(id);
 			UnitType unitType = unitFactory.generateUnitType(type);
 			OperationZone operationZone = zoneFactory.generateOperationZone(zone);
 			UnitStatus requestedStatus = unitStatusFactory.generateUnitStatus(status);
 
-			ServiceUnit actualServiceUnit = serviceUnitRepository.getServiceUnitByID(id);
+			ServiceUnit actualServiceUnit = serviceUnitRepository.getServiceUnitByID(unitId);
 
 			if (actualServiceUnit == null) {
-				return new ResponseDTO(false,
-						"La unidad de servicio no se encontró en el sistema. Es posible que haya sido eliminada.");
+				return new ResponseDTO(false, "La unidad de servicio no se encontró en el sistema.");
 			}
 
-			boolean requiresConfirmation = (actualServiceUnit.getStatus() == UnitStatus.AVAILABLE
-					&& requestedStatus == UnitStatus.MAINTENANCE)
-					|| (actualServiceUnit.getStatus() == UnitStatus.MAINTENANCE
-							&& requestedStatus == UnitStatus.AVAILABLE)
-					|| (requestedStatus == UnitStatus.INACTIVE);
+			// CORRECCIÓN CRÍTICA: Cualquier cambio de estado requiere confirmación del admin.
+			// Si el operador solo cambió la zona, se actualiza directamente.
+			boolean requiresConfirmation = (actualServiceUnit.getStatus() != requestedStatus);
 
+			// Si requiere confirmación, la lista principal conserva el estado original momentáneamente.
 			UnitStatus statusForMainList = requiresConfirmation ? actualServiceUnit.getStatus() : requestedStatus;
 
 			ServiceUnit updatedUnitForMainList = new ServiceUnit(unitType, statusForMainList, operationZone);
-			updatedUnitForMainList.setId(id);
+			updatedUnitForMainList.setId(unitId);
 
 			boolean isUpdated = serviceUnitRepository.update(actualServiceUnit, updatedUnitForMainList);
 
 			if (isUpdated) {
-
 				if (requiresConfirmation) {
-
+					// Enviar el borrador con el nuevo estado a la pila LIFO
 					ServiceUnit unitForConfirmation = new ServiceUnit(unitType, requestedStatus, operationZone);
-					unitForConfirmation.setId(id);
+					unitForConfirmation.setId(unitId);
 					serviceUnitRepository.pushToConfirm(unitForConfirmation);
 
-					return new ResponseDTO(true, "Datos generales actualizados. El cambio de estado a "
-							+ requestedStatus.name() + " fue enviado a la pila de confirmación.");
+					return new ResponseDTO(true, "Datos guardados. El cambio de estado a "
+							+ requestedStatus.getDisplayName() + " fue enviado a la pila de confirmación.");
 				}
 
-				return new ResponseDTO(true, "La información de la unidad de servicio fue actualizada exitosamente.");
+				return new ResponseDTO(true, "La zona de la unidad de servicio fue actualizada exitosamente.");
 			} else {
 				return new ResponseDTO(false, "No se pudo actualizar la información de la unidad de servicio.");
 			}
@@ -110,8 +70,7 @@ public class UpdateServiceUnitUseCase {
 		} catch (IllegalArgumentException e) {
 			return new ResponseDTO(false, "Datos inválidos: " + e.getMessage());
 		} catch (Exception e) {
-			return new ResponseDTO(false,
-					"Ocurrió un error inesperado al actualizar los datos de la unidad de servicio.");
+			return new ResponseDTO(false, "Ocurrió un error inesperado al actualizar la unidad de servicio.");
 		}
 	}
 }

@@ -123,16 +123,8 @@ public class KitsView {
                 actions.getChildren().addAll(btnReturn, btnRetire);
             }
         } 
-        // 2. LÓGICA DE ACTIVACIÓN / MANTENIMIENTO MANUAL
+        // 2. LÓGICA DE ACTIVACIÓN 
         else {
-            // Todos pueden enviar a mantenimiento si está disponible
-            if(kit.getStatus().equalsIgnoreCase("Disponible")) {
-                Button btnMaint = new Button("Mantenimiento");
-                btnMaint.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand;");
-                btnMaint.setOnAction(e -> appController.updateKitToMaintenance(kit.getId().toString(), kit.getType()));
-                actions.getChildren().add(btnMaint);
-            }
-
             // ADMIN controla el Toggle de Activar/Desactivar
             if (role.equals("ADMIN")) {
                 boolean isAvailable = kit.getStatus().equalsIgnoreCase("Disponible");

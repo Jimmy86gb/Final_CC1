@@ -39,7 +39,7 @@ public class GetSortedAndFilteredKitsUseCase {
 	private SimpleList<Kit> buildOrderedList() {
 		SimpleList<Kit> orderedList = new SimpleList<Kit>();
 
-		UnitStatus[] statusOrder = { UnitStatus.AVAILABLE, UnitStatus.ASSIGNED, UnitStatus.MAINTENANCE };
+		UnitStatus[] statusOrder = { UnitStatus.AVAILABLE, UnitStatus.ASSIGNED, UnitStatus.MAINTENANCE, UnitStatus.INACTIVE };
 
 		for (int i = 0; i < statusOrder.length; i++) {
 
