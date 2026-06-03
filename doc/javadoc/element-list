@@ -1,0 +1,9 @@
+co.edu.udistrital.controller
+co.edu.udistrital.model.dtos
+co.edu.udistrital.model.entities
+co.edu.udistrital.model.enums
+co.edu.udistrital.model.repositories
+co.edu.udistrital.model.structures
+co.edu.udistrital.model.usecases
+co.edu.udistrital.model.utils
+co.edu.udistrital.view
