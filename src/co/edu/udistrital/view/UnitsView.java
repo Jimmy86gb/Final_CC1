@@ -12,6 +12,13 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 
+/**
+ * Clase encargada de la representacion visual de las unidades de servicio.
+ * Implementa una interfaz dividida en paneles para diferenciar las unidades activas
+ * de aquellas que requieren aprobacion administrativa tras una solicitud de cambio.
+ * Gestiona el registro de nuevas unidades y la interaccion de roles (Operador/Admin).
+ * * @author Jimmy86gb
+ */
 public class UnitsView {
     private VBox rootContainer;
     private VBox activeContainer;
@@ -19,6 +26,12 @@ public class UnitsView {
     private UnitsController controller;
     private String role;
 
+    /**
+     * Constructor de la vista de unidades.
+     * Configura el layout principal, inicializa los contenedores de scroll y 
+     * añade el boton de registro de nuevas unidades.
+     * * @param role Perfil de seguridad para habilitar o restringir acciones administrativas.
+     */
     public UnitsView(String role) {
     	this.role = role;
         rootContainer = new VBox(25);
@@ -30,7 +43,6 @@ public class UnitsView {
         Label lblTitle = new Label("Control de Unidades de Servicio");
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
         
-        // BOTÓN RESTAURADO
         Button btnNewUnit = new Button("+ Registrar Unidad");
         btnNewUnit.setStyle("-fx-background-color: #2563EB; -fx-text-fill: white; -fx-padding: 8 16; -fx-cursor: hand;");
         btnNewUnit.setOnAction(e -> showAddUnitDialog());
@@ -44,7 +56,7 @@ public class UnitsView {
         pendingContainer = new VBox(12);
         
         VBox colActive = createColumn("✅ Unidades Activas", "#DBEAFE", activeContainer);
-        VBox colPending = createColumn("⏳ Cambios Pendientes (Aprobación Admin)", "#FEF3C7", pendingContainer);
+        VBox colPending = createColumn("⏳ Cambios Pendientes (Aprobacion Admin)", "#FEF3C7", pendingContainer);
         
         columnsContainer.getChildren().addAll(colActive, colPending);
         HBox.setHgrow(colActive, Priority.ALWAYS);
@@ -54,8 +66,19 @@ public class UnitsView {
         VBox.setVgrow(columnsContainer, Priority.ALWAYS);
     }
 
+    /**
+     * Inyecta el controlador asociado a esta vista.
+     * * @param controller Instancia de UnitsController.
+     */
     public void setController(UnitsController controller) { this.controller = controller; }
 
+    /**
+     * Metodo factoria para generar columnas de datos estandarizadas con scroll interno.
+     * * @param title Titulo de la columna.
+     * @param bgColor Color de fondo en hexadecimal.
+     * @param internalContainer Contenedor hijo donde se añadiran las tarjetas.
+     * @return Contenedor VBox con la estructura completa.
+     */
     private VBox createColumn(String title, String bgColor, VBox internalContainer) {
         VBox col = new VBox(15);
         col.setPadding(new Insets(15));
@@ -78,11 +101,21 @@ public class UnitsView {
         return col;
     }
 
+    /**
+     * Limpia ambos contenedores (activos y pendientes) para recargar datos frescos.
+     */
     public void clearTable() {
         activeContainer.getChildren().clear();
         pendingContainer.getChildren().clear();
     }
 
+    /**
+     * Renderiza una tarjeta informativa de la unidad de servicio.
+     * Aplica logica de seguridad para mostrar botones de edicion solo al operador 
+     * o botones de aprobacion solo al administrador.
+     * * @param unit Objeto DTO con los datos de la unidad.
+     * @param isPending Indica si la unidad esta en la cola de aprobacion.
+     */
     public void addUnit(ServiceUnitDTO unit, boolean isPending) {
         VBox card = new VBox(8);
         card.setPadding(new Insets(15));
@@ -91,7 +124,7 @@ public class UnitsView {
         Label lblId = new Label("ID: " + unit.getId().toString().substring(0, 8));
         lblId.setFont(Font.font("Consolas", 11));
         
-        Label lblType = new Label("Vehículo: " + unit.getType());
+        Label lblType = new Label("Vehiculo: " + unit.getType());
         lblType.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
         
         Label lblStatus = new Label("Estado: " + unit.getStatus());
@@ -104,7 +137,6 @@ public class UnitsView {
         btnCopy.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(unit.getId().toString()); }}));
         actions.getChildren().add(btnCopy);
 
-        // Operador Solicita Cambio
         if (!isPending && role.equals("OPERATOR")) {
             Button btnEdit = new Button("✏️ Solicitar Cambio");
             btnEdit.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand;");
@@ -112,7 +144,6 @@ public class UnitsView {
             actions.getChildren().add(btnEdit);
         }
 
-        // Administrador Aprueba/Rechaza Cambio
         if (isPending && role.equals("ADMIN")) {
             Button btnApprove = new Button("Aprobar");
             btnApprove.setStyle("-fx-background-color: #10B981; -fx-text-fill: white;");
@@ -131,6 +162,9 @@ public class UnitsView {
         else activeContainer.getChildren().add(card);
     }
     
+    /**
+     * Muestra el dialogo de registro para crear un nuevo grupo de unidades.
+     */
     private void showAddUnitDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Registrar Unidad");
@@ -163,6 +197,13 @@ public class UnitsView {
         });
     }
 
+    /**
+     * Muestra el dialogo de edicion para solicitar cambios de estado o zona.
+     * * @param id UUID de la unidad.
+     * @param currentType Tipo actual.
+     * @param currentStatus Estado actual.
+     * @param currentZone Zona actual.
+     */
     private void showEditUnitDialog(String id, String currentType, String currentStatus, String currentZone) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Solicitar Cambio: " + id.substring(0, 8));
@@ -188,10 +229,14 @@ public class UnitsView {
         dialog.showAndWait().ifPresent(res -> {
             if (res == ButtonType.OK) {
                 controller.updateServiceUnit(id, currentType, statusBox.getValue(), zoneBox.getValue());
-                new Alert(Alert.AlertType.INFORMATION, "Cambio enviado a la pila de aprobación.").showAndWait();
+                new Alert(Alert.AlertType.INFORMATION, "Cambio enviado a la pila de aprobacion.").showAndWait();
             }
         });
     }
 
+    /**
+     * Retorna el contenedor principal.
+     * * @return VBox contenedor.
+     */
     public VBox getView() { return rootContainer; }
 }

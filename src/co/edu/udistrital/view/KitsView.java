@@ -12,6 +12,13 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 
+/**
+ * Clase encargada de la representacion visual del inventario de Kits.
+ * Implementa una interfaz dividida en paneles para distinguir entre la disponibilidad 
+ * operativa de los equipos y la pila de mantenimiento (LIFO). Gestiona la interaccion 
+ * del usuario para el registro, activacion y gestion de recursos tecnicos.
+ * * @author Jimmy86gb
+ */
 public class KitsView {
     private VBox rootContainer;
     private VBox availableContainer;
@@ -19,6 +26,12 @@ public class KitsView {
     private KitsController controller;
     private String role;
 
+    /**
+     * Constructor de la vista de kits.
+     * Configura el diseño de columnas para separar visualmente los kits operativos 
+     * de aquellos que se encuentran en proceso de reparacion o mantenimiento.
+     * * @param role Perfil de seguridad para habilitar o restringir acciones administrativas.
+     */
     public KitsView(String role) {
         this.role = role;
         rootContainer = new VBox(25);
@@ -51,6 +64,15 @@ public class KitsView {
         rootContainer.getChildren().addAll(headerBox, columnsContainer);
     }
 
+    /**
+     * Metodo factoria para generar columnas de datos estandarizadas.
+     * Envuelve el contenedor de datos en un ScrollPane para garantizar la 
+     * navegabilidad cuando el inventario supera el espacio vertical.
+     * * @param title Titulo de la columna.
+     * @param bgColor Color de fondo en hexadecimal.
+     * @param internalContainer Contenedor hijo donde se añadiran las tarjetas.
+     * @return Contenedor VBox con la estructura completa de la columna.
+     */
     private VBox createColumn(String title, String bgColor, VBox internalContainer) {
         VBox col = new VBox(15);
         col.setPadding(new Insets(15));
@@ -73,13 +95,27 @@ public class KitsView {
         return col;
     }
 
+    /**
+     * Inyecta el controlador asociado a esta vista.
+     * * @param controller Instancia de KitsController.
+     */
     public void setController(KitsController controller) { this.controller = controller; }
 
+    /**
+     * Limpia ambos contenedores de la vista para permitir una recarga limpia 
+     * de los datos provenientes del repositorio.
+     */
     public void clearTable() {
         availableContainer.getChildren().clear();
         maintenanceContainer.getChildren().clear();
     }
 
+    /**
+     * Crea y renderiza una tarjeta informativa (card) para un Kit especifico.
+     * Aplica logica de seguridad para habilitar botones de mantenimiento solo 
+     * bajo el patron LIFO y habilita controles de administracion segun el rol.
+     * * @param kit Objeto DTO del kit a visualizar.
+     */
     public void addKit(KitDTO kit) {
         VBox card = new VBox(8);
         card.setPadding(new Insets(15));
@@ -100,10 +136,8 @@ public class KitsView {
         btnCopy.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(kit.getId().toString()); }}));
         actions.getChildren().add(btnCopy);
 
-        // CORRECCIÓN 1: Unificamos la validación del estado para evitar discrepancias de texto
         boolean isMaintenance = kit.getStatus().equalsIgnoreCase("En mantenimiento") || kit.getStatus().equalsIgnoreCase("Mantenimiento");
 
-        // 1. LÓGICA DE MANTENIMIENTO (PILA LIFO)
         if (isMaintenance) {
             if (role.equals("ADMIN")) {
                 Button btnReturn = new Button("Retornar (Pila)");
@@ -114,7 +148,7 @@ public class KitsView {
                 btnRetire.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-cursor: hand;");
                 btnRetire.setOnAction(e -> controller.retireKitFromMaintenance());
                 
-                // CORRECCIÓN 2: Aplicamos la regla LIFO. Si no es el tope, se bloquean los botones.
+                // Regla LIFO estricta: Solo el elemento tope (isEditable) puede salir de la pila
                 if (!kit.isEditable()) {
                     btnReturn.setDisable(true);
                     btnRetire.setDisable(true);
@@ -123,9 +157,7 @@ public class KitsView {
                 actions.getChildren().addAll(btnReturn, btnRetire);
             }
         } 
-        // 2. LÓGICA DE ACTIVACIÓN 
         else {
-            // ADMIN controla el Toggle de Activar/Desactivar
             if (role.equals("ADMIN")) {
                 boolean isAvailable = kit.getStatus().equalsIgnoreCase("Disponible");
                 Button btnToggle = new Button(isAvailable ? "Desactivar" : "Activar");
@@ -141,7 +173,6 @@ public class KitsView {
 
         card.getChildren().addAll(lblId, lblType, lblStatus, actions);
 
-        // CORRECCIÓN 3: Reasignamos el contenedor usando la validación segura
         if (isMaintenance) {
             maintenanceContainer.getChildren().add(card);
         } else {
@@ -149,6 +180,9 @@ public class KitsView {
         }
     }
 
+    /**
+     * Muestra el dialogo para el registro de nuevos lotes de kits en inventario.
+     */
     private void showAddKitDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Registrar Kit");
@@ -163,7 +197,6 @@ public class KitsView {
 
         TextField qtyField = new TextField("1");
 
-        // CORRECCIÓN: Se agrega la fila del Tipo de Kit al GridPane (columna 0 y 1, fila 0)
         grid.add(new Label("Tipo de Kit:"), 0, 0); grid.add(typeBox, 1, 0);
         grid.add(new Label("Cantidad:"), 0, 1);    grid.add(qtyField, 1, 1);
 
@@ -175,11 +208,15 @@ public class KitsView {
                 try { 
                     controller.registerKit(typeBox.getValue(), Integer.parseInt(qtyField.getText())); 
                 } catch (NumberFormatException e) { 
-                    new Alert(Alert.AlertType.ERROR, "Cantidad inválida").show(); 
+                    new Alert(Alert.AlertType.ERROR, "Cantidad invalida").show(); 
                 }
             }
         });
     }
 
+    /**
+     * Retorna el contenedor principal de la vista.
+     * * @return VBox contenedor.
+     */
     public VBox getView() { return rootContainer; }
 }

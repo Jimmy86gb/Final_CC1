@@ -11,6 +11,13 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import co.edu.udistrital.model.structures.SimpleList;
 
+/**
+ * Clase encargada de la renderizacion de la interfaz de gestion de personal tecnico.
+ * Construye dinamicamente una tabla utilizando un GridPane y gestiona los cuadros 
+ * de dialogo necesarios para el registro y actualizacion de datos operativos, 
+ * delegando toda la logica de negocio al controlador de tecnicos.
+ * * @author Jimmy86gb
+ */
 public class TechniciansView {
     private VBox rootContainer;
     private GridPane dataGrid;
@@ -18,6 +25,12 @@ public class TechniciansView {
     private TechniciansController controller;
     private String role;
     
+    /**
+     * Constructor de la vista de tecnicos.
+     * Configura el diseño base, los encabezados de la tabla y aplica restricciones 
+     * de permisos basadas en el rol del usuario (ej. bloquear registro para operadores).
+     * * @param role Perfil de seguridad del usuario autenticado.
+     */
     public TechniciansView(String role) {
         this.role = role;
         rootContainer = new VBox(25);
@@ -26,13 +39,14 @@ public class TechniciansView {
         HBox headerBox = new HBox();
         headerBox.setAlignment(Pos.CENTER_LEFT);
         
-        Label lblTitle = new Label("Gestión de Técnicos");
+        Label lblTitle = new Label("Gestion de Tecnicos");
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
         
-        Button btnNewTechnician = new Button("+ Registrar Técnico");
+        Button btnNewTechnician = new Button("+ Registrar Tecnico");
         btnNewTechnician.setStyle("-fx-background-color: #8B5CF6; -fx-text-fill: white; -fx-padding: 8 16; -fx-cursor: hand;");
         btnNewTechnician.setOnAction(e -> showAddTechnicianDialog());
         
+        // Bloqueo de funcionalidad administrativa segun rol
         if (role.equals("ADMIN")) btnNewTechnician.setDisable(true);
 
         Region spacer = new Region();
@@ -58,8 +72,17 @@ public class TechniciansView {
         rootContainer.getChildren().addAll(headerBox, tableContainer);
     }
 
+    /**
+     * Inyecta el controlador correspondiente para manejar las interacciones.
+     * * @param controller Instancia de TechniciansController.
+     */
     public void setController(TechniciansController controller) { this.controller = controller; }
 
+    /**
+     * Auxiliar para añadir los encabezados a la cuadricula de datos.
+     * * @param text Titulo de la celda.
+     * @param col Indice de la columna.
+     */
     private void addHeaderCell(String text, int col) {
         Label lbl = new Label(text);
         lbl.setFont(Font.font("Segoe UI", FontWeight.BOLD, 14));
@@ -67,11 +90,24 @@ public class TechniciansView {
         dataGrid.add(lbl, col, 0);
     }
 
+    /**
+     * Limpia todas las filas de la tabla excepto la cabecera, restableciendo 
+     * el contador de filas para la siguiente carga.
+     */
     public void clearTable() {
         dataGrid.getChildren().removeIf(node -> GridPane.getRowIndex(node) != null && GridPane.getRowIndex(node) > 0);
         currentRow = 1;
     }
 
+    /**
+     * Añade una fila de datos a la tabla correspondiente a un tecnico.
+     * * @param id UUID del tecnico.
+     * @param name Nombre completo.
+     * @param specialty Especialidad tecnica.
+     * @param status Estado operativo actual.
+     * @param zone Zona de cobertura.
+     * @param isEditable Define si el tecnico puede ser modificado.
+     */
     public void addTechnician(String id, String name, String specialty, String status, String zone, boolean isEditable) {
         dataGrid.add(new Label(id.substring(0, 8)), 0, currentRow);
         dataGrid.add(new Label(name), 1, currentRow);
@@ -85,14 +121,11 @@ public class TechniciansView {
         btnCopy.setStyle("-fx-background-color: white; -fx-border-color: #D1D5DB; -fx-cursor: hand;");
         btnCopy.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(id); }}));
         
-        // Cambio de estado directo (Toggle)
         if (role.equals("OPERATOR") || role.equals("ADMIN")) {
             Button btnToggle = new Button("Editar");
             btnToggle.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white;");
             
-            btnToggle.setOnAction(e -> {
-            	showEditTechnicianDialog(id, name, specialty, zone, status);
-            });
+            btnToggle.setOnAction(e -> showEditTechnicianDialog(id, name, specialty, zone, status));
             actionsBox.getChildren().add(btnToggle);
         }
         
@@ -101,34 +134,39 @@ public class TechniciansView {
         currentRow++;
     }
     
+    /**
+     * Muestra el dialogo emergente para editar los atributos de un tecnico existente.
+     * @param id UUID del tecnico.
+     * @param name Nombre.
+     * @param spec Especialidad.
+     * @param zone Zona.
+     * @param status Estado.
+     */
     private void showEditTechnicianDialog(String id, String name, String spec, String zone, String status) {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Editar Técnico");
+        dialog.setTitle("Editar Tecnico");
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
 
-        // Labels sin edición
         grid.add(new Label("ID: " + id.substring(0,8)), 0, 0);
         grid.add(new Label("Nombre: " + name), 0, 1);
         grid.add(new Label("Especialidad: " + spec), 0, 2);
 
-        // ComboBoxes para editar
         ComboBox<String> statusBox = new ComboBox<>();
-	     // ITERACIÓN MANUAL: Así recorres tu SimpleList de forma segura
-	     SimpleList<String> statusList = controller.getTechnicianStatusLabels();
-	     SimpleList.Iterator<String> sIt = statusList.iterador();
-	     while (sIt.hasNext()) {
-	         statusBox.getItems().add(sIt.Next());
-	     }
-	     statusBox.setValue(status);
-	
-	     ComboBox<String> zoneBox = new ComboBox<>();
-	     SimpleList<String> zoneList = controller.getZoneLabels();
-	     SimpleList.Iterator<String> zIt = zoneList.iterador();
-	     while (zIt.hasNext()) {
-	         zoneBox.getItems().add(zIt.Next());
-	     }
-	     zoneBox.setValue(zone);
+        SimpleList<String> statusList = controller.getTechnicianStatusLabels();
+        SimpleList.Iterator<String> sIt = statusList.iterador();
+        while (sIt.hasNext()) {
+            statusBox.getItems().add(sIt.Next());
+        }
+        statusBox.setValue(status);
+        
+        ComboBox<String> zoneBox = new ComboBox<>();
+        SimpleList<String> zoneList = controller.getZoneLabels();
+        SimpleList.Iterator<String> zIt = zoneList.iterador();
+        while (zIt.hasNext()) {
+            zoneBox.getItems().add(zIt.Next());
+        }
+        zoneBox.setValue(zone);
 
         grid.add(new Label("Estado:"), 0, 3); grid.add(statusBox, 1, 3);
         grid.add(new Label("Zona:"), 0, 4);   grid.add(zoneBox, 1, 4);
@@ -141,9 +179,12 @@ public class TechniciansView {
         });
     }
 
+    /**
+     * Muestra el dialogo emergente para registrar un nuevo tecnico en el sistema.
+     */
     private void showAddTechnicianDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Registrar Técnico");
+        dialog.setTitle("Registrar Tecnico");
         GridPane grid = new GridPane();
         grid.setHgap(10); grid.setVgap(10);
         grid.setPadding(new Insets(20));
@@ -174,5 +215,9 @@ public class TechniciansView {
         });
     }
 
+    /**
+     * Retorna el contenedor principal de la vista.
+     * * @return VBox contenedor.
+     */
     public VBox getView() { return rootContainer; }
 }

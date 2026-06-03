@@ -1,5 +1,6 @@
 package co.edu.udistrital.view;
 
+import co.edu.udistrital.controller.LoginController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -9,11 +10,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 /**
- * Clase que define la vista de autenticacion del sistema.
- * Se encarga de construir los elementos graficos necesarios para la entrada 
- * de credenciales del usuario.
- * 
- * @author Jimmy86gb
+ * Clase encargada de la construccion y renderizado de la interfaz de autenticacion.
+ * Proporciona los campos de entrada para credenciales y el disparador de inicio de sesion,
+ * manteniendo una separacion clara entre los componentes visuales y la logica de control.
+ * * @author Jimmy86gb
  */
 public class LoginView {
     private VBox rootContainer;
@@ -24,8 +24,8 @@ public class LoginView {
 
     /**
      * Constructor de la clase.
-     * Se inicializan los contenedores y los controles de entrada de texto
-     * junto con el boton de acceso mediante los estilos visuales definidos.
+     * Inicializa los contenedores (VBox), define los campos de texto, el campo de 
+     * contrasena enmascarado y el boton de acceso con sus respectivos estilos CSS.
      */
     public LoginView() {
         rootContainer = new VBox(15);
@@ -45,7 +45,7 @@ public class LoginView {
         txtUsername.setMaxWidth(260);
 
         txtPassword = new PasswordField();
-        txtPassword.setPromptText("Contraseña");
+        txtPassword.setPromptText("Contrasena");
         txtPassword.setMaxWidth(260);
 
         btnLogin = new Button("Iniciar sesion");
@@ -59,45 +59,41 @@ public class LoginView {
     }
 
     /**
-     * Retorna la escena de JavaFX que contiene los elementos de la interfaz.
-     * 
-     * @return Objeto de tipo Scene con el diseño del login.
+     * Crea y retorna la escena de JavaFX que contiene la interfaz de usuario.
+     * * @return Objeto Scene con las dimensiones definidas para el login.
      */
     public Scene getScene() { 
         return new Scene(rootContainer, 450, 400); 
     }
 
     /**
-     * Define la accion que se ejecuta al presionar el boton de inicio de sesion.
-     * 
-     * @param action Interfaz funcional Runnable que contiene la logica de validacion.
+     * Define la logica a ejecutar cuando el usuario presiona el boton de inicio.
+     * Utiliza una interfaz funcional (Runnable) para delegar la ejecucion al controlador.
+     * * @param action Logica externa (proveniente del controlador) a ejecutar en el clic.
      */
     public void setOnLoginAction(Runnable action) { 
         btnLogin.setOnAction(e -> action.run()); 
     }
 
     /**
-     * Obtiene el nombre de usuario ingresado en el campo de texto.
-     * 
-     * @return String con el usuario capturado.
+     * Captura el texto ingresado en el campo de usuario.
+     * * @return El nombre de usuario capturado.
      */
     public String getUsername() { 
         return txtUsername.getText(); 
     }
 
     /**
-     * Obtiene la contraseña ingresada en el campo de texto seguro.
-     * 
-     * @return String con la contraseña capturada.
+     * Captura la contrasena ingresada en el campo seguro.
+     * * @return La contrasena capturada como String.
      */
     public String getPassword() { 
         return txtPassword.getText(); 
     }
 
     /**
-     * Muestra un mensaje de error o informacion en la etiqueta correspondiente de la interfaz.
-     *
-     * @param msg Texto del mensaje a visualizar.
+     * Actualiza el feedback visual para el usuario en caso de error de autenticacion.
+     * * @param msg El mensaje descriptivo del fallo o informacion a visualizar.
      */
     public void showMessage(String msg) { 
         lblMessage.setText(msg); 
