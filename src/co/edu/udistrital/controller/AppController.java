@@ -8,8 +8,6 @@ import co.edu.udistrital.model.dtos.ResponseDTO;
 import co.edu.udistrital.model.dtos.ServiceUnitDTO;
 import co.edu.udistrital.model.dtos.SessionDTO;
 import co.edu.udistrital.model.dtos.TechnicianDTO;
-import co.edu.udistrital.model.entities.Client;
-import co.edu.udistrital.model.enums.ProfileType;
 import co.edu.udistrital.model.repositories.ClientRepository;
 import co.edu.udistrital.model.repositories.KitRepository;
 import co.edu.udistrital.model.repositories.ProfileRepository;
@@ -25,6 +23,7 @@ import co.edu.udistrital.model.usecases.GenerateDailyCSVUseCase;
 import co.edu.udistrital.model.usecases.GetAvailableKitsByTypeUseCase;
 import co.edu.udistrital.model.usecases.GetAvailableTechnicianByZoneAndProblemUseCase;
 import co.edu.udistrital.model.usecases.GetAvailableUnitsByZoneUseCase;
+import co.edu.udistrital.model.usecases.GetClientByIDUseCase;
 import co.edu.udistrital.model.usecases.GetClientTypeLabelsUseCase;
 import co.edu.udistrital.model.usecases.GetCriticLevelLabelsUseCase;
 import co.edu.udistrital.model.usecases.GetKitStatusLabelsUseCase;
@@ -97,6 +96,7 @@ public class AppController {
 	private final UpdateClientUseCase updateClientUseCase;
 	private final GetSortedAndFilteredClientsUseCase getSortedClientsUseCase;
 	private final GetClientTypeLabelsUseCase getClientTypeLabelsUseCase;
+	private final GetClientByIDUseCase getClientByIDUseCase;
 
 	private final RegisterTechnicianUseCase registerTechnicianUseCase;
 	private final UpdateTechnicianUseCase updateTechnicianUseCase;
@@ -145,10 +145,7 @@ public class AppController {
 	private final SaveSystemDataUseCase saveSystemDataUseCase;
 	private final LoadSystemDataUseCase loadSystemDataUseCase;
 
-	private ProfileType currentRole;
-	private String roleType;
 	private Stage primaryStage;
-	private final StringBuilder consoleHistory = new StringBuilder("Sistema AutoRescate Iniciado...\n");
 
 	public AppController() {
 		this.clientRepository = new ClientRepository();
@@ -162,6 +159,7 @@ public class AppController {
 		updateClientUseCase = new UpdateClientUseCase(clientRepository);
 		getSortedClientsUseCase = new GetSortedAndFilteredClientsUseCase(clientRepository);
 		getClientTypeLabelsUseCase = new GetClientTypeLabelsUseCase();
+		getClientByIDUseCase = new GetClientByIDUseCase(clientRepository);
 
 		registerTechnicianUseCase = new RegisterTechnicianUseCase(technicianRepository);
 		updateTechnicianUseCase = new UpdateTechnicianUseCase(technicianRepository);
@@ -230,8 +228,7 @@ public class AppController {
 		loginView.setOnLoginAction(() -> {
 			SessionDTO session = loginUseCase.execute(loginView.getUsername(), loginView.getPassword());
 			if (session.isSuccess()) {
-				logAction("SESION INICIADA: " + session.getRole());
-				initializeSystem(ProfileType.valueOf(session.getRole()));
+				initializeSystem(session.getRole());
 			} else {
 				loginView.showMessage(session.getMessage());
 			}
@@ -248,17 +245,15 @@ public class AppController {
 		saveSystemDataUseCase.execute();
 	}
 
-	private void initializeSystem(ProfileType role) {
-		this.currentRole = role;
-		roleType = (role == ProfileType.ADMIN) ? "ADMIN" : "OPERATOR";
+	private void initializeSystem(String role) {
 
-		mainView = new MainView(roleType);
-		dashboardView = new DashboardView(roleType, this);
-		requestsView = new RequestsView(roleType);
-		unitsView = new UnitsView(roleType);
-		techniciansView = new TechniciansView(roleType);
-		kitsView = new KitsView(roleType);
-		clientsView = new ClientsView(roleType);
+		mainView = new MainView(role);
+		dashboardView = new DashboardView(role, this);
+		requestsView = new RequestsView(role);
+		unitsView = new UnitsView(role);
+		techniciansView = new TechniciansView(role);
+		kitsView = new KitsView(role);
+		clientsView = new ClientsView(role);
 
 		mainView.setNavigationController(this);
 		clientsView.setController(this);
@@ -267,105 +262,75 @@ public class AppController {
 		techniciansView.setController(this);
 		requestsView.setController(this);
 
-        refreshAllViews();
-        primaryStage.setScene(mainView.getScene());
-        primaryStage.centerOnScreen();
-    }
+		refreshAllViews();
+		primaryStage.setScene(mainView.getScene());
+		primaryStage.centerOnScreen();
+	}
 
-    public void performUndo() {
-    	
-        if (currentRole != ProfileType.ADMIN) {
-            showNotification(false, "Acceso denegado: Solo Administradores pueden revertir operaciones.");
-            return;
-        }
-        
-        ResponseDTO res = undoReportResourcesUseCase.execute();
-        
-        if (res.isSuccess()) {
-            handleResponse(res, this::refreshAllViews);
-            return;
-        }
-        
-        res = rejectReportActionUseCase.execute();
-        
-        if (res.isSuccess()) {
-            handleResponse(res, this::refreshAllViews);
-            return;
-        }
-        
-        res = rejectUnitStatusUseCase.execute();
-        if (res.isSuccess()) {
-            handleResponse(res, this::refreshAllViews);
-            return;
-        }
-        
-        showNotification(false, "No hay operaciones pendientes que se puedan revertir.");
-    }
-    
-    public void registerClient(String id, String name, String type, String contact) {
-        ResponseDTO res = registerClientUseCase.ResponseDTO(id, name, type, contact);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void registerClient(String id, String name, String type, String contact) {
+		ResponseDTO res = registerClientUseCase.ResponseDTO(id, name, type, contact);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void updateClient(String id, String name, String type, String contact) {
-        ResponseDTO res = updateClientUseCase.execute(id, name, type, contact);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void updateClient(String id, String name, String type, String contact) {
+		ResponseDTO res = updateClientUseCase.execute(id, name, type, contact);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void registerTechnician(String name, String specialty, String zone) {
-        ResponseDTO res = registerTechnicianUseCase.execute(name, specialty, zone);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void registerTechnician(String name, String specialty, String zone) {
+		ResponseDTO res = registerTechnicianUseCase.execute(name, specialty, zone);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void updateTechnician(String id, String name, String specialty, String zone, String status) {
-        ResponseDTO res = updateTechnicianUseCase.execute(id, name, specialty, zone, status);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void updateTechnician(String id, String name, String specialty, String zone, String status) {
+		ResponseDTO res = updateTechnicianUseCase.execute(id, name, specialty, zone, status);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void registerUnit(String type, String zone, int quantity) {
-        ResponseDTO res = registerServiceUnitUseCase.execute(type, zone, quantity);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void registerUnit(String type, String zone, int quantity) {
+		ResponseDTO res = registerServiceUnitUseCase.execute(type, zone, quantity);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void updateServiceUnit(String id, String type, String status, String zone) {
-        ResponseDTO res = updateServiceUnitUseCase.execute(id, type, status, zone);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void updateServiceUnit(String id, String type, String status, String zone) {
+		ResponseDTO res = updateServiceUnitUseCase.execute(id, type, status, zone);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void approveUnitStatus() {
-        ResponseDTO res = approveUnitStatusUseCase.execute();
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void approveUnitStatus() {
+		ResponseDTO res = approveUnitStatusUseCase.execute();
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void rejectUnitStatus() {
-        ResponseDTO res = rejectUnitStatusUseCase.execute();
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void rejectUnitStatus() {
+		ResponseDTO res = rejectUnitStatusUseCase.execute();
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void registerKit(String type, int quantity) {
-        ResponseDTO res = registerKitUseCase.execute(type, quantity);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void registerKit(String type, int quantity) {
+		ResponseDTO res = registerKitUseCase.execute(type, quantity);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void updateKitToMaintenance(String id, String type) {
-        ResponseDTO res = updateKitUseCase.execute(id, type, "Mantenimiento");
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void updateKitToMaintenance(String id, String type) {
+		ResponseDTO res = updateKitUseCase.execute(id, type, "Mantenimiento");
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void updateKitStatus(String id, String type, String newStatus) {
-        ResponseDTO res = updateKitUseCase.execute(id, type, newStatus);
-        handleResponse(res, this::refreshAllViews);
-    }
-    
-    public void returnKitToService() {
-        ResponseDTO res = returnKitToServiceUseCase.execute();
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void updateKitStatus(String id, String type, String newStatus) {
+		ResponseDTO res = updateKitUseCase.execute(id, type, newStatus);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void retireKitFromMaintenance() {
-        ResponseDTO res = retireKitFromMaintenanceUseCase.execute();
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void returnKitToService() {
+		ResponseDTO res = returnKitToServiceUseCase.execute();
+		handleResponse(res, this::refreshAllViews);
+	}
+
+	public void retireKitFromMaintenance() {
+		ResponseDTO res = retireKitFromMaintenanceUseCase.execute();
+		handleResponse(res, this::refreshAllViews);
+	}
 
 	public SimpleList<String> getZoneLabels() {
 		return getZoneLabelsUseCase.execute();
@@ -454,7 +419,8 @@ public class AppController {
 	}
 
 	public void processNewRequest(String clientId) {
-		Client client = clientRepository.getClientByID(clientId.trim());
+		ClientDTO client = getClientByIDUseCase.execute(clientId);
+
 		if (client == null) {
 			navigateToClients();
 			clientsView.showAddClientDialog(clientId);
@@ -463,50 +429,53 @@ public class AppController {
 		}
 	}
 
-    public void submitReportCreation(String cliId, String desc, String type, String prio, String zone) {
-        ResponseDTO res = registerReportUseCase.execute(cliId, desc, type, prio, zone);
-        handleResponse(res, this::refreshAllViews);
-    }
-    
-    public ReportDTO getNextPendingReport() { return getNextPendingReportUseCase.execute(); }
+	public void submitReportCreation(String cliId, String desc, String type, String prio, String zone) {
+		ResponseDTO res = registerReportUseCase.execute(cliId, desc, type, prio, zone);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void assignReportResources(String techId, String unitId, String kitId) {
-        ResponseDTO res = assignResourcesReportUseCase.execute(techId, unitId, kitId);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public ReportDTO getNextPendingReport() {
+		return getNextPendingReportUseCase.execute();
+	}
 
-    public void finishReport(String ticketId) {
-        ResponseDTO res = finishReportInFieldUseCase.execute(ticketId);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void assignReportResources(String techId, String unitId, String kitId) {
+		ResponseDTO res = assignResourcesReportUseCase.execute(techId, unitId, kitId);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void approveReport() {
-        ResponseDTO res = approveReportActionUseCase.execute();
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void finishReport(String ticketId) {
+		ResponseDTO res = finishReportInFieldUseCase.execute(ticketId);
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void rejectReport() {
-        ResponseDTO res = rejectReportActionUseCase.execute();
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void approveReport() {
+		ResponseDTO res = approveReportActionUseCase.execute();
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void cancelReport(String ticketId) {
-        ResponseDTO res = requestReportCancellationUseCase.execute(ticketId);
-        handleResponse(res, this::refreshAllViews);
-    }
+	public void rejectReport() {
+		ResponseDTO res = rejectReportActionUseCase.execute();
+		handleResponse(res, this::refreshAllViews);
+	}
 
-    public void exportDailyReport() {
-    	handleResponse(generateDailyCSVUseCase.execute(""), () -> {});
-    }
-    
-    public void refreshAllViews() {
-        refreshClientsView();
-        refreshKitsView();
-        refreshUnitsView();
-        refreshTechniciansView();
-        refreshRequestsView();
-        refreshDashboardView();
-    }
+	public void cancelReport(String ticketId) {
+		ResponseDTO res = requestReportCancellationUseCase.execute(ticketId);
+		handleResponse(res, this::refreshAllViews);
+	}
+
+	public void exportDailyReport() {
+		handleResponse(generateDailyCSVUseCase.execute(""), () -> {
+		});
+	}
+
+	public void refreshAllViews() {
+		refreshClientsView();
+		refreshKitsView();
+		refreshUnitsView();
+		refreshTechniciansView();
+		refreshRequestsView();
+		refreshDashboardView();
+	}
 
 	private void refreshDashboardView() {
 		if (dashboardView == null) {
@@ -612,39 +581,32 @@ public class AppController {
 		alert.showAndWait();
 	}
 
-    public void navigateToDashboard()   { mainView.setContent(dashboardView.getView()); }
-    public void navigateToRequests()    { mainView.setContent(requestsView.getView()); }
-    public void navigateToUnits()       { mainView.setContent(unitsView.getView()); }
-    public void navigateToTechnicians() { mainView.setContent(techniciansView.getView()); }
-    public void navigateToKits()        { mainView.setContent(kitsView.getView()); }
-    public void navigateToClients()     { mainView.setContent(clientsView.getView()); }
-    
-    public void logout() {
-        saveSystemDataUseCase.execute();
-        this.currentRole = null;
-        startApplication(this.primaryStage);
-    }
+	public void navigateToDashboard() {
+		mainView.setContent(dashboardView.getView());
+	}
 
-    private void injectSeedData() {
-        System.out.println("--- INYECTANDO DATOS SEMILLA ---");
-        registerClientUseCase.ResponseDTO("102030", "Empresa de Transportes VIP",   "Empresarial", "3001234567");
-        registerClientUseCase.ResponseDTO("405060", "Aseguradora Solidaria",         "Seguros",     "3109876543");
-        registerClientUseCase.ResponseDTO("708090", "Juan Perez",                    "Particular",  "3201112233");
+	public void navigateToRequests() {
+		mainView.setContent(requestsView.getView());
+	}
 
-        registerTechnicianUseCase.execute("Carlos Ramirez",  "OperadordeGrua",          "Kennedy");
-        registerTechnicianUseCase.execute("Julian Perez",    "MecanicoGeneral",          "Suba");
-        registerTechnicianUseCase.execute("Ana Gomez",       "ElectricoAutomotriz",      "Chapinero");
-        registerTechnicianUseCase.execute("Luis Martinez",   "CerrajerodeVehiculos",     "Usaquen");
+	public void navigateToUnits() {
+		mainView.setContent(unitsView.getView());
+	}
 
-        registerServiceUnitUseCase.execute("Grua",      "Kennedy",   2);
-        registerServiceUnitUseCase.execute("Moto",      "Suba",      3);
-        registerServiceUnitUseCase.execute("Camioneta", "Chapinero", 2);
+	public void navigateToTechnicians() {
+		mainView.setContent(techniciansView.getView());
+	}
 
-        registerKitUseCase.execute("KitdeGrua",        3);
-        registerKitUseCase.execute("KitGeneral",       5);
-        registerKitUseCase.execute("KitdeElectricidad",2);
+	public void navigateToKits() {
+		mainView.setContent(kitsView.getView());
+	}
 
-        saveSystemDataUseCase.execute();
-        System.out.println("--- DATOS SEMILLA GUARDADOS ---");
-    }
+	public void navigateToClients() {
+		mainView.setContent(clientsView.getView());
+	}
+
+	public void logout() {
+		saveSystemDataUseCase.execute();
+		startApplication(this.primaryStage);
+	}
 }
