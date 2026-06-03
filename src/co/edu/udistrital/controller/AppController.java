@@ -267,154 +267,105 @@ public class AppController {
 		techniciansView.setController(this);
 		requestsView.setController(this);
 
-		refreshAllViews();
-		primaryStage.setScene(mainView.getScene());
-		primaryStage.centerOnScreen();
-	}
+        refreshAllViews();
+        primaryStage.setScene(mainView.getScene());
+        primaryStage.centerOnScreen();
+    }
 
-	private void logAction(String message) {
-		String entry = "[" + java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"))
-				+ "] " + message;
-		consoleHistory.append(entry).append("\n");
-		if (dashboardView != null) {
-			dashboardView.updateLog(entry);
-		}
-	}
+    public void performUndo() {
+    	
+        if (currentRole != ProfileType.ADMIN) {
+            showNotification(false, "Acceso denegado: Solo Administradores pueden revertir operaciones.");
+            return;
+        }
+        
+        ResponseDTO res = undoReportResourcesUseCase.execute();
+        
+        if (res.isSuccess()) {
+            handleResponse(res, this::refreshAllViews);
+            return;
+        }
+        
+        res = rejectReportActionUseCase.execute();
+        
+        if (res.isSuccess()) {
+            handleResponse(res, this::refreshAllViews);
+            return;
+        }
+        
+        res = rejectUnitStatusUseCase.execute();
+        if (res.isSuccess()) {
+            handleResponse(res, this::refreshAllViews);
+            return;
+        }
+        
+        showNotification(false, "No hay operaciones pendientes que se puedan revertir.");
+    }
+    
+    public void registerClient(String id, String name, String type, String contact) {
+        ResponseDTO res = registerClientUseCase.ResponseDTO(id, name, type, contact);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public String getConsoleHistory() {
-		return consoleHistory.toString();
-	}
+    public void updateClient(String id, String name, String type, String contact) {
+        ResponseDTO res = updateClientUseCase.execute(id, name, type, contact);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void performUndo() {
-		if (currentRole != ProfileType.ADMIN) {
-			showNotification(false, "Acceso denegado: Solo Administradores pueden revertir operaciones.");
-			return;
-		}
-		ResponseDTO res = undoReportResourcesUseCase.execute();
-		if (res.isSuccess()) {
-			logAction("REVERSION On-Going: " + res.getMessage());
-			handleResponse(res, this::refreshAllViews);
-			return;
-		}
-		res = rejectReportActionUseCase.execute();
-		if (res.isSuccess()) {
-			logAction("REVERSION Confirmacion: " + res.getMessage());
-			handleResponse(res, this::refreshAllViews);
-			return;
-		}
-		res = rejectUnitStatusUseCase.execute();
-		if (res.isSuccess()) {
-			logAction("REVERSION Estado Unidad: " + res.getMessage());
-			handleResponse(res, this::refreshAllViews);
-			return;
-		}
-		showNotification(false, "No hay operaciones pendientes que se puedan revertir.");
-	}
+    public void registerTechnician(String name, String specialty, String zone) {
+        ResponseDTO res = registerTechnicianUseCase.execute(name, specialty, zone);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void registerClient(String id, String name, String type, String contact) {
-		ResponseDTO res = registerClientUseCase.ResponseDTO(id, name, type, contact);
-		if (res.isSuccess()) {
-			logAction("CLIENTE REGISTRADO: " + name);
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void updateTechnician(String id, String name, String specialty, String zone, String status) {
+        ResponseDTO res = updateTechnicianUseCase.execute(id, name, specialty, zone, status);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void updateClient(String id, String name, String type, String contact) {
-		ResponseDTO res = updateClientUseCase.execute(id, name, type, contact);
-		if (res.isSuccess()) {
-			logAction("CLIENTE ACTUALIZADO: " + name);
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void registerUnit(String type, String zone, int quantity) {
+        ResponseDTO res = registerServiceUnitUseCase.execute(type, zone, quantity);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void registerTechnician(String name, String specialty, String zone) {
-		ResponseDTO res = registerTechnicianUseCase.execute(name, specialty, zone);
-		if (res.isSuccess()) {
-			logAction("TECNICO REGISTRADO: " + name + " | " + specialty);
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void updateServiceUnit(String id, String type, String status, String zone) {
+        ResponseDTO res = updateServiceUnitUseCase.execute(id, type, status, zone);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void updateTechnician(String id, String name, String specialty, String zone, String status) {
-		ResponseDTO res = updateTechnicianUseCase.execute(id, name, specialty, zone, status);
-		if (res.isSuccess()) {
-			logAction("TECNICO ACTUALIZADO: " + name + " → Estado: " + status);
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void approveUnitStatus() {
+        ResponseDTO res = approveUnitStatusUseCase.execute();
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void registerUnit(String type, String zone, int quantity) {
-		ResponseDTO res = registerServiceUnitUseCase.execute(type, zone, quantity);
-		if (res.isSuccess()) {
-			logAction("UNIDADES REGISTRADAS: " + quantity + "x " + type + " | Zona: " + zone);
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void rejectUnitStatus() {
+        ResponseDTO res = rejectUnitStatusUseCase.execute();
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void updateServiceUnit(String id, String type, String status, String zone) {
-		ResponseDTO res = updateServiceUnitUseCase.execute(id, type, status, zone);
-		if (res.isSuccess()) {
-			logAction("CAMBIO UNIDAD " + id.substring(0, 8) + " → " + status + " (pendiente aprobacion)");
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void registerKit(String type, int quantity) {
+        ResponseDTO res = registerKitUseCase.execute(type, quantity);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void approveUnitStatus() {
-		ResponseDTO res = approveUnitStatusUseCase.execute();
-		if (res.isSuccess()) {
-			logAction("APROBACION UNIDAD: " + res.getMessage());
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void updateKitToMaintenance(String id, String type) {
+        ResponseDTO res = updateKitUseCase.execute(id, type, "Mantenimiento");
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void rejectUnitStatus() {
-		ResponseDTO res = rejectUnitStatusUseCase.execute();
-		if (res.isSuccess()) {
-			logAction("RECHAZO UNIDAD: Cambio de estado descartado.");
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void updateKitStatus(String id, String type, String newStatus) {
+        ResponseDTO res = updateKitUseCase.execute(id, type, newStatus);
+        handleResponse(res, this::refreshAllViews);
+    }
+    
+    public void returnKitToService() {
+        ResponseDTO res = returnKitToServiceUseCase.execute();
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void registerKit(String type, int quantity) {
-		ResponseDTO res = registerKitUseCase.execute(type, quantity);
-		if (res.isSuccess()) {
-			logAction("KITS REGISTRADOS: " + quantity + "x " + type);
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
-
-	public void updateKitToMaintenance(String id, String type) {
-		ResponseDTO res = updateKitUseCase.execute(id, type, "Mantenimiento");
-		if (res.isSuccess()) {
-			logAction("ESTADO KIT " + id.substring(0, 8) + " → Mantenimiento");
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
-
-	// MÉTODO AGREGADO: Permite el cambio directo Inactivo/Disponible
-	public void updateKitStatus(String id, String type, String newStatus) {
-		ResponseDTO res = updateKitUseCase.execute(id, type, newStatus);
-		if (res.isSuccess()) {
-			logAction("ESTADO KIT " + id.substring(0, 8) + " → " + newStatus);
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
-
-	public void returnKitToService() {
-		ResponseDTO res = returnKitToServiceUseCase.execute();
-		if (res.isSuccess()) {
-			logAction("KIT RETORNADO: Tope de pila de mantenimiento vuelve a servicio.");
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
-
-	public void retireKitFromMaintenance() {
-		ResponseDTO res = retireKitFromMaintenanceUseCase.execute();
-		if (res.isSuccess()) {
-			logAction("KIT DADO DE BAJA: Tope de pila de mantenimiento retirado.");
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void retireKitFromMaintenance() {
+        ResponseDTO res = retireKitFromMaintenanceUseCase.execute();
+        handleResponse(res, this::refreshAllViews);
+    }
 
 	public SimpleList<String> getZoneLabels() {
 		return getZoneLabelsUseCase.execute();
@@ -512,70 +463,50 @@ public class AppController {
 		}
 	}
 
-	public void submitReportCreation(String cliId, String desc, String type, String prio, String zone) {
-		ResponseDTO res = registerReportUseCase.execute(cliId, desc, type, prio, zone);
-		if (res.isSuccess()) {
-			logAction("EMERGENCIA REGISTRADA: Cliente " + cliId + " | Zona: " + zone + " | Prioridad: " + prio);
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void submitReportCreation(String cliId, String desc, String type, String prio, String zone) {
+        ResponseDTO res = registerReportUseCase.execute(cliId, desc, type, prio, zone);
+        handleResponse(res, this::refreshAllViews);
+    }
+    
+    public ReportDTO getNextPendingReport() { return getNextPendingReportUseCase.execute(); }
 
-	public ReportDTO getNextPendingReport() {
-		return getNextPendingReportUseCase.execute();
-	}
+    public void assignReportResources(String techId, String unitId, String kitId) {
+        ResponseDTO res = assignResourcesReportUseCase.execute(techId, unitId, kitId);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void assignReportResources(String techId, String unitId, String kitId) {
-		ResponseDTO res = assignResourcesReportUseCase.execute(techId, unitId, kitId);
-		if (res.isSuccess()) {
-			logAction("ASIGNACION: Tec=" + techId.substring(0, 8) + " | Unidad=" + unitId.substring(0, 8));
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void finishReport(String ticketId) {
+        ResponseDTO res = finishReportInFieldUseCase.execute(ticketId);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void finishReport(String ticketId) {
-		ResponseDTO res = finishReportInFieldUseCase.execute(ticketId);
-		if (res.isSuccess()) {
-			logAction("FINALIZADO: TKT " + ticketId.substring(0, 8) + " → Pila de confirmacion");
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void approveReport() {
+        ResponseDTO res = approveReportActionUseCase.execute();
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void approveReport() {
-		ResponseDTO res = approveReportActionUseCase.execute();
-		if (res.isSuccess()) {
-			logAction("APROBADO: Siniestro cerrado. Recursos liberados.");
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void rejectReport() {
+        ResponseDTO res = rejectReportActionUseCase.execute();
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void rejectReport() {
-		ResponseDTO res = rejectReportActionUseCase.execute();
-		if (res.isSuccess()) {
-			logAction("RECHAZADO: Accion revertida en pila de confirmacion.");
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
+    public void cancelReport(String ticketId) {
+        ResponseDTO res = requestReportCancellationUseCase.execute(ticketId);
+        handleResponse(res, this::refreshAllViews);
+    }
 
-	public void cancelReport(String ticketId) {
-		ResponseDTO res = requestReportCancellationUseCase.execute(ticketId);
-		if (res.isSuccess()) {
-			logAction("CANCELACION SOLICITADA: TKT " + ticketId.substring(0, 8));
-		}
-		handleResponse(res, this::refreshAllViews);
-	}
-
-	public void exportDailyReport() {
-		handleResponse(generateDailyCSVUseCase.execute(""), () -> logAction("REPORTE CSV: Generado con exito."));
-	}
-
-	public void refreshAllViews() {
-		refreshClientsView();
-		refreshKitsView();
-		refreshUnitsView();
-		refreshTechniciansView();
-		refreshRequestsView();
-		refreshDashboardView();
-	}
+    public void exportDailyReport() {
+    	handleResponse(generateDailyCSVUseCase.execute(""), () -> {});
+    }
+    
+    public void refreshAllViews() {
+        refreshClientsView();
+        refreshKitsView();
+        refreshUnitsView();
+        refreshTechniciansView();
+        refreshRequestsView();
+        refreshDashboardView();
+    }
 
 	private void refreshDashboardView() {
 		if (dashboardView == null) {
@@ -681,38 +612,39 @@ public class AppController {
 		alert.showAndWait();
 	}
 
-	public SimpleList<ReportDTO> getPendingReportsQueue() {
-		return getPendingReportsUseCase.execute();
-	}
+    public void navigateToDashboard()   { mainView.setContent(dashboardView.getView()); }
+    public void navigateToRequests()    { mainView.setContent(requestsView.getView()); }
+    public void navigateToUnits()       { mainView.setContent(unitsView.getView()); }
+    public void navigateToTechnicians() { mainView.setContent(techniciansView.getView()); }
+    public void navigateToKits()        { mainView.setContent(kitsView.getView()); }
+    public void navigateToClients()     { mainView.setContent(clientsView.getView()); }
+    
+    public void logout() {
+        saveSystemDataUseCase.execute();
+        this.currentRole = null;
+        startApplication(this.primaryStage);
+    }
 
-	public void navigateToDashboard() {
-		mainView.setContent(dashboardView.getView());
-	}
+    private void injectSeedData() {
+        System.out.println("--- INYECTANDO DATOS SEMILLA ---");
+        registerClientUseCase.ResponseDTO("102030", "Empresa de Transportes VIP",   "Empresarial", "3001234567");
+        registerClientUseCase.ResponseDTO("405060", "Aseguradora Solidaria",         "Seguros",     "3109876543");
+        registerClientUseCase.ResponseDTO("708090", "Juan Perez",                    "Particular",  "3201112233");
 
-	public void navigateToRequests() {
-		mainView.setContent(requestsView.getView());
-	}
+        registerTechnicianUseCase.execute("Carlos Ramirez",  "OperadordeGrua",          "Kennedy");
+        registerTechnicianUseCase.execute("Julian Perez",    "MecanicoGeneral",          "Suba");
+        registerTechnicianUseCase.execute("Ana Gomez",       "ElectricoAutomotriz",      "Chapinero");
+        registerTechnicianUseCase.execute("Luis Martinez",   "CerrajerodeVehiculos",     "Usaquen");
 
-	public void navigateToUnits() {
-		mainView.setContent(unitsView.getView());
-	}
+        registerServiceUnitUseCase.execute("Grua",      "Kennedy",   2);
+        registerServiceUnitUseCase.execute("Moto",      "Suba",      3);
+        registerServiceUnitUseCase.execute("Camioneta", "Chapinero", 2);
 
-	public void navigateToTechnicians() {
-		mainView.setContent(techniciansView.getView());
-	}
+        registerKitUseCase.execute("KitdeGrua",        3);
+        registerKitUseCase.execute("KitGeneral",       5);
+        registerKitUseCase.execute("KitdeElectricidad",2);
 
-	public void navigateToKits() {
-		mainView.setContent(kitsView.getView());
-	}
-
-	public void navigateToClients() {
-		mainView.setContent(clientsView.getView());
-	}
-
-	public void logout() {
-		saveSystemDataUseCase.execute();
-		logAction("SESION CERRADA");
-		this.currentRole = null;
-		startApplication(this.primaryStage);
-	}
+        saveSystemDataUseCase.execute();
+        System.out.println("--- DATOS SEMILLA GUARDADOS ---");
+    }
 }

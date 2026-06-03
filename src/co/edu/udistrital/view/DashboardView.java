@@ -18,7 +18,6 @@ public class DashboardView {
     private Label lblCriticalCases;
     private Label lblMaintenance;
     private Label lblTotalRequests;
-    private TextArea consoleLog;
 
     public DashboardView(String role, AppController controller) {
         this.role = role;
@@ -41,32 +40,11 @@ public class DashboardView {
             createCard("En Mantenimiento", lblMaintenance, "#F59E0B"),
             createCard("Total Solicitudes", lblTotalRequests, "#3B82F6")
         );
-
-        Label lblLog = new Label("Historial de Operaciones (Últimas acciones):");
-        lblLog.setFont(Font.font("Segoe UI", FontWeight.SEMI_BOLD, 14));
         
-        consoleLog = new TextArea();
-        consoleLog.setEditable(false);
-        consoleLog.setPrefHeight(150);
-        consoleLog.setFont(Font.font("Consolas", 12));
-        consoleLog.setStyle("-fx-control-inner-background: #1E293B; -fx-text-fill: #34D399; -fx-border-radius: 5;");
-        
-        if (appController != null) {
-            consoleLog.setText(appController.getConsoleHistory());
-        }
 
         HBox actionsContainer = new HBox(15);
         actionsContainer.setAlignment(Pos.CENTER_LEFT);
-
-        Button btnUndoGlobal = new Button("🔄 Revertir última operación");
-        btnUndoGlobal.setStyle("-fx-background-color: #7C3AED; -fx-text-fill: white; -fx-padding: 10 20; -fx-cursor: hand;");
-        btnUndoGlobal.setOnAction(e -> {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "¿Está seguro de revertir la última operación registrada?");
-            if (confirm.showAndWait().get() == ButtonType.OK) appController.performUndo();
-        });
-
-        actionsContainer.getChildren().add(btnUndoGlobal);
-
+        
         if ((role.equals("ADMIN"))) {
             Button btnCSV = new Button("Exportar reporte diario (CSV)");
             btnCSV.setStyle("-fx-background-color:#10B981; -fx-text-fill:white; -fx-padding: 10 20; -fx-cursor: hand;");
@@ -74,11 +52,7 @@ public class DashboardView {
             actionsContainer.getChildren().add(btnCSV);
         }
 
-        rootContainer.getChildren().addAll(lblTitle, cardsContainer, lblLog, consoleLog, actionsContainer);
-    }
-
-    public void updateLog(String message) {
-        consoleLog.appendText("> " + message + "\n");
+        rootContainer.getChildren().addAll(lblTitle, cardsContainer, actionsContainer);
     }
 
     public void updateStatistics(String active, String critical, String maint, String total) {
