@@ -1,6 +1,6 @@
 package co.edu.udistrital.view;
 
-import co.edu.udistrital.controller.AppController;
+import co.edu.udistrital.controller.TechniciansController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -15,7 +15,7 @@ public class TechniciansView {
     private VBox rootContainer;
     private GridPane dataGrid;
     private int currentRow = 1;
-    private AppController appController;
+    private TechniciansController controller;
     private String role;
     
     public TechniciansView(String role) {
@@ -58,7 +58,7 @@ public class TechniciansView {
         rootContainer.getChildren().addAll(headerBox, tableContainer);
     }
 
-    public void setController(AppController controller) { this.appController = controller; }
+    public void setController(TechniciansController controller) { this.controller = controller; }
 
     private void addHeaderCell(String text, int col) {
         Label lbl = new Label(text);
@@ -115,7 +115,7 @@ public class TechniciansView {
         // ComboBoxes para editar
         ComboBox<String> statusBox = new ComboBox<>();
 	     // ITERACIÓN MANUAL: Así recorres tu SimpleList de forma segura
-	     SimpleList<String> statusList = appController.getTechnicianStatusLabels();
+	     SimpleList<String> statusList = controller.getTechnicianStatusLabels();
 	     SimpleList.Iterator<String> sIt = statusList.iterador();
 	     while (sIt.hasNext()) {
 	         statusBox.getItems().add(sIt.Next());
@@ -123,7 +123,7 @@ public class TechniciansView {
 	     statusBox.setValue(status);
 	
 	     ComboBox<String> zoneBox = new ComboBox<>();
-	     SimpleList<String> zoneList = appController.getZoneLabels();
+	     SimpleList<String> zoneList = controller.getZoneLabels();
 	     SimpleList.Iterator<String> zIt = zoneList.iterador();
 	     while (zIt.hasNext()) {
 	         zoneBox.getItems().add(zIt.Next());
@@ -137,7 +137,7 @@ public class TechniciansView {
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
         dialog.showAndWait().ifPresent(res -> {
-            if(res == ButtonType.OK) appController.updateTechnician(id, name, spec, zoneBox.getValue(), statusBox.getValue());
+            if(res == ButtonType.OK) controller.updateTechnician(id, name, spec, zoneBox.getValue(), statusBox.getValue());
         });
     }
 
@@ -151,12 +151,12 @@ public class TechniciansView {
         TextField nameField = new TextField();
         
         ComboBox<String> specialtyBox = new ComboBox<>();
-        SimpleList.Iterator<String> sIt = appController.getSpecialityLabels().iterador();
+        SimpleList.Iterator<String> sIt = controller.getSpecialityLabels().iterador();
         while(sIt.hasNext()) specialtyBox.getItems().add(sIt.Next());
         specialtyBox.getSelectionModel().selectFirst();
         
         ComboBox<String> zoneBox = new ComboBox<>();
-        SimpleList.Iterator<String> zIt = appController.getZoneLabels().iterador();
+        SimpleList.Iterator<String> zIt = controller.getZoneLabels().iterador();
         while(zIt.hasNext()) zoneBox.getItems().add(zIt.Next());
         zoneBox.getSelectionModel().selectFirst();
 
@@ -169,7 +169,7 @@ public class TechniciansView {
 
         dialog.showAndWait().ifPresent(res -> {
             if (res == ButtonType.OK && !nameField.getText().trim().isEmpty()) {
-                appController.registerTechnician(nameField.getText(), specialtyBox.getValue(), zoneBox.getValue());
+                controller.registerTechnician(nameField.getText(), specialtyBox.getValue(), zoneBox.getValue());
             }
         });
     }

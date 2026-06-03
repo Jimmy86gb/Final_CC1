@@ -1,6 +1,6 @@
 package co.edu.udistrital.view;
 
-import co.edu.udistrital.controller.AppController;
+import co.edu.udistrital.controller.DashboardController;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -13,16 +13,16 @@ import javafx.scene.text.FontWeight;
 public class DashboardView {
 	private VBox rootContainer;
 	private String role;
-	private AppController appController;
+	private DashboardController controller;
 
 	private Label lblActiveUnits;
 	private Label lblCriticalCases;
 	private Label lblMaintenance;
 	private Label lblTotalRequests;
 
-	public DashboardView(String role, AppController controller) {
+	public DashboardView(String role, DashboardController controller) {
 		this.role = role;
-		this.appController = controller;
+		this.controller = controller;
 		rootContainer = new VBox(20);
 		rootContainer.setPadding(new Insets(20));
 
@@ -47,8 +47,8 @@ public class DashboardView {
 			Button btnCSV = new Button("Exportar reporte diario (CSV)");
 			btnCSV.setStyle("-fx-background-color:#10B981; -fx-text-fill:white; -fx-padding: 10 20; -fx-cursor: hand;");
 			btnCSV.setOnAction(e -> {
-				if (appController != null) {
-					appController.exportDailyReport();
+				if (controller != null) {
+					controller.exportDailyReport();
 				}
 			});
 			actionsContainer.getChildren().add(btnCSV);

@@ -1,6 +1,6 @@
 package co.edu.udistrital.view;
 
-import co.edu.udistrital.controller.AppController;
+import co.edu.udistrital.controller.RequestsController;
 import co.edu.udistrital.model.dtos.ClientDTO;
 import co.edu.udistrital.model.dtos.EntityItem;
 import co.edu.udistrital.model.dtos.ReportDTO;
@@ -28,7 +28,7 @@ import javafx.scene.text.FontWeight;
 public class RequestsView {
 	private VBox rootContainer;
 	private String role;
-	private AppController appController;
+	private RequestsController controller;
 
 	private VBox pendingCasesContainer;
 	private VBox ongoingCasesContainer;
@@ -56,7 +56,7 @@ public class RequestsView {
 		btnAssignManual.setStyle(
 				"-fx-background-color: #3B82F6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16; -fx-cursor: hand;");
 		btnAssignManual.setOnAction(e -> {
-			ReportDTO next = appController.getNextPendingReport();
+			ReportDTO next = controller.getNextPendingReport();
 			if (next != null && next.getTicketID() != null && !next.getTicketID().toString().trim().isEmpty()) {
 				showAssignManualDialog(next);
 			} else {
@@ -134,8 +134,8 @@ public class RequestsView {
 				rootContainer.getChildren().addAll(headerBox, columnsContainer, lblSummaryTitle, summaryScroll);
 	}
 
-	public void setController(AppController controller) {
-		this.appController = controller;
+	public void setController(RequestsController controller) {
+		this.controller = controller;
 	}
 
 	private VBox createColumn(String title, String bgColor, VBox internalContainer) {
@@ -279,7 +279,7 @@ public class RequestsView {
 		if (targetPanel.equals("PENDING") && role.equals("OPERATOR")) {
 			Button btnCancel = new Button("Cancelar Cita");
 			btnCancel.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-cursor: hand;");
-			btnCancel.setOnAction(e -> appController.cancelReport(report.getTicketID().toString()));
+			btnCancel.setOnAction(e -> controller.cancelReport(report.getTicketID().toString()));
 			actions.getChildren().add(btnCancel);
 		}
 
@@ -287,13 +287,13 @@ public class RequestsView {
 			if (report.canUndo()) {
 				Button btnUndo = new Button("Deshacer ↩");
 				btnUndo.setStyle("-fx-background-color: #FEF3C7; -fx-text-fill: #B45309; -fx-cursor: hand;");
-				btnUndo.setOnAction(e -> appController.rejectReport());
+				btnUndo.setOnAction(e -> controller.rejectReport());
 				actions.getChildren().add(btnUndo);
 			}
 			if (report.canFinish()) {
 				Button btnFinish = new Button("Finalizar ✔");
 				btnFinish.setStyle("-fx-background-color: #DBEAFE; -fx-text-fill: #1E40AF; -fx-cursor: hand;");
-				btnFinish.setOnAction(e -> appController.finishReport(report.getTicketID().toString()));
+				btnFinish.setOnAction(e -> controller.finishReport(report.getTicketID().toString()));
 				actions.getChildren().add(btnFinish);
 			}
 		}
@@ -301,11 +301,11 @@ public class RequestsView {
 		if (targetPanel.equals("CONFIRM") && role.equals("ADMIN") && report.canConfirm()) {
 			Button btnApprove = new Button("Aprobar");
 			btnApprove.setStyle("-fx-background-color: #D1FAE5; -fx-text-fill: #065F46; -fx-cursor: hand;");
-			btnApprove.setOnAction(e -> appController.approveReport());
+			btnApprove.setOnAction(e -> controller.approveReport());
 
 			Button btnReject = new Button("Rechazar");
 			btnReject.setStyle("-fx-background-color: #FEE2E2; -fx-text-fill: #991B1B; -fx-cursor: hand;");
-			btnReject.setOnAction(e -> appController.rejectReport());
+			btnReject.setOnAction(e -> controller.rejectReport());
 			actions.getChildren().addAll(btnApprove, btnReject);
 		}
 
@@ -332,7 +332,7 @@ public class RequestsView {
 		grid.setPadding(new Insets(20));
 
 		ComboBox<EntityItem> techBox = new ComboBox<>();
-		SimpleList.Iterator<EntityItem> tIt = appController
+		SimpleList.Iterator<EntityItem> tIt = controller
 				.getSuggestedTechnicians(report.getReportZone(), report.getProblemType()).iterador();
 		while (tIt.hasNext()) {
 			techBox.getItems().add(tIt.Next());
@@ -342,7 +342,7 @@ public class RequestsView {
 		}
 
 		ComboBox<EntityItem> unitBox = new ComboBox<>();
-		SimpleList.Iterator<EntityItem> uIt = appController.getSuggestedUnits(report.getReportZone()).iterador();
+		SimpleList.Iterator<EntityItem> uIt = controller.getSuggestedUnits(report.getReportZone()).iterador();
 		while (uIt.hasNext()) {
 			unitBox.getItems().add(uIt.Next());
 		}
@@ -351,7 +351,7 @@ public class RequestsView {
 		}
 
 		ComboBox<EntityItem> kitBox = new ComboBox<>();
-		SimpleList.Iterator<EntityItem> kIt = appController.getSuggestedKits(report.getProblemType()).iterador();
+		SimpleList.Iterator<EntityItem> kIt = controller.getSuggestedKits(report.getProblemType()).iterador();
 		while (kIt.hasNext()) {
 			kitBox.getItems().add(kIt.Next());
 		}
@@ -372,7 +372,7 @@ public class RequestsView {
 		dialog.showAndWait().ifPresent(res -> {
 			if (res == ButtonType.OK && techBox.getValue() != null && unitBox.getValue() != null
 					&& kitBox.getValue() != null) {
-				appController.assignReportResources(techBox.getValue().getId(), unitBox.getValue().getId(),
+				controller.assignReportResources(techBox.getValue().getId(), unitBox.getValue().getId(),
 						kitBox.getValue().getId());
 			} else if (res == ButtonType.OK) {
 				new Alert(Alert.AlertType.ERROR,
@@ -387,7 +387,7 @@ public class RequestsView {
 		dialog.setTitle("Nueva Solicitud");
 		dialog.setHeaderText("Validación de Cliente");
 		dialog.setContentText("Ingrese la cédula o NIT del cliente:");
-		dialog.showAndWait().ifPresent(id -> appController.processNewRequest(id));
+		dialog.showAndWait().ifPresent(id -> controller.processNewRequest(id));
 	}
 
 	public void showCreateReportDialog(ClientDTO client) {
@@ -401,14 +401,14 @@ public class RequestsView {
 		grid.setPadding(new Insets(20));
 
 		ComboBox<String> typeBox = new ComboBox<>();
-		SimpleList.Iterator<String> sIt = appController.getSpecialityLabels().iterador();
+		SimpleList.Iterator<String> sIt = controller.getSpecialityLabels().iterador();
 		while (sIt.hasNext()) {
 			typeBox.getItems().add(sIt.Next());
 		}
 		typeBox.getSelectionModel().selectFirst();
 
 		ComboBox<String> zoneBox = new ComboBox<>();
-		SimpleList.Iterator<String> zIt = appController.getZoneLabels().iterador();
+		SimpleList.Iterator<String> zIt = controller.getZoneLabels().iterador();
 		while (zIt.hasNext()) {
 			zoneBox.getItems().add(zIt.Next());
 		}
@@ -448,7 +448,7 @@ public class RequestsView {
 							.showAndWait();
 				}
 
-				appController.submitReportCreation(client.getId(), descArea.getText(), typeBox.getValue(),
+				controller.submitReportCreation(client.getId(), descArea.getText(), typeBox.getValue(),
 						finalPriority, zoneBox.getValue());
 			}
 		});

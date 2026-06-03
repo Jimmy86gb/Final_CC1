@@ -1,6 +1,6 @@
 package co.edu.udistrital.view;
 
-import co.edu.udistrital.controller.AppController;
+import co.edu.udistrital.controller.UnitsController;
 import co.edu.udistrital.model.dtos.ServiceUnitDTO;
 import co.edu.udistrital.model.structures.SimpleList;
 import javafx.geometry.Insets;
@@ -16,7 +16,7 @@ public class UnitsView {
     private VBox rootContainer;
     private VBox activeContainer;
     private VBox pendingContainer;
-    private AppController appController;
+    private UnitsController controller;
     private String role;
 
     public UnitsView(String role) {
@@ -54,7 +54,7 @@ public class UnitsView {
         VBox.setVgrow(columnsContainer, Priority.ALWAYS);
     }
 
-    public void setController(AppController controller) { this.appController = controller; }
+    public void setController(UnitsController controller) { this.controller = controller; }
 
     private VBox createColumn(String title, String bgColor, VBox internalContainer) {
         VBox col = new VBox(15);
@@ -116,11 +116,11 @@ public class UnitsView {
         if (isPending && role.equals("ADMIN")) {
             Button btnApprove = new Button("Aprobar");
             btnApprove.setStyle("-fx-background-color: #10B981; -fx-text-fill: white;");
-            btnApprove.setOnAction(e -> appController.approveUnitStatus());
+            btnApprove.setOnAction(e -> controller.approveUnitStatus());
             
             Button btnReject = new Button("Rechazar");
             btnReject.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white;");
-            btnReject.setOnAction(e -> appController.rejectUnitStatus());
+            btnReject.setOnAction(e -> controller.rejectUnitStatus());
             
             actions.getChildren().addAll(btnApprove, btnReject);
         }
@@ -138,12 +138,12 @@ public class UnitsView {
         grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
 
         ComboBox<String> typeBox = new ComboBox<>();
-        SimpleList.Iterator<String> tIt = appController.getUnitTypeLabels().iterador();
+        SimpleList.Iterator<String> tIt = controller.getUnitTypeLabels().iterador();
         while(tIt.hasNext()) typeBox.getItems().add(tIt.Next());
         typeBox.getSelectionModel().selectFirst();
         
         ComboBox<String> zoneBox = new ComboBox<>();
-        SimpleList.Iterator<String> zIt = appController.getZoneLabels().iterador();
+        SimpleList.Iterator<String> zIt = controller.getZoneLabels().iterador();
         while(zIt.hasNext()) zoneBox.getItems().add(zIt.Next());
         zoneBox.getSelectionModel().selectFirst();
 
@@ -158,7 +158,7 @@ public class UnitsView {
 
         dialog.showAndWait().ifPresent(res -> {
             if (res == ButtonType.OK) {
-                appController.registerUnit(typeBox.getValue(), zoneBox.getValue(), Integer.parseInt(qtyField.getText()));
+                controller.registerUnit(typeBox.getValue(), zoneBox.getValue(), Integer.parseInt(qtyField.getText()));
             }
         });
     }
@@ -170,12 +170,12 @@ public class UnitsView {
         grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
 
         ComboBox<String> statusBox = new ComboBox<>();
-        SimpleList.Iterator<String> sIt = appController.getUnitStatusLabels().iterador();
+        SimpleList.Iterator<String> sIt = controller.getUnitStatusLabels().iterador();
         while(sIt.hasNext()) statusBox.getItems().add(sIt.Next());
         statusBox.setValue(currentStatus);
         
         ComboBox<String> zoneBox = new ComboBox<>();
-        SimpleList.Iterator<String> zIt = appController.getZoneLabels().iterador();
+        SimpleList.Iterator<String> zIt = controller.getZoneLabels().iterador();
         while(zIt.hasNext()) zoneBox.getItems().add(zIt.Next());
         zoneBox.setValue(currentZone);
 
@@ -187,7 +187,7 @@ public class UnitsView {
 
         dialog.showAndWait().ifPresent(res -> {
             if (res == ButtonType.OK) {
-                appController.updateServiceUnit(id, currentType, statusBox.getValue(), zoneBox.getValue());
+                controller.updateServiceUnit(id, currentType, statusBox.getValue(), zoneBox.getValue());
                 new Alert(Alert.AlertType.INFORMATION, "Cambio enviado a la pila de aprobación.").showAndWait();
             }
         });

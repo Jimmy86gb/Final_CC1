@@ -1,6 +1,6 @@
 package co.edu.udistrital.view;
 
-import co.edu.udistrital.controller.AppController;
+import co.edu.udistrital.controller.ClientsController;
 import co.edu.udistrital.model.dtos.ClientDTO;
 import co.edu.udistrital.model.structures.SimpleList;
 import javafx.geometry.Insets;
@@ -23,7 +23,7 @@ public class ClientsView {
 	private VBox rootContainer;
 	private GridPane dataGrid;
 	private int currentRow = 1;
-	private AppController appController;
+	private ClientsController controller;
 	private String role;
 
 	public ClientsView(String role) {
@@ -67,8 +67,8 @@ public class ClientsView {
 		rootContainer.getChildren().addAll(headerBox, tableContainer);
 	}
 
-	public void setController(AppController controller) {
-		this.appController = controller;
+	public void setController(ClientsController controller) {
+		this.controller = controller;
 	}
 
 	private void addHeaderCell(String text, int col) {
@@ -110,7 +110,7 @@ public class ClientsView {
 		TextField nameField = new TextField();
 
 		ComboBox<String> typeBox = new ComboBox<>();
-		SimpleList.Iterator<String> cIt = appController.getClientTypeLabels().iterador();
+		SimpleList.Iterator<String> cIt = controller.getClientTypeLabels().iterador();
 		while (cIt.hasNext()) {
 			typeBox.getItems().add(cIt.Next());
 		}
@@ -132,7 +132,7 @@ public class ClientsView {
 
 		dialog.showAndWait().ifPresent(res -> {
 			if (res == ButtonType.OK) {
-				appController.registerClient(idField.getText(), nameField.getText(), typeBox.getValue(),
+				controller.registerClient(idField.getText(), nameField.getText(), typeBox.getValue(),
 						contactField.getText());
 			}
 		});
@@ -148,7 +148,7 @@ public class ClientsView {
 
 		TextField nameField = new TextField(client.getName());
 		ComboBox<String> typeBox = new ComboBox<>();
-		SimpleList.Iterator<String> cIt = appController.getClientTypeLabels().iterador();
+		SimpleList.Iterator<String> cIt = controller.getClientTypeLabels().iterador();
 		while (cIt.hasNext()) {
 			typeBox.getItems().add(cIt.Next());
 		}
@@ -169,7 +169,7 @@ public class ClientsView {
 
 		dialog.showAndWait().ifPresent(res -> {
 			if (res == ButtonType.OK) {
-				appController.updateClient(client.getId(), nameField.getText(), typeBox.getValue(),
+				controller.updateClient(client.getId(), nameField.getText(), typeBox.getValue(),
 						contactField.getText());
 			}
 		});

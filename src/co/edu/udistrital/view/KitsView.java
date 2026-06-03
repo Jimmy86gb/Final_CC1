@@ -1,6 +1,6 @@
 package co.edu.udistrital.view;
 
-import co.edu.udistrital.controller.AppController;
+import co.edu.udistrital.controller.KitsController;
 import co.edu.udistrital.model.dtos.KitDTO;
 import co.edu.udistrital.model.structures.SimpleList;
 import javafx.geometry.Insets;
@@ -16,7 +16,7 @@ public class KitsView {
     private VBox rootContainer;
     private VBox availableContainer;
     private VBox maintenanceContainer;
-    private AppController appController;
+    private KitsController controller;
     private String role;
 
     public KitsView(String role) {
@@ -73,7 +73,7 @@ public class KitsView {
         return col;
     }
 
-    public void setController(AppController controller) { this.appController = controller; }
+    public void setController(KitsController controller) { this.controller = controller; }
 
     public void clearTable() {
         availableContainer.getChildren().clear();
@@ -108,11 +108,11 @@ public class KitsView {
             if (role.equals("ADMIN")) {
                 Button btnReturn = new Button("Retornar (Pila)");
                 btnReturn.setStyle("-fx-background-color: #10B981; -fx-text-fill: white; -fx-cursor: hand;");
-                btnReturn.setOnAction(e -> appController.returnKitToService());
+                btnReturn.setOnAction(e -> controller.returnKitToService());
 
                 Button btnRetire = new Button("Baja (Pila)");
                 btnRetire.setStyle("-fx-background-color: #EF4444; -fx-text-fill: white; -fx-cursor: hand;");
-                btnRetire.setOnAction(e -> appController.retireKitFromMaintenance());
+                btnRetire.setOnAction(e -> controller.retireKitFromMaintenance());
                 
                 // CORRECCIÓN 2: Aplicamos la regla LIFO. Si no es el tope, se bloquean los botones.
                 if (!kit.isEditable()) {
@@ -133,7 +133,7 @@ public class KitsView {
                 
                 btnToggle.setOnAction(e -> {
                     String newStatus = isAvailable ? "Inactivo" : "Disponible";
-                    appController.updateKitStatus(kit.getId().toString(), kit.getType(), newStatus);
+                    controller.updateKitStatus(kit.getId().toString(), kit.getType(), newStatus);
                 });
                 actions.getChildren().add(btnToggle);
             }
@@ -157,7 +157,7 @@ public class KitsView {
         grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
 
         ComboBox<String> typeBox = new ComboBox<>();
-        SimpleList.Iterator<String> it = appController.getKitTypeLabels().iterador();
+        SimpleList.Iterator<String> it = controller.getKitTypeLabels().iterador();
         while(it.hasNext()) typeBox.getItems().add(it.Next());
         typeBox.getSelectionModel().selectFirst();
 
@@ -173,7 +173,7 @@ public class KitsView {
         dialog.showAndWait().ifPresent(res -> {
             if (res == ButtonType.OK) {
                 try { 
-                    appController.registerKit(typeBox.getValue(), Integer.parseInt(qtyField.getText())); 
+                    controller.registerKit(typeBox.getValue(), Integer.parseInt(qtyField.getText())); 
                 } catch (NumberFormatException e) { 
                     new Alert(Alert.AlertType.ERROR, "Cantidad inválida").show(); 
                 }
