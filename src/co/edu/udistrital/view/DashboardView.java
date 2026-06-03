@@ -63,25 +63,28 @@ public class DashboardView {
 		HBox actionsContainer = new HBox(15);
 		actionsContainer.setAlignment(Pos.CENTER_LEFT);
 
-		// Validacion de seguridad para inyectar componentes exclusivos
-		if ((role.equals("ADMIN"))) {
-			Button btnCSV = new Button("Exportar reporte diario (CSV)");
-			btnCSV.setStyle("-fx-background-color:#10B981; -fx-text-fill:white; -fx-padding: 10 20; -fx-cursor: hand;");
-			btnCSV.setOnAction(e -> {
-				if (controller != null) {
-					controller.exportDailyReport();
-				}
-			});
-			actionsContainer.getChildren().add(btnCSV);
-		}
-
-		btnGlobalUndo = new Button("↩ Deshacer Última Acción");
+		
+		Button btnGlobalUndo = new Button("↩ Deshacer Última Acción");
 		btnGlobalUndo.setStyle("-fx-background-color: #DC2626; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-cursor: hand;");
 		btnGlobalUndo.setOnAction(e -> {
 			if (controller != null) {
 				controller.undoLastGlobalAction();
 			}
 		});
+
+		if (role.equals("ADMIN")) {
+			Button btnCSV = new Button("Exportar reporte diario (CSV)");
+			btnCSV.setStyle("-fx-background-color:#10B981; -fx-text-fill:white; -fx-padding: 10 20; -fx-cursor: hand;");
+			btnCSV.setOnAction(e -> {
+				if (controller != null) {
+					controller.exportDailyReport(); 
+				}
+			});
+			actionsContainer.getChildren().add(btnCSV);
+		} else {
+			btnGlobalUndo.setVisible(false);
+			btnGlobalUndo.setManaged(false); 
+		}
 
 		logListView = new ListView<>();
 		logListView.setPrefHeight(220);
@@ -90,8 +93,10 @@ public class DashboardView {
 		VBox logPanel = new VBox(12);
 		logPanel.setPadding(new Insets(20));
 		logPanel.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 5);");
+		
 		Label lblLogTitle = new Label("Historial de acciones");
 		lblLogTitle.setFont(Font.font("Segoe UI", FontWeight.SEMI_BOLD, 16));
+		
 		logPanel.getChildren().addAll(lblLogTitle, logListView, btnGlobalUndo);
 
 		rootContainer.getChildren().addAll(lblTitle, cardsContainer, actionsContainer, logPanel);
