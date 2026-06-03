@@ -182,7 +182,6 @@ public class AppController {
         loginView.setOnLoginAction(() -> {
             SessionDTO session = loginUseCase.execute(loginView.getUsername(), loginView.getPassword());
             if (session.isSuccess()) {
-                logAction("SESION INICIADA: " + session.getRole());
                 initializeSystem(ProfileType.valueOf(session.getRole()));
             } else {
                 loginView.showMessage(session.getMessage());
@@ -228,15 +227,6 @@ public class AppController {
         primaryStage.centerOnScreen();
     }
 
-    private void logAction(String message) {
-        String entry = "[" + java.time.LocalTime.now()
-                .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss")) + "] " + message;
-        consoleHistory.append(entry).append("\n");
-        if (dashboardView != null) dashboardView.updateLog(entry);
-    }
-
-    public String getConsoleHistory() { return consoleHistory.toString(); }
-
     public void performUndo() {
     	
         if (currentRole != ProfileType.ADMIN) {
@@ -247,7 +237,6 @@ public class AppController {
         ResponseDTO res = undoReportResourcesUseCase.execute();
         
         if (res.isSuccess()) {
-            logAction("REVERSION On-Going: " + res.getMessage());
             handleResponse(res, this::refreshAllViews);
             return;
         }
@@ -255,14 +244,12 @@ public class AppController {
         res = rejectReportActionUseCase.execute();
         
         if (res.isSuccess()) {
-            logAction("REVERSION Confirmacion: " + res.getMessage());
             handleResponse(res, this::refreshAllViews);
             return;
         }
         
         res = rejectUnitStatusUseCase.execute();
         if (res.isSuccess()) {
-            logAction("REVERSION Estado Unidad: " + res.getMessage());
             handleResponse(res, this::refreshAllViews);
             return;
         }
@@ -272,79 +259,66 @@ public class AppController {
     
     public void registerClient(String id, String name, String type, String contact) {
         ResponseDTO res = registerClientUseCase.ResponseDTO(id, name, type, contact);
-        if (res.isSuccess()) logAction("CLIENTE REGISTRADO: " + name);
         handleResponse(res, this::refreshAllViews);
     }
 
     public void updateClient(String id, String name, String type, String contact) {
         ResponseDTO res = updateClientUseCase.execute(id, name, type, contact);
-        if (res.isSuccess()) logAction("CLIENTE ACTUALIZADO: " + name);
         handleResponse(res, this::refreshAllViews);
     }
 
     public void registerTechnician(String name, String specialty, String zone) {
         ResponseDTO res = registerTechnicianUseCase.execute(name, specialty, zone);
-        if (res.isSuccess()) logAction("TECNICO REGISTRADO: " + name + " | " + specialty);
         handleResponse(res, this::refreshAllViews);
     }
 
     public void updateTechnician(String id, String name, String specialty, String zone, String status) {
         ResponseDTO res = updateTechnicianUseCase.execute(id, name, specialty, zone, status);
-        if (res.isSuccess()) logAction("TECNICO ACTUALIZADO: " + name + " → Estado: " + status);
         handleResponse(res, this::refreshAllViews);
     }
 
     public void registerUnit(String type, String zone, int quantity) {
         ResponseDTO res = registerServiceUnitUseCase.execute(type, zone, quantity);
-        if (res.isSuccess()) logAction("UNIDADES REGISTRADAS: " + quantity + "x " + type + " | Zona: " + zone);
         handleResponse(res, this::refreshAllViews);
     }
 
     public void updateServiceUnit(String id, String type, String status, String zone) {
         ResponseDTO res = updateServiceUnitUseCase.execute(id, type, status, zone);
-        if (res.isSuccess()) logAction("CAMBIO UNIDAD " + id.substring(0, 8) + " → " + status + " (pendiente aprobacion)");
         handleResponse(res, this::refreshAllViews);
     }
 
     public void approveUnitStatus() {
         ResponseDTO res = approveUnitStatusUseCase.execute();
-        if (res.isSuccess()) logAction("APROBACION UNIDAD: " + res.getMessage());
         handleResponse(res, this::refreshAllViews);
     }
 
     public void rejectUnitStatus() {
         ResponseDTO res = rejectUnitStatusUseCase.execute();
-        if (res.isSuccess()) logAction("RECHAZO UNIDAD: Cambio de estado descartado.");
         handleResponse(res, this::refreshAllViews);
     }
 
     public void registerKit(String type, int quantity) {
         ResponseDTO res = registerKitUseCase.execute(type, quantity);
-        if (res.isSuccess()) logAction("KITS REGISTRADOS: " + quantity + "x " + type);
         handleResponse(res, this::refreshAllViews);
     }
 
     public void updateKitToMaintenance(String id, String type) {
         ResponseDTO res = updateKitUseCase.execute(id, type, "Mantenimiento");
-        if (res.isSuccess()) logAction("ESTADO KIT " + id.substring(0, 8) + " → Mantenimiento");
         handleResponse(res, this::refreshAllViews);
     }
 
     public void updateKitStatus(String id, String type, String newStatus) {
         ResponseDTO res = updateKitUseCase.execute(id, type, newStatus);
-        if (res.isSuccess()) logAction("ESTADO KIT " + id.substring(0, 8) + " → " + newStatus);
         handleResponse(res, this::refreshAllViews);
     }
     
     public void returnKitToService() {
         ResponseDTO res = returnKitToServiceUseCase.execute();
-        if (res.isSuccess()) logAction("KIT RETORNADO: Tope de pila de mantenimiento vuelve a servicio.");
         handleResponse(res, this::refreshAllViews);
     }
 
     public void retireKitFromMaintenance() {
         ResponseDTO res = retireKitFromMaintenanceUseCase.execute();
-        if (res.isSuccess()) logAction("KIT DADO DE BAJA: Tope de pila de mantenimiento retirado.");
         handleResponse(res, this::refreshAllViews);
     }
 
@@ -412,7 +386,6 @@ public class AppController {
 
     public void submitReportCreation(String cliId, String desc, String type, String prio, String zone) {
         ResponseDTO res = registerReportUseCase.execute(cliId, desc, type, prio, zone);
-        if (res.isSuccess()) logAction("EMERGENCIA REGISTRADA: Cliente " + cliId + " | Zona: " + zone + " | Prioridad: " + prio);
         handleResponse(res, this::refreshAllViews);
     }
     
@@ -420,36 +393,31 @@ public class AppController {
 
     public void assignReportResources(String techId, String unitId, String kitId) {
         ResponseDTO res = assignResourcesReportUseCase.execute(techId, unitId, kitId);
-        if (res.isSuccess()) logAction("ASIGNACION: Tec=" + techId.substring(0, 8) + " | Unidad=" + unitId.substring(0, 8));
         handleResponse(res, this::refreshAllViews);
     }
 
     public void finishReport(String ticketId) {
         ResponseDTO res = finishReportInFieldUseCase.execute(ticketId);
-        if (res.isSuccess()) logAction("FINALIZADO: TKT " + ticketId.substring(0, 8) + " → Pila de confirmacion");
         handleResponse(res, this::refreshAllViews);
     }
 
     public void approveReport() {
         ResponseDTO res = approveReportActionUseCase.execute();
-        if (res.isSuccess()) logAction("APROBADO: Siniestro cerrado. Recursos liberados.");
         handleResponse(res, this::refreshAllViews);
     }
 
     public void rejectReport() {
         ResponseDTO res = rejectReportActionUseCase.execute();
-        if (res.isSuccess()) logAction("RECHAZADO: Accion revertida en pila de confirmacion.");
         handleResponse(res, this::refreshAllViews);
     }
 
     public void cancelReport(String ticketId) {
         ResponseDTO res = requestReportCancellationUseCase.execute(ticketId);
-        if (res.isSuccess()) logAction("CANCELACION SOLICITADA: TKT " + ticketId.substring(0, 8));
         handleResponse(res, this::refreshAllViews);
     }
 
     public void exportDailyReport() {
-        handleResponse(generateDailyCSVUseCase.execute(""), () -> logAction("REPORTE CSV: Generado con exito."));
+    	handleResponse(generateDailyCSVUseCase.execute(""), () -> {});
     }
     
     public void refreshAllViews() {
@@ -556,7 +524,6 @@ public class AppController {
     
     public void logout() {
         saveSystemDataUseCase.execute();
-        logAction("SESION CERRADA");
         this.currentRole = null;
         startApplication(this.primaryStage);
     }
