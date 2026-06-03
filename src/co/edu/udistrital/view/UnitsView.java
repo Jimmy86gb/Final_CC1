@@ -20,7 +20,7 @@ public class UnitsView {
     private String role;
 
     public UnitsView(String role) {
-        this.role = role;
+    	this.role = role;
         rootContainer = new VBox(25);
         rootContainer.setPadding(new Insets(20));
         
@@ -30,22 +30,28 @@ public class UnitsView {
         Label lblTitle = new Label("Control de Unidades de Servicio");
         lblTitle.setFont(Font.font("Segoe UI", FontWeight.BOLD, 28));
         
+        // BOTÓN RESTAURADO
+        Button btnNewUnit = new Button("+ Registrar Unidad");
+        btnNewUnit.setStyle("-fx-background-color: #2563EB; -fx-text-fill: white; -fx-padding: 8 16; -fx-cursor: hand;");
+        btnNewUnit.setOnAction(e -> showAddUnitDialog());
+        
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        headerBox.getChildren().addAll(lblTitle, spacer); // Sin botón de registrar
+        headerBox.getChildren().addAll(lblTitle, spacer, btnNewUnit);
 
         HBox columnsContainer = new HBox(20);
         activeContainer = new VBox(12);
         pendingContainer = new VBox(12);
         
         VBox colActive = createColumn("✅ Unidades Activas", "#DBEAFE", activeContainer);
-        VBox colPending = createColumn("⏳ Cambios Pendientes (Aprobación)", "#FEF3C7", pendingContainer);
+        VBox colPending = createColumn("⏳ Cambios Pendientes (Aprobación Admin)", "#FEF3C7", pendingContainer);
         
         columnsContainer.getChildren().addAll(colActive, colPending);
         HBox.setHgrow(colActive, Priority.ALWAYS);
         HBox.setHgrow(colPending, Priority.ALWAYS);
 
         rootContainer.getChildren().addAll(headerBox, columnsContainer);
+        VBox.setVgrow(columnsContainer, Priority.ALWAYS);
     }
 
     public void setController(AppController controller) { this.appController = controller; }
@@ -63,7 +69,7 @@ public class UnitsView {
         
         ScrollPane scroll = new ScrollPane(internalContainer);
         scroll.setFitToWidth(true);
-        scroll.setPrefHeight(600);
+        scroll.setFitToHeight(true);
         scroll.setStyle("-fx-background: " + bgColor + "; -fx-background-color: transparent; -fx-control-inner-background: transparent;");
         scroll.setBorder(Border.EMPTY);
         
@@ -98,6 +104,7 @@ public class UnitsView {
         btnCopy.setOnAction(e -> Clipboard.getSystemClipboard().setContent(new ClipboardContent() {{ putString(unit.getId().toString()); }}));
         actions.getChildren().add(btnCopy);
 
+        // Operador Solicita Cambio
         if (!isPending && role.equals("OPERATOR")) {
             Button btnEdit = new Button("✏️ Solicitar Cambio");
             btnEdit.setStyle("-fx-background-color: #F59E0B; -fx-text-fill: white; -fx-cursor: hand;");
@@ -105,6 +112,7 @@ public class UnitsView {
             actions.getChildren().add(btnEdit);
         }
 
+        // Administrador Aprueba/Rechaza Cambio
         if (isPending && role.equals("ADMIN")) {
             Button btnApprove = new Button("Aprobar");
             btnApprove.setStyle("-fx-background-color: #10B981; -fx-text-fill: white;");
@@ -121,6 +129,38 @@ public class UnitsView {
 
         if (isPending) pendingContainer.getChildren().add(card);
         else activeContainer.getChildren().add(card);
+    }
+    
+    private void showAddUnitDialog() {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Registrar Unidad");
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10); grid.setPadding(new Insets(20));
+
+        ComboBox<String> typeBox = new ComboBox<>();
+        SimpleList.Iterator<String> tIt = appController.getUnitTypeLabels().iterador();
+        while(tIt.hasNext()) typeBox.getItems().add(tIt.Next());
+        typeBox.getSelectionModel().selectFirst();
+        
+        ComboBox<String> zoneBox = new ComboBox<>();
+        SimpleList.Iterator<String> zIt = appController.getZoneLabels().iterador();
+        while(zIt.hasNext()) zoneBox.getItems().add(zIt.Next());
+        zoneBox.getSelectionModel().selectFirst();
+
+        TextField qtyField = new TextField("1");
+
+        grid.add(new Label("Tipo:"), 0, 0); grid.add(typeBox, 1, 0);
+        grid.add(new Label("Zona:"), 0, 1);   grid.add(zoneBox, 1, 1);
+        grid.add(new Label("Cantidad:"), 0, 2); grid.add(qtyField, 1, 2);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(res -> {
+            if (res == ButtonType.OK) {
+                appController.registerUnit(typeBox.getValue(), zoneBox.getValue(), Integer.parseInt(qtyField.getText()));
+            }
+        });
     }
 
     private void showEditUnitDialog(String id, String currentType, String currentStatus, String currentZone) {
