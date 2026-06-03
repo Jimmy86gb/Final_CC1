@@ -32,6 +32,7 @@ import co.edu.udistrital.model.usecases.GetKitTypeLabelsUseCase;
 import co.edu.udistrital.model.usecases.GetMaintenanceKitsUseCase;
 import co.edu.udistrital.model.usecases.GetNextPendingReportUseCase;
 import co.edu.udistrital.model.usecases.GetOnGoingReportsUseCase;
+import co.edu.udistrital.model.usecases.GetPendingReportsUseCase;
 import co.edu.udistrital.model.usecases.GetServiceUnitsStatusLabelsUseCase;
 import co.edu.udistrital.model.usecases.GetServiceUnitsTypeLabelsUseCase;
 import co.edu.udistrital.model.usecases.GetSortedAndDFilteredTechniciansUseCase;
@@ -132,6 +133,7 @@ public class AppController {
 	private final RejectReportActionUseCase rejectReportActionUseCase;
 	private final RequestReportCancellationUseCase requestReportCancellationUseCase;
 	private final GetSortedAndFilteredReportsUseCase getSortedAndFilteredReportsUseCase;
+	private final GetPendingReportsUseCase getPendingReportsUseCase;
 	private final GetOnGoingReportsUseCase getOnGoingReportsUseCase;
 	private final GetToConfirmReportsUseCase getToConfirmReportsUseCase;
 	private final GetNextPendingReportUseCase getNextPendingReportUseCase;
@@ -198,6 +200,7 @@ public class AppController {
 		rejectReportActionUseCase = new RejectReportActionUseCase(reportRepository);
 		requestReportCancellationUseCase = new RequestReportCancellationUseCase(reportRepository);
 		getSortedAndFilteredReportsUseCase = new GetSortedAndFilteredReportsUseCase(reportRepository);
+		getPendingReportsUseCase = new GetPendingReportsUseCase(reportRepository);
 		getOnGoingReportsUseCase = new GetOnGoingReportsUseCase(reportRepository);
 		getToConfirmReportsUseCase = new GetToConfirmReportsUseCase(reportRepository);
 		getNextPendingReportUseCase = new GetNextPendingReportUseCase(reportRepository);
@@ -676,6 +679,10 @@ public class AppController {
 		Alert alert = new Alert(success ? AlertType.INFORMATION : AlertType.ERROR);
 		alert.setContentText(message);
 		alert.showAndWait();
+	}
+
+	public SimpleList<ReportDTO> getPendingReportsQueue() {
+		return getPendingReportsUseCase.execute();
 	}
 
 	public void navigateToDashboard() {

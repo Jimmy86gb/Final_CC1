@@ -456,4 +456,45 @@ public class ReportRepository {
 	public SimpleList<Report> getAllHistoricalReports() {
 		return allHistoricalReports;
 	}
+
+	/**
+	 * Metodo auxiliar que extrae los elementos de una cola, los añade a una lista y
+	 * los devuelve a la cola original manteniendo su orden exacto.
+	 * 
+	 * @param sourceQueue La cola de prioridad a leer
+	 * @param targetList  La lista donde se guardarán los resultados
+	 */
+	private void appendQueueToListSafely(Queue<Report> sourceQueue, SimpleList<Report> targetList) {
+		Queue<Report> tempQueue = new Queue<>();
+
+		while (!sourceQueue.isEmpty()) {
+			Report current = sourceQueue.dequeue();
+			targetList.add(current);
+			tempQueue.enqueue(current);
+		}
+
+		// 2. Restauramos la cola original
+		while (!tempQueue.isEmpty()) {
+			sourceQueue.enqueue(tempQueue.dequeue());
+		}
+	}
+
+	/**
+	 * Obtiene TODOS los reportes pendientes ordenados estrictamente por su
+	 * jerarquía de negocio (Undo -> High -> Medium -> Low), sin sacarlos del
+	 * sistema.
+	 * 
+	 * @return Una lista enlazada con los reportes en espera.
+	 */
+	public SimpleList<Report> getAllPendingReportsOrdered() {
+		SimpleList<Report> allPending = new SimpleList<>();
+
+		// El orden en que llamamos a este método garantiza la prioridad global
+		appendQueueToListSafely(undoQueue, allPending);
+		appendQueueToListSafely(highPriorityQueue, allPending);
+		appendQueueToListSafely(mediumPriorityQueue, allPending);
+		appendQueueToListSafely(lowPriorityQueue, allPending);
+
+		return allPending;
+	}
 }
