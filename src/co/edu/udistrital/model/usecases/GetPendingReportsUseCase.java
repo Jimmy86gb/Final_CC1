@@ -10,12 +10,7 @@ import co.edu.udistrital.model.repositories.ReportRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 
-/**
- * Caso de uso encargado de consultar la fila completa de siniestros pendientes
- * ordenados por prioridad y transformarlos a DTOs para la interfaz.
- *
- * @author Juan David Diaz Perez
- */
+
 public class GetPendingReportsUseCase {
 
 	private final ReportRepository reportRepository;
@@ -24,10 +19,7 @@ public class GetPendingReportsUseCase {
 		this.reportRepository = reportRepository;
 	}
 
-	/**
-	 * Ejecuta la extracción de todos los reportes pendientes. * @return Una lista
-	 * de ReportDTOs lista para la vista.
-	 */
+	
 	public SimpleList<ReportDTO> execute() {
 
 		SimpleList<ReportDTO> resultList = new SimpleList<>();

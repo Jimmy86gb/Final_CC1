@@ -11,12 +11,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-/**
- * Clase encargada de la construccion y renderizado de la interfaz de
- * autenticacion. Proporciona los campos de entrada para credenciales y el
- * disparador de inicio de sesion, manteniendo una separacion clara entre los
- * componentes visuales y la logica de control. * @author Jimmy86gb
- */
+
 public class LoginView {
 	private VBox rootContainer;
 	private TextField txtUsername;
@@ -24,11 +19,7 @@ public class LoginView {
 	private Button btnLogin;
 	private Label lblMessage;
 
-	/**
-	 * Constructor de la clase. Inicializa los contenedores (VBox), define los
-	 * campos de texto, el campo de contrasena enmascarado y el boton de acceso con
-	 * sus respectivos estilos CSS.
-	 */
+	
 	public LoginView() {
 		rootContainer = new VBox(15);
 		rootContainer.setAlignment(Pos.CENTER);
@@ -61,45 +52,27 @@ public class LoginView {
 		rootContainer.getChildren().addAll(lblTitle, lblSubtitle, txtUsername, txtPassword, btnLogin, lblMessage);
 	}
 
-	/**
-	 * Crea y retorna la escena de JavaFX que contiene la interfaz de usuario.
-	 * * @return Objeto Scene con las dimensiones definidas para el login.
-	 */
+	
 	public Scene getScene() {
 		return new Scene(rootContainer, 450, 400);
 	}
 
-	/**
-	 * Define la logica a ejecutar cuando el usuario presiona el boton de inicio.
-	 * Utiliza una interfaz funcional (Runnable) para delegar la ejecucion al
-	 * controlador. * @param action Logica externa (proveniente del controlador) a
-	 * ejecutar en el clic.
-	 */
+	
 	public void setOnLoginAction(Runnable action) {
 		btnLogin.setOnAction(e -> action.run());
 	}
 
-	/**
-	 * Captura el texto ingresado en el campo de usuario. * @return El nombre de
-	 * usuario capturado
-	 */
+	
 	public String getUsername() {
 		return txtUsername.getText();
 	}
 
-	/**
-	 * Captura la contrasena ingresada en el campo seguro. * @return La contrasena
-	 * capturada como String.
-	 */
+	
 	public String getPassword() {
 		return txtPassword.getText();
 	}
 
-	/**
-	 * Actualiza el feedback visual para el usuario en caso de error de
-	 * autenticacion. * @param msg El mensaje descriptivo del fallo o informacion a
-	 * visualizar.
-	 */
+	
 	public void showMessage(String msg) {
 		lblMessage.setText(msg);
 	}

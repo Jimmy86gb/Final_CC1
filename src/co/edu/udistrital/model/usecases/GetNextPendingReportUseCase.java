@@ -7,33 +7,18 @@ import co.edu.udistrital.model.dtos.ReportDTO;
 import co.edu.udistrital.model.entities.Report;
 import co.edu.udistrital.model.repositories.ReportRepository;
 
-/**
- * Caso de uso que retorna la informacion en un DTO de el siguiente reporte a
- * procesar
- *
- * @author Juan David Diaz Perez
- */
+
 public class GetNextPendingReportUseCase {
 
-	/**
-	 * Instancia privada del repositorio de reportes en memoria
-	 */
+	
 	private final ReportRepository reportRepository;
 
-	/**
-	 * Constructor que inyecta dentro del caso de uso el repositorio de reportes
-	 * 
-	 * @param reportRepository El repositorio de reportes
-	 */
+	
 	public GetNextPendingReportUseCase(ReportRepository reportRepository) {
 		this.reportRepository = reportRepository;
 	}
 
-	/**
-	 * Ejecuta el caso de uso y retorna el DTO del reporte más urgente.
-	 * 
-	 * @return ReportDTO listo para la vista, o null si no hay emergencias.
-	 */
+	
 	public ReportDTO execute() {
 
 		Report nextReport = reportRepository.peekNextPendingReport();

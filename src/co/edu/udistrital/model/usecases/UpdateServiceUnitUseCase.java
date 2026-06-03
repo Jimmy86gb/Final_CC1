@@ -14,10 +14,7 @@ import co.edu.udistrital.model.enums.ZoneFactory;
 import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.ServiceUnitRepository;
 
-/**
- * Caso de uso que actualiza la información de las unidades de servicio.
- * Delega los cambios de estado a la pila de confirmación del administrador.
- */
+
 public class UpdateServiceUnitUseCase {
 
 	private final UnitFactory unitFactory = new UnitFactory();
@@ -49,11 +46,11 @@ public class UpdateServiceUnitUseCase {
 					actualServiceUnit.getId().toString(), actualServiceUnit.getType().name(),
 					actualServiceUnit.getStatus().name(), actualServiceUnit.getZone().name()));
 
-			// CORRECCIÓN CRÍTICA: Cualquier cambio de estado requiere confirmación del admin.
-			// Si el operador solo cambió la zona, se actualiza directamente.
+			
+			
 			boolean requiresConfirmation = (actualServiceUnit.getStatus() != requestedStatus);
 
-			// Si requiere confirmación, la lista principal conserva el estado original momentáneamente.
+			
 			UnitStatus statusForMainList = requiresConfirmation ? actualServiceUnit.getStatus() : requestedStatus;
 
 			ServiceUnit updatedUnitForMainList = new ServiceUnit(unitType, statusForMainList, operationZone);
@@ -63,7 +60,7 @@ public class UpdateServiceUnitUseCase {
 
 			if (isUpdated) {
 				if (requiresConfirmation) {
-					// Enviar el borrador con el nuevo estado a la pila LIFO
+					
 					ServiceUnit unitForConfirmation = new ServiceUnit(unitType, requestedStatus, operationZone);
 					unitForConfirmation.setId(unitId);
 					serviceUnitRepository.pushToConfirm(unitForConfirmation);

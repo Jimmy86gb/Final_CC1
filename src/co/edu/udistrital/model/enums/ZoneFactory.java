@@ -1,20 +1,9 @@
 package co.edu.udistrital.model.enums;
 
-/**
- * Clase encargada de retornar que tipo de enum de tipo zona usar en la logica
- * del sistema con base en la seleccion de la vista
- *
- * @author Juan David Diaz Perez
- */
+
 public class ZoneFactory {
 
-	/**
-	 * Metodo que recibe la zona de operacion en string y retorna su equivalente en
-	 * enum
-	 * 
-	 * @param zone Zona en sting
-	 * @return Zona en enum
-	 */
+	
 	public OperationZone generateOperationZone(String zone) {
 		return switch (zone.replaceAll("\\s+", "").toLowerCase()) {
 		case "usaquen" -> OperationZone.USAQUEN;

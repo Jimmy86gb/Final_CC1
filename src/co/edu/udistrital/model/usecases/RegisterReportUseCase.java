@@ -13,61 +13,31 @@ import co.edu.udistrital.model.enums.ZoneFactory;
 import co.edu.udistrital.model.repositories.ClientRepository;
 import co.edu.udistrital.model.repositories.ReportRepository;
 
-/**
- * Caso de uso que orquesta el registro de un nuevo siniestro y lo asigna a la
- * cola de prioridad correspondiente.
- *
- * @author Juan David Diaz Perez
- */
+
 public class RegisterReportUseCase {
 
-	/**
-	 * Instancia privada del factory de zona
-	 */
+	
 	private final ZoneFactory zoneFactory = new ZoneFactory();
 
-	/**
-	 * Instancia privada del factory de especialidad de tecnico, en este caso el
-	 * tipo de tecnico requerido
-	 */
+	
 	private final TechnicianFactory specialtyFactory = new TechnicianFactory();
 
-	/**
-	 * Instancia privada del factory de prioridad de solicitud
-	 */
+	
 	private final CriticFactory priorityFactory = new CriticFactory();
 
-	/**
-	 * Repositorio privado de clientes para encontrar el cliente seleccionado
-	 */
+	
 	private final ClientRepository clientRepository;
 
-	/**
-	 * Repositorio de reportes para manejar la memoria de estos
-	 */
+	
 	private final ReportRepository reportRepository;
 
-	/**
-	 * Constructor que inyecta los repositorios de clientes y de reportes
-	 * 
-	 * @param clientRepository Repositorio de cliente
-	 * @param reportRepository Repositorio de reportes
-	 */
+	
 	public RegisterReportUseCase(ClientRepository clientRepository, ReportRepository reportRepository) {
 		this.clientRepository = clientRepository;
 		this.reportRepository = reportRepository;
 	}
 
-	/**
-	 * Ejecuta el registro del nuevo siniestro. * @param clientId ID del cliente
-	 * extraído desde el DTO seleccionado en la vista.
-	 * 
-	 * @param description Qué ocurrió.
-	 * @param type        Tipo de problema (Especialidad).
-	 * @param priority    Criticidad elegida.
-	 * @param zone        Zona del incidente.
-	 * @return DTO con el resultado de la operación.
-	 */
+	
 	public ResponseDTO execute(String clientId, String description, String type, String priority, String zone) {
 		try {
 

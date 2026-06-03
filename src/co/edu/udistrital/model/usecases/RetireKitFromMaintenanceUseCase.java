@@ -5,33 +5,18 @@ import co.edu.udistrital.model.entities.Kit;
 import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.repositories.KitRepository;
 
-/**
- * Caso de uso para finalizar el mantenimiento de un kit y eliminarlo
- * logicamente del sistema.
- *
- * @author Juan David Diaz Perez
- */
+
 public class RetireKitFromMaintenanceUseCase {
 
-	/**
-	 * Instancia del repositorio que maneja la memoria de los kits
-	 */
+	
 	private final KitRepository kitRepository;
 
-	/**
-	 * Constructor que inyecta el repositorio de kits
-	 * 
-	 * @param kitRepository Repositorio de memoria de kits
-	 */
+	
 	public RetireKitFromMaintenanceUseCase(KitRepository kitRepository) {
 		this.kitRepository = kitRepository;
 	}
 
-	/**
-	 * Metodo que elimina logicamente un kit del mantenimiento
-	 * 
-	 * @return DTO de respuesta para la vista
-	 */
+	
 	public ResponseDTO execute() {
 		try {
 

@@ -7,10 +7,10 @@ import co.edu.udistrital.model.enums.ActionType;
 public class ActionRecord implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private final String description; // Ej: "Se actualizó al técnico Carlos a Ocupado"
-	private final ActionType type; // El tipo de acción
-	private final String targetId; // A qué ID le hicimos el cambio
-	private final String[] previousState; // El arreglo con los datos Viejos para poder restaurar
+	private final String description; 
+	private final ActionType type; 
+	private final String targetId; 
+	private final String[] previousState; 
 
 	public ActionRecord(String description, ActionType type, String targetId, String... previousState) {
 		this.description = description;

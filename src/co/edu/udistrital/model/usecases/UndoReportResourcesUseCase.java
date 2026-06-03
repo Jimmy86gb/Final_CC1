@@ -7,34 +7,18 @@ import co.edu.udistrital.model.enums.TechnicianStatus;
 import co.edu.udistrital.model.enums.UnitStatus;
 import co.edu.udistrital.model.repositories.ReportRepository;
 
-/**
- * Caso de uso para desaprobar los recursos asignados a un reporte y liberarlos
- * para otros reportes
- *
- * @author Juan David Diaz Perez
- */
+
 public class UndoReportResourcesUseCase {
 
-	/**
-	 * Instancia privada del repositorio de memoria de reportes
-	 */
+	
 	private final ReportRepository reportRepository;
 
-	/**
-	 * Constructor que inyecta al caso de uso todos los repositotios necesarios en
-	 * la logica
-	 * 
-	 * @param reportRepository Repositorio de reporte
-	 */
+	
 	public UndoReportResourcesUseCase(ReportRepository reportRepository) {
 		this.reportRepository = reportRepository;
 	}
 
-	/**
-	 * Método que se encarga de liberar los recursos cuando se deshace la orden.
-	 * 
-	 * @return DTO de muestra en la vista con el resultado de la operación.
-	 */
+	
 	public ResponseDTO execute() {
 		try {
 

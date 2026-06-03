@@ -12,13 +12,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
-/**
- * Clase encargada de renderizar el panel de control principal o "Dashboard".
- * Proporciona una vista de alto nivel del estado del sistema mediante tarjetas 
- * de resumen (KPIs) y agrupa las acciones globales como la exportacion de reportes.
- * Su diseño es netamente visual, delegando toda la logica de calculo al controlador.
- * * @author Jimmy86gb
- */
+
 public class DashboardView {
 	private VBox rootContainer;
 	private String role;
@@ -31,13 +25,7 @@ public class DashboardView {
 	private ListView<String> logListView;
 	private Button btnGlobalUndo;
 
-	/**
-	 * Constructor de la vista del Dashboard.
-	 * Ensambla los contenedores principales, las tarjetas numericas y, dependiendo 
-	 * del rol del usuario, despliega las herramientas de administracion globales.
-	 * * @param role Perfil de seguridad del usuario autenticado (determina la visibilidad de botones).
-	 * @param controller Enlace directo al sub-controlador del dashboard.
-	 */
+	
 	public DashboardView(String role, DashboardController controller) {
 		this.role = role;
 		this.controller = controller;
@@ -63,7 +51,7 @@ public class DashboardView {
 		HBox actionsContainer = new HBox(15);
 		actionsContainer.setAlignment(Pos.CENTER_LEFT);
 
-		// Validacion de seguridad para inyectar componentes exclusivos
+		
 		if ((role.equals("ADMIN"))) {
 			Button btnCSV = new Button("Exportar reporte diario (CSV)");
 			btnCSV.setStyle("-fx-background-color:#10B981; -fx-text-fill:white; -fx-padding: 10 20; -fx-cursor: hand;");
@@ -97,15 +85,7 @@ public class DashboardView {
 		rootContainer.getChildren().addAll(lblTitle, cardsContainer, actionsContainer, logPanel);
 	}
 
-	/**
-	 * Actualiza los contadores visuales del panel de control.
-	 * Este metodo es llamado por el controlador una vez se han tabulado 
-	 * y calculado las metricas correspondientes en la logica de negocio.
-	 * * @param active Cantidad en texto de unidades en terreno disponibles o ocupadas.
-	 * @param critical Cantidad en texto de siniestros de prioridad alta.
-	 * @param maint Cantidad en texto de kits y unidades en estado de reparacion.
-	 * @param total Total historico o diario de solicitudes procesadas.
-	 */
+	
 	public void updateStatistics(String active, String critical, String maint, String total) {
 		lblActiveUnits.setText(active);
 		lblCriticalCases.setText(critical);
@@ -113,11 +93,7 @@ public class DashboardView {
 		lblTotalRequests.setText(total);
 	}
 
-	/**
-	 * Actualiza el ListView del historial de acciones con los registros recientes.
-	 * Recorre la estructura SimpleList usando su iterador y agrega cada descripcion.
-	 * @param logs Estructura SimpleList con las descripciones de las acciones.
-	 */
+	
 	public void updateLogPanel(SimpleList<String> logs) {
 		logListView.getItems().clear();
 		if (logs == null) {
@@ -129,15 +105,7 @@ public class DashboardView {
 		}
 	}
 
-	/**
-	 * Metodo de factoria visual (Factory Method) para construir tarjetas estandarizadas.
-	 * Aplica estilos consistentes (sombras, bordes, tipografias) a los componentes 
-	 * para unificar la presentacion de los indicadores de desempeño.
-	 * * @param title Titulo descriptivo de la metrica.
-	 * @param lblValue Referencia en memoria al Label que contendra el numero dinamico.
-	 * @param hexColor Codigo de color en hexadecimal para resaltar el valor numerico.
-	 * @return Un contenedor VBox completamente estilizado en formato de tarjeta.
-	 */
+	
 	private VBox createCard(String title, Label lblValue, String hexColor) {
 		VBox card = new VBox(10);
 		card.setPadding(new Insets(20));
@@ -153,10 +121,7 @@ public class DashboardView {
 		return card;
 	}
 
-	/**
-	 * Retorna el contenedor raiz de esta vista para ser acoplado en la interfaz principal.
-	 * * @return Objeto VBox principal de la pantalla de resumen.
-	 */
+	
 	public VBox getView() {
 		return rootContainer;
 	}

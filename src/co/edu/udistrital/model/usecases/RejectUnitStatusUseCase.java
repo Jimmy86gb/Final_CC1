@@ -4,34 +4,18 @@ import co.edu.udistrital.model.dtos.ResponseDTO;
 import co.edu.udistrital.model.entities.ServiceUnit;
 import co.edu.udistrital.model.repositories.ServiceUnitRepository;
 
-/**
- * Caso de uso para desaprovar el cambio de estado de una unidad de servicio
- *
- * @author Juan David Diaz Perez
- */
+
 public class RejectUnitStatusUseCase {
 
-	/**
-	 * Instancia del repositorio que manneja la memoria de las unidades de servicio
-	 */
+	
 	private final ServiceUnitRepository serviceUnitRepository;
 
-	/**
-	 * Constructor del caso de uso que inyecta el repositorio de unidades de
-	 * servicio
-	 * 
-	 * @param serviceUnitRepository Repositorio de unidades de servicio
-	 */
+	
 	public RejectUnitStatusUseCase(ServiceUnitRepository serviceUnitRepository) {
 		this.serviceUnitRepository = serviceUnitRepository;
 	}
 
-	/**
-	 * Metodo que se encarga de actualizar el estado de una unidad de servicio
-	 * cuando se es denegada
-	 * 
-	 * @return DTO de muestra en la vista
-	 */
+	
 	public ResponseDTO execute() {
 		try {
 			ServiceUnit rejectedDraft = serviceUnitRepository.popOnConfirm();

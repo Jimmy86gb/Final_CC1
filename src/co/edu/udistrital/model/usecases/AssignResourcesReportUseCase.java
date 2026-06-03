@@ -18,45 +18,23 @@ import co.edu.udistrital.model.repositories.ReportRepository;
 import co.edu.udistrital.model.repositories.ServiceUnitRepository;
 import co.edu.udistrital.model.repositories.TechnicianRepository;
 
-/**
- * Caso de uso que orquesta la asignación manual de recursos a un siniestro.
- * Bloquea los recursos cambiándolos de estado y mueve el reporte a la pila de
- * emergencias activas (On-Going).
- *
- * @author Juan David Diaz Perez
- */
+
 public class AssignResourcesReportUseCase {
 
-	/**
-	 * Instancia privada del repositorio de memoria de reportes
-	 */
+	
 	private final ReportRepository reportRepository;
 	private final ActionLogRepository logRepo;
 
-	/**
-	 * Instancia privada del repositorio de memoria de tecnicos
-	 */
+	
 	private final TechnicianRepository technicianRepository;
 
-	/**
-	 * Instancia privada del repositorio de memoria de unidades de servicio
-	 */
+	
 	private final ServiceUnitRepository serviceUnitRepository;
 
-	/**
-	 * Instancia privada del repositorio de memoria de kits
-	 */
+	
 	private final KitRepository kitRepository;
 
-	/**
-	 * Constructor que inyecta al caso de uso todos los repositotios necesarios en
-	 * la logica
-	 * 
-	 * @param reportRepository      Repositorio de reporte
-	 * @param technicianRepository  Repositorio de tecnico
-	 * @param serviceUnitRepository Repositorio de unidades de servicio
-	 * @param kitRepository         Repositorio de kits
-	 */
+	
 	public AssignResourcesReportUseCase(ReportRepository reportRepository, TechnicianRepository technicianRepository,
 			ServiceUnitRepository serviceUnitRepository, KitRepository kitRepository, ActionLogRepository logRepo) {
 		this.reportRepository = reportRepository;
@@ -66,15 +44,7 @@ public class AssignResourcesReportUseCase {
 		this.logRepo = logRepo;
 	}
 
-	/**
-	 * Ejecuta la asignación transaccional de la emergencia.
-	 * 
-	 * @param reportIdStr ID del reporte a atender.
-	 * @param techIdStr   ID del técnico seleccionado.
-	 * @param unitIdStr   ID de la unidad de servicio seleccionada.
-	 * @param kitIdStr    ID del kit seleccionado.
-	 * @return DTO con el resultado de la operación.
-	 */
+	
 	public ResponseDTO execute(String techIdStr, String unitIdStr, String kitIdStr) {
 		try {
 

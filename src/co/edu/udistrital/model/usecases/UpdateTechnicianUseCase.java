@@ -15,59 +15,31 @@ import co.edu.udistrital.model.enums.ZoneFactory;
 import co.edu.udistrital.model.repositories.ActionLogRepository;
 import co.edu.udistrital.model.repositories.TechnicianRepository;
 
-/**
- * Clase de caso de uso que se encarga de actualizar la informacion de los
- * tecnicos recibida desde la vista
- *
- * @author Juan David Diaz Perez
- */
+
 public class UpdateTechnicianUseCase {
 
-	/**
-	 * Instancia del factory de la especializacion del tecnico
-	 */
+	
 	private final TechnicianFactory technicianFactory = new TechnicianFactory();
 
-	/**
-	 * Instancia del factory de la zona de las entidades
-	 */
+	
 	private final ZoneFactory zoneFactory = new ZoneFactory();
 
-	/**
-	 * Instancia del factory de el status del tecnico
-	 */
+	
 	private final TechnicianStatusFactory technicianStatusFactory = new TechnicianStatusFactory();
 
-	/**
-	 * Instancia del repositorio que maneja la memoria de los técnicos
-	 */
+	
 	private final TechnicianRepository technicianRepository;
 
-	/**
-	 * Repositorio global de historial de acciones (Memento)
-	 */
+	
 	private final ActionLogRepository logRepo;
 
-	/**
-	 * Constructor que inyecta el repositorio centralizado del sistema
-	 * 
-	 * @param technicianRepository El DAO de técnicos instanciado en el sistema
-	 */
+	
 	public UpdateTechnicianUseCase(TechnicianRepository technicianRepository, ActionLogRepository logRepo) {
 		this.technicianRepository = technicianRepository;
 		this.logRepo = logRepo;
 	}
 
-	/**
-	 * Metodo que ejecuta el caso de uso de actualizacion de datos de tenico
-	 * 
-	 * @param idTechnician El ID de ambos tecnicos
-	 * @param name         El nombre de ambos tecnicos
-	 * @param specialty    La especialidad de ambos tecnicos
-	 * @param zone         La nueva zona del tecnico
-	 * @param status       El nuevo status del tecnico
-	 * @return DTO de respuesta frente a la accion realizada
-	 */
+	
 	public ResponseDTO execute(String idTechnician, String name, String specialty, String zone, String status) {
 		try {
 

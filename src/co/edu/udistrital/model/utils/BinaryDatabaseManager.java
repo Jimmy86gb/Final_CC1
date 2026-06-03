@@ -9,11 +9,7 @@ import java.io.ObjectOutputStream;
 
 import co.edu.udistrital.model.dtos.DatabaseSnapshot;
 
-/**
- * Clase util de escritura y recibo de la informacion de las bases de datos
- *
- * @author Juan David Diaz Perez
- */
+
 public class BinaryDatabaseManager {
 
 	private static final String FILE_PATH = "autorescate_db.dat";
@@ -31,7 +27,7 @@ public class BinaryDatabaseManager {
 	public static DatabaseSnapshot loadSnapshot() {
 		File file = new File(FILE_PATH);
 		if (!file.exists()) {
-			return null; // Es la primera vez que se abre el programa
+			return null; 
 		}
 
 		try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {

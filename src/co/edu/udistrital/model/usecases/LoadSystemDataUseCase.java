@@ -10,13 +10,7 @@ import co.edu.udistrital.model.repositories.ServiceUnitRepository;
 import co.edu.udistrital.model.repositories.TechnicianRepository;
 import co.edu.udistrital.model.utils.BinaryDatabaseManager;
 
-/**
- * Caso de uso encargado de leer el archivo binario del disco duro y restaurar
- * la memoria RAM inyectando las estructuras guardadas de vuelta a sus
- * repositorios correspondientes.
- *
- * @author Juan David Diaz Perez
- */
+
 public class LoadSystemDataUseCase {
 
 	private final ProfileRepository profileRepo;
@@ -26,17 +20,7 @@ public class LoadSystemDataUseCase {
 	private final KitRepository kitRepo;
 	private final ReportRepository reportRepo;
 
-	/**
-	 * Constructor que recibe los repositorios donde se restaurará la información
-	 * almacenada en el archivo binario.
-	 *
-	 * @param profileRepo Repositorio de perfiles de usuario.
-	 * @param clientRepo Repositorio de clientes.
-	 * @param technicianRepo Repositorio de técnicos.
-	 * @param unitRepo Repositorio de unidades de servicio.
-	 * @param kitRepo Repositorio de kits.
-	 * @param reportRepo Repositorio de reportes.
-	 */
+	
 	public LoadSystemDataUseCase(ProfileRepository profileRepo, ClientRepository clientRepo,
 			TechnicianRepository technicianRepo, ServiceUnitRepository unitRepo, KitRepository kitRepo,
 			ReportRepository reportRepo) {
@@ -48,31 +32,24 @@ public class LoadSystemDataUseCase {
 		this.reportRepo = reportRepo;
 	}
 
-	/**
-	 * Ejecuta el proceso de carga de datos desde el archivo binario,
-	 * restaurando el estado previamente almacenado en los repositorios
-	 * correspondientes.
-	 *
-	 * @return Un ResponseDTO indicando si la operación fue exitosa o si ocurrió
-	 *         algún error durante la carga.
-	 */
+	
 	public ResponseDTO execute() {
 		try {
-			// 1. Leer el archivo binario
+			
 			DatabaseSnapshot snapshot = BinaryDatabaseManager.loadSnapshot();
 
-			// Si es la primera vez que se abre el programa (no hay archivo),
-			// no hacemos nada para que los repositorios usen sus listas vacías por defecto.
+			
+			
 			if (snapshot == null) {
 				return new ResponseDTO(true, "No se encontró base de datos previa. El sistema inició en blanco.");
 			}
 
-			// 2. Restaurar Perfiles
+			
 			if (snapshot.getUsersList() != null) {
 				profileRepo.setUsersList(snapshot.getUsersList());
 			}
 
-			// 3. Restaurar Recursos Básicos
+			
 			if (snapshot.getClientList() != null) {
 				clientRepo.setClientList(snapshot.getClientList());
 			}
@@ -94,7 +71,7 @@ public class LoadSystemDataUseCase {
 				kitRepo.setMaintenanceKitStack(snapshot.getMaintenanceKitStack());
 			}
 
-			// 4. Restaurar Estructuras de Siniestros
+			
 			if (snapshot.getUndoQueue() != null) {
 				reportRepo.setUndoQueue(snapshot.getUndoQueue());
 			}
@@ -114,7 +91,7 @@ public class LoadSystemDataUseCase {
 			if (snapshot.getToConfirmReportStack() != null) {
 				reportRepo.setToConfirmStack(snapshot.getToConfirmReportStack());
 			}
-			// Restaura el historial completo
+			
 			if (snapshot.getAllHistoricalReports() != null) {
 				reportRepo.setAllHistoricalReports(snapshot.getAllHistoricalReports());
 			}

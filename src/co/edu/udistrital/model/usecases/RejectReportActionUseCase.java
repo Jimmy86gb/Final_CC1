@@ -6,11 +6,7 @@ import co.edu.udistrital.model.enums.CriticLevel;
 import co.edu.udistrital.model.enums.ReportStatus;
 import co.edu.udistrital.model.repositories.ReportRepository;
 
-/**
- * Caso de uso para deshacer un cambio de estado de reporte y devolverlo a su flujo original
- *
- * @author Juan David Diaz Perez
- */
+
 public class RejectReportActionUseCase {
 
 	private final ReportRepository reportRepository;
@@ -37,10 +33,10 @@ public class RejectReportActionUseCase {
 				
 			} else if (confirmReport.getStatus() == ReportStatus.CANCELLED) {
 
-				// Restaurar estado
+				
 				confirmReport.setStatus(ReportStatus.PENDING);
 
-				// CORRECCIÓN CRÍTICA: Reencolar según prioridad sin usar registerReport (que duplica en el historial)
+				
 				if (confirmReport.getPriority() == CriticLevel.HIGH) {
 					reportRepository.getHighPriorityQueue().enqueue(confirmReport);
 				} else if (confirmReport.getPriority() == CriticLevel.MEDIUM) {

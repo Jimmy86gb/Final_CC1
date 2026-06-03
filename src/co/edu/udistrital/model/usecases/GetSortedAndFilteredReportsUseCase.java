@@ -11,34 +11,18 @@ import co.edu.udistrital.model.repositories.ReportRepository;
 import co.edu.udistrital.model.structures.SimpleList;
 import co.edu.udistrital.model.structures.SimpleList.Iterator;
 
-/**
- * Clase encargada de ejecutar el caso de uso de devolucion de lista completa
- * ordenada con opciones de cancelar segun estados especificos en el caso de uso
- *
- * @author Juan David Diaz Perez
- */
+
 public class GetSortedAndFilteredReportsUseCase {
 
-	/**
-	 * Instancia privada del repositorio de memoria de reportes
-	 */
+	
 	private final ReportRepository reportRepository;
 
-	/**
-	 * Constructor que inyecta dentro del caso de uso el repositorio de reportes
-	 * 
-	 * @param reportRepository Repositorio de reportes
-	 */
+	
 	public GetSortedAndFilteredReportsUseCase(ReportRepository reportRepository) {
 		this.reportRepository = reportRepository;
 	}
 
-	/**
-	 * Metodo de apoyo optimizado que genera la lista ordenada final con base en el
-	 * criterio del repositorio cruzando Tipo de Unidad y Estado.
-	 * 
-	 * @return Lista ordenada
-	 */
+	
 	private SimpleList<Report> buildOrderedList() {
 		SimpleList<Report> orderedList = new SimpleList<>();
 
@@ -64,11 +48,7 @@ public class GetSortedAndFilteredReportsUseCase {
 		return orderedList;
 	}
 
-	/**
-	 * Metodo encargado de retornar la lista de DTO para la vista ya ordenada
-	 * 
-	 * @return Lista basada en kitDTO
-	 */
+	
 	public SimpleList<ReportDTO> execute() {
 
 		SimpleList<ReportDTO> resultList = new SimpleList<>();
