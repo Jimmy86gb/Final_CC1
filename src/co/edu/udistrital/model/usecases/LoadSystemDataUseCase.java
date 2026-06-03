@@ -26,6 +26,17 @@ public class LoadSystemDataUseCase {
 	private final KitRepository kitRepo;
 	private final ReportRepository reportRepo;
 
+	/**
+	 * Constructor que recibe los repositorios donde se restaurará la información
+	 * almacenada en el archivo binario.
+	 *
+	 * @param profileRepo Repositorio de perfiles de usuario.
+	 * @param clientRepo Repositorio de clientes.
+	 * @param technicianRepo Repositorio de técnicos.
+	 * @param unitRepo Repositorio de unidades de servicio.
+	 * @param kitRepo Repositorio de kits.
+	 * @param reportRepo Repositorio de reportes.
+	 */
 	public LoadSystemDataUseCase(ProfileRepository profileRepo, ClientRepository clientRepo,
 			TechnicianRepository technicianRepo, ServiceUnitRepository unitRepo, KitRepository kitRepo,
 			ReportRepository reportRepo) {
@@ -37,6 +48,14 @@ public class LoadSystemDataUseCase {
 		this.reportRepo = reportRepo;
 	}
 
+	/**
+	 * Ejecuta el proceso de carga de datos desde el archivo binario,
+	 * restaurando el estado previamente almacenado en los repositorios
+	 * correspondientes.
+	 *
+	 * @return Un ResponseDTO indicando si la operación fue exitosa o si ocurrió
+	 *         algún error durante la carga.
+	 */
 	public ResponseDTO execute() {
 		try {
 			// 1. Leer el archivo binario

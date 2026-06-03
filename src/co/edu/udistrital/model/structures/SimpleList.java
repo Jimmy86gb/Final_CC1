@@ -3,10 +3,10 @@ package co.edu.udistrital.model.structures;
 import java.io.Serializable;
 
 /**
- * Lista simplemente enlazada
+ * Lista simplemente enlazada.
  *
  * @author Jimmy86gb
- * @param <T> el tipo de dato que queremos guardar en la lista
+ * @param <T> el tipo de dato que queremos guardar en la lista.
  */
 public class SimpleList<T> implements Serializable {
 
@@ -15,12 +15,21 @@ public class SimpleList<T> implements Serializable {
 	private Node<T> head;
 	private int size;
 
+	/**
+	 * Constructor que crea una lista vacía.
+	 */
 	public SimpleList() {
 		head = null;
 		size = 0;
 	}
 
 	// ---------------------- Operaciones Básicas ----------------------
+
+	/**
+	 * Agrega un elemento al final de la lista.
+	 *
+	 * @param data El elemento a agregar.
+	 */
 	public void add(T data) {
 		Node<T> newNode = new Node<>(data);
 		if (head == null) {
@@ -35,6 +44,12 @@ public class SimpleList<T> implements Serializable {
 		size++;
 	}
 
+	/**
+	 * Elimina la primera ocurrencia del elemento indicado.
+	 *
+	 * @param data El elemento a eliminar.
+	 * @return true si el elemento fue eliminado, false en caso contrario.
+	 */
 	public boolean delete(T data) {
 		if (head == null) {
 			return false;
@@ -61,6 +76,13 @@ public class SimpleList<T> implements Serializable {
 		return false;
 	}
 
+	/**
+	 * Actualiza un elemento existente de la lista.
+	 *
+	 * @param actualData Elemento actual que se desea reemplazar.
+	 * @param newData Nuevo elemento que reemplazará al actual.
+	 * @return true si la actualización fue exitosa, false si el elemento no existe.
+	 */
 	public boolean update(T actualData, T newData) {
 		if (head == null) {
 			return false;
@@ -89,6 +111,13 @@ public class SimpleList<T> implements Serializable {
 	}
 
 	// ---------------------- Búsqueda ----------------------
+
+	/**
+	 * Verifica si un elemento se encuentra almacenado en la lista.
+	 *
+	 * @param data El elemento a buscar.
+	 * @return true si el elemento existe en la lista, false en caso contrario.
+	 */
 	public boolean contains(T data) {
 		Node<T> actual = head;
 		while (actual != null) {
@@ -101,30 +130,68 @@ public class SimpleList<T> implements Serializable {
 	}
 
 	// ---------------------- Utilidades ----------------------
+
+	/**
+	 * Verifica si la lista está vacía.
+	 *
+	 * @return true si la lista no contiene elementos, false en caso contrario.
+	 */
 	public boolean isEmpty() {
 		return head == null;
 	}
 
+	/**
+	 * Obtiene la cantidad de elementos almacenados en la lista.
+	 *
+	 * @return El tamaño actual de la lista.
+	 */
 	public int getSize() {
 		return size;
 	}
 
 	// ---------------------- Iterador Básico ----------------------
+
+	/**
+	 * Crea un iterador para recorrer los elementos de la lista.
+	 *
+	 * @return Un iterador posicionado al inicio de la lista.
+	 */
 	public Iterator<T> iterador() {
 		return new Iterator<>(head);
 	}
 
+	/**
+	 * Iterador básico para recorrer los elementos de una lista simplemente enlazada.
+	 *
+	 * @param <T> Tipo de dato almacenado en la lista.
+	 */
 	public static class Iterator<T> {
 		private Node<T> actual;
 
+		/**
+		 * Crea un iterador a partir del nodo inicial de la lista.
+		 *
+		 * @param head Nodo inicial de la lista.
+		 */
 		public Iterator(Node<T> head) {
 			this.actual = head;
 		}
 
+		/**
+		 * Verifica si existen más elementos por recorrer.
+		 *
+		 * @return true si existen más elementos, false en caso contrario.
+		 */
 		public boolean hasNext() {
 			return actual != null;
 		}
 
+		/**
+		 * Obtiene el siguiente elemento del recorrido y avanza el iterador.
+		 *
+		 * @return El siguiente elemento de la lista.
+		 * @throws IllegalStateException Si no existen más elementos por recorrer.
+		 */
 		public T Next() {
 			if (!hasNext()) {
 				throw new IllegalStateException("No hay más elementos");
