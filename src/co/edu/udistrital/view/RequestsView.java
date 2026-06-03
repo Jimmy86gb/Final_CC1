@@ -96,26 +96,42 @@ public class RequestsView {
 		summaryContainer.setPadding(new Insets(10));
 		summaryContainer.setStyle("-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #E5E7EB; -fx-border-width: 1;");
 
-		// Cabecera "falsa" para simular una tabla limpia
-		HBox headerRow = new HBox(15);
-		headerRow.setPadding(new Insets(10));
-		headerRow.setStyle("-fx-background-color: #F3F4F6; -fx-font-weight: bold; -fx-background-radius: 5;");
-		Label hId = new Label("ID Tiquete"); hId.setPrefWidth(80);
-		Label hClient = new Label("Cliente"); hClient.setPrefWidth(150);
-		Label hType = new Label("Tipo Siniestro"); hType.setPrefWidth(150);
-		Label hStatus = new Label("Estado"); hStatus.setPrefWidth(100);
-		Label hDate = new Label("Fecha y Hora"); hDate.setPrefWidth(130);
-		headerRow.getChildren().addAll(hId, hClient, hType, hStatus, hDate);
-	        
-		VBox summaryWrapper = new VBox(headerRow, summaryContainer);
-		        
-		ScrollPane summaryScroll = new ScrollPane(summaryWrapper);
-		summaryScroll.setFitToWidth(true);
-		summaryScroll.setPrefHeight(250); // Altura fija para que no empuje las columnas superiores
-		summaryScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+		// --- CABECERA CON MEDIDAS EXACTAS AL MÉTODO ---
+				HBox headerRow = new HBox(15);
+				headerRow.setPadding(new Insets(10));
+				headerRow.setStyle("-fx-background-color: #F3F4F6; -fx-font-weight: bold; -fx-background-radius: 5;");
+				
+				Label hId = new Label("ID Tiquete"); 
+				hId.setPrefWidth(80); hId.setMinWidth(80); hId.setMaxWidth(80);
+				hId.setStyle("-fx-text-fill: #1F2937;");
 
-		// Modifica la adición final para incluir el título y el scroll del resumen
-		rootContainer.getChildren().addAll(headerBox, columnsContainer, lblSummaryTitle, summaryScroll);
+				Label hClient = new Label("Cliente"); 
+				hClient.setPrefWidth(150); hClient.setMinWidth(150); hClient.setMaxWidth(150);
+				hClient.setStyle("-fx-text-fill: #1F2937;");
+
+				Label hType = new Label("Tipo Siniestro"); 
+				hType.setPrefWidth(150); hType.setMinWidth(150); hType.setMaxWidth(150);
+				hType.setStyle("-fx-text-fill: #1F2937;");
+
+				Label hStatus = new Label("Estado"); 
+				hStatus.setPrefWidth(100); hStatus.setMinWidth(100); hStatus.setMaxWidth(100);
+				hStatus.setStyle("-fx-text-fill: #1F2937;");
+
+				Label hDate = new Label("Fecha y Hora"); 
+				hDate.setPrefWidth(130); hDate.setMinWidth(130); hDate.setMaxWidth(130);
+				hDate.setStyle("-fx-text-fill: #1F2937;");
+
+				headerRow.getChildren().addAll(hId, hClient, hType, hStatus, hDate);
+		        
+				VBox summaryWrapper = new VBox(headerRow, summaryContainer);
+		        
+				ScrollPane summaryScroll = new ScrollPane(summaryWrapper);
+				summaryScroll.setFitToWidth(true);
+				summaryScroll.setPrefHeight(250); 
+				summaryScroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
+
+				// Agregamos todo al contenedor principal (rootContainer)
+				rootContainer.getChildren().addAll(headerBox, columnsContainer, lblSummaryTitle, summaryScroll);
 	}
 
 	public void setController(AppController controller) {

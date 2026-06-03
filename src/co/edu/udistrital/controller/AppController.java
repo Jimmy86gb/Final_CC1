@@ -235,6 +235,7 @@ public class AppController {
 		});
 		primaryStage.setScene(loginView.getScene());
 		primaryStage.show();
+		primaryStage.centerOnScreen();
 	}
 
 	public void loadData() {
