@@ -117,7 +117,7 @@ public class AppController {
 
 	private final RegisterKitUseCase registerKitUseCase;
 	private final UpdateKitUseCase updateKitUseCase;
-	private final GetSortedAndFilteredKitsUseCase getSortedKitsUseCase;
+	private final GetSortedAndFilteredKitsUseCase getSortedAndFilteredKitsUseCase;
 	private final RetireKitFromMaintenanceUseCase retireKitFromMaintenanceUseCase;
 	private final ReturnKitToServiceUseCase returnKitToServiceUseCase;
 	private final GetKitTypeLabelsUseCase getKitTypeLabelsUseCase;
@@ -181,7 +181,7 @@ public class AppController {
 
 		registerKitUseCase = new RegisterKitUseCase(kitRepository);
 		updateKitUseCase = new UpdateKitUseCase(kitRepository);
-		getSortedKitsUseCase = new GetSortedAndFilteredKitsUseCase(kitRepository);
+		getSortedAndFilteredKitsUseCase = new GetSortedAndFilteredKitsUseCase(kitRepository);
 		retireKitFromMaintenanceUseCase = new RetireKitFromMaintenanceUseCase(kitRepository);
 		returnKitToServiceUseCase = new ReturnKitToServiceUseCase(kitRepository);
 		getKitTypeLabelsUseCase = new GetKitTypeLabelsUseCase();
@@ -501,18 +501,23 @@ public class AppController {
 				String.valueOf(total));
 	}
 
+	/**
+	 * Actualiza la vista de solicitudes clasificando los tiquetes en sus 
+	 * tres contenedores visuales correspondientes, respetando el flujo de colas y pilas.
+	 */
 	private void refreshRequestsView() {
 		requestsView.clearPanels();
 
-		SimpleList.Iterator<ReportDTO> pendIt = getSortedAndFilteredReportsUseCase.execute().iterador();
+		// 1. Cargar solicitudes PENDIENTES desde las colas FIFO de prioridad activa
+		SimpleList.Iterator<ReportDTO> pendIt = getPendingReportsUseCase.execute().iterador();
 		while (pendIt.hasNext()) {
 			ReportDTO r = pendIt.Next();
-			// ESCUDO: Solo entran los verdaderamente pendientes (canCancel == true)
 			if (r.canCancel()) {
 				requestsView.addReportCard(r, "PENDING");
 			}
 		}
 
+		// 2. Cargar solicitudes EN PROGRESO (ON_GOING) desde su pila LIFO activa
 		SimpleList.Iterator<ReportDTO> ongoIt = getOnGoingReportsUseCase.execute().iterador();
 		while (ongoIt.hasNext()) {
 			ReportDTO r = ongoIt.Next();
@@ -521,6 +526,7 @@ public class AppController {
 			}
 		}
 
+		// 3. Cargar solicitudes POR CONFIRMAR (CONFIRM) desde la pila LIFO de auditoría
 		SimpleList.Iterator<ReportDTO> confIt = getToConfirmReportsUseCase.execute().iterador();
 		while (confIt.hasNext()) {
 			ReportDTO r = confIt.Next();
@@ -530,15 +536,39 @@ public class AppController {
 		}
 	}
 
+	/**
+	 * Actualiza la vista de control de unidades de servicio evitando duplicidades visuales
+	 * cuando un recurso se encuentra en proceso de cambio de estado.
+	 */
 	private void refreshUnitsView() {
 		unitsView.clearTable();
-		SimpleList.Iterator<ServiceUnitDTO> uIt = getSortedAndFilteredServiceUnitsUseCase.execute().iterador();
+        
+		SimpleList<ServiceUnitDTO> pendingUnits = getToConfirmServiceUnitsUseCase.execute();
+		SimpleList<ServiceUnitDTO> allUnits = getSortedAndFilteredServiceUnitsUseCase.execute();
+        
+		// Filtrar y renderizar las unidades activas libres de transiciones pendientes
+		SimpleList.Iterator<ServiceUnitDTO> uIt = allUnits.iterador();
 		while (uIt.hasNext()) {
-			unitsView.addUnit(uIt.Next(), false);
+			ServiceUnitDTO activeUnit = uIt.Next();
+			boolean isPending = false;
+            
+			SimpleList.Iterator<ServiceUnitDTO> checkIt = pendingUnits.iterador();
+			while (checkIt.hasNext()) {
+				if (checkIt.Next().getId().equals(activeUnit.getId())) {
+					isPending = true;
+					break;
+				}
+			}
+            
+			if (!isPending) {
+				unitsView.addUnit(activeUnit, false); // Añade al contenedor de activas
+			}
 		}
-		SimpleList.Iterator<ServiceUnitDTO> pIt = getToConfirmServiceUnitsUseCase.execute().iterador();
+        
+		// Renderizar las unidades que están esperando la confirmación del administrador
+		SimpleList.Iterator<ServiceUnitDTO> pIt = pendingUnits.iterador();
 		while (pIt.hasNext()) {
-			unitsView.addUnit(pIt.Next(), true);
+			unitsView.addUnit(pIt.Next(), true); // Añade al contenedor de pendientes
 		}
 	}
 
@@ -552,11 +582,27 @@ public class AppController {
 		}
 	}
 
+	/**
+	 * Actualiza el inventario de herramientas combinando los listados generales
+	 * con la pila LIFO de mantenimiento para validar la regla de negocio del tope.
+	 */
 	private void refreshKitsView() {
 		kitsView.clearTable();
-		SimpleList.Iterator<KitDTO> kIt = getSortedKitsUseCase.execute().iterador();
+        
+		// 1. Cargar los kits en mantenimiento directamente desde la pila LIFO (asigna correctamente la editabilidad del tope)
+		SimpleList.Iterator<KitDTO> mIt = getMaintenanceKitsUseCase.execute().iterador();
+		while (mIt.hasNext()) {
+			kitsView.addKit(mIt.Next());
+		}
+        
+		// 2. Cargar los kits disponibles y asignados desde la lista maestra ordenada
+		SimpleList.Iterator<KitDTO> kIt = getSortedAndFilteredKitsUseCase.execute().iterador();
 		while (kIt.hasNext()) {
-			kitsView.addKit(kIt.Next());
+			KitDTO kit = kIt.Next();
+			// Evita duplicar el kit en la interfaz si este ya fue pintado por la subestructura de mantenimiento
+			if (!kit.getStatus().equalsIgnoreCase("En mantenimiento")) {
+				kitsView.addKit(kit);
+			}
 		}
 	}
 
